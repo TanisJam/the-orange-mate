@@ -5,6 +5,7 @@ import { Hero } from "@/components/hero";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { ConnectSupabaseSteps } from "@/components/tutorial/connect-supabase-steps";
 import { SignUpUserSteps } from "@/components/tutorial/sign-up-user-steps";
+import { DesignSystemDemo } from "@/components/design-system-demo";
 import { hasEnvVars } from "@/lib/utils";
 import Link from "next/link";
 
@@ -29,6 +30,9 @@ export default function Home() {
             <h2 className="font-medium text-xl mb-4">Next steps</h2>
             {hasEnvVars ? <SignUpUserSteps /> : <ConnectSupabaseSteps />}
           </main>
+          <section className="w-full">
+            <DesignSystemDemo />
+          </section>
         </div>
 
         <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-16">

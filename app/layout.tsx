@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Bebas_Neue, Oxanium } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
@@ -13,8 +13,15 @@ export const metadata: Metadata = {
   description: "The fastest way to build apps with Next.js and Supabase",
 };
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const bebasNeue = Bebas_Neue({
+  variable: "--font-bebas-neue",
+  weight: "400",
+  display: "swap",
+  subsets: ["latin"],
+});
+
+const oxanium = Oxanium({
+  variable: "--font-oxanium",
   display: "swap",
   subsets: ["latin"],
 });
@@ -26,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.className} antialiased`}>
+      <body className={`${bebasNeue.variable} ${oxanium.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
