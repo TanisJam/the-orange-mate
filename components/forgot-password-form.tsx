@@ -31,14 +31,13 @@ export function ForgotPasswordForm({
     setError(null);
 
     try {
-      // The url which will be included in the email. This URL needs to be configured in your redirect URLs in the Supabase dashboard at https://supabase.com/dashboard/project/_/auth/url-configuration
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/update-password`,
       });
       if (error) throw error;
       setSuccess(true);
     } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      setError(error instanceof Error ? error.message : "Ocurrió un error");
     } finally {
       setIsLoading(false);
     }
@@ -49,23 +48,27 @@ export function ForgotPasswordForm({
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
-            <CardDescription>Password reset instructions sent</CardDescription>
+            <CardTitle className="text-2xl font-heading text-success">
+              ¡Email enviado!
+            </CardTitle>
+            <CardDescription className="font-body text-neutral-gray dark:text-neutral-white">
+              Revisa tu email para restablecer tu contraseña
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              If you registered using your email and password, you will receive
-              a password reset email.
+            <p className="text-sm font-body text-neutral-gray dark:text-neutral-white">
+              Te hemos enviado un enlace para restablecer tu contraseña. Por favor revisa tu bandeja de entrada y sigue las instrucciones.
             </p>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
-            <CardDescription>
-              Type in your email and we&apos;ll send you a link to reset your
-              password
+            <CardTitle className="text-2xl font-heading text-primary dark:text-primary-light">
+              Restablecer Contraseña
+            </CardTitle>
+            <CardDescription className="font-body text-neutral-gray dark:text-neutral-white">
+              Ingresa tu email para recibir un enlace de restablecimiento
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -76,25 +79,27 @@ export function ForgotPasswordForm({
                   <Input
                     id="email"
                     type="email"
-                    placeholder="m@example.com"
+                    placeholder="tu@email.com"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                   />
                 </div>
-                {error && <p className="text-sm text-red-500">{error}</p>}
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Sending..." : "Send reset email"}
+                {error && <p className="text-sm font-body text-error">{error}</p>}
+                <Button type="submit" className="w-full" disabled={isLoading} variant="primary">
+                  {isLoading ? "Enviando..." : "Enviar enlace de restablecimiento"}
                 </Button>
               </div>
               <div className="mt-4 text-center text-sm">
-                Already have an account?{" "}
-                <Link
-                  href="/auth/login"
-                  className="underline underline-offset-4"
-                >
-                  Login
-                </Link>
+                <span className="font-body text-neutral-gray dark:text-neutral-white">
+                  ¿Ya tienes cuenta?{" "}
+                  <Link
+                    href="/auth/login"
+                    className="font-body text-primary dark:text-primary-light underline underline-offset-4 hover:text-primary-dark dark:hover:text-primary"
+                  >
+                    Inicia sesión
+                  </Link>
+                </span>
               </div>
             </form>
           </CardContent>

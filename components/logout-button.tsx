@@ -19,7 +19,7 @@ export function LogoutButton() {
       variant="destructive" 
       size="sm"
     >
-      Logout
+      Cerrar Sesión
     </Button>
   );
 }

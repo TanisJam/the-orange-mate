@@ -1,64 +1,92 @@
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
-import { DesignSystemDemo } from "@/components/design-system-demo";
-import { ButtonDemo } from "@/components/button-demo";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen flex flex-col">
-      <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-        <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-          <div className="flex gap-5 items-center font-semibold">
-            <Link href={"/"} className="font-heading text-xl text-primary">
-              The Orange Mate
-            </Link>
+    <main className="min-h-screen flex flex-col bg-neutral-light dark:bg-neutral-gray">
+      {/* Header */}
+      <nav className="w-full bg-primary dark:bg-primary-dark px-4 py-3">
+        <div className="w-full max-w-5xl mx-auto flex justify-between items-center">
+          <div className="flex gap-5 items-center">
+            <h1 className="font-heading text-2xl text-white font-bold">
+              THE ORANGE MATE
+            </h1>
           </div>
-          <AuthButton />
+          <div className="flex items-center gap-4">
+            <ThemeSwitcher />
+            <AuthButton />
+          </div>
         </div>
       </nav>
       
-      <div className="flex-1 flex flex-col items-center justify-center p-8">
-        <div className="max-w-4xl w-full text-center space-y-8">
-          <h1 className="text-6xl font-heading text-primary">
-            Welcome to The Orange Mate
-          </h1>
-          <p className="text-xl font-body text-neutral-gray max-w-2xl mx-auto">
-            A modern Next.js application with Supabase authentication and a beautiful design system.
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center p-8 max-w-md mx-auto w-full">
+        {/* TOM Logo/Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-8xl font-heading text-neutral-black dark:text-neutral-white font-bold mb-4">
+            TOM
+          </h2>
+          <p className="text-2xl font-body text-neutral-gray dark:text-neutral-light">
+            Conecta, Viaja, Ahorra.
           </p>
+        </div>
+
+        {/* Orange Card */}
+        <div className="w-full bg-primary dark:bg-primary-light rounded-2xl p-8 mb-8 text-center shadow-lg">
+          <h3 className="text-4xl font-heading text-white dark:text-neutral-black font-bold">
+            The Orange Mate
+          </h3>
+        </div>
+
+        {/* Description */}
+        <div className="text-center mb-8">
+          <p className="text-lg font-body text-neutral-black dark:text-neutral-white leading-relaxed">
+            Encuentra compañeros de viaje para compartir alojamiento, transporte y experiencias inolvidables.
+          </p>
+        </div>
+
+        {/* CTA Buttons */}
+        <div className="w-full space-y-4 mb-8">
+          <Button 
+            asChild 
+            className="w-full bg-accent hover:bg-accent-dark dark:bg-accent-light dark:hover:bg-accent text-white dark:text-neutral-black font-bold py-4 text-lg rounded-xl transition-colors"
+          >
+            <Link href="/auth/sign-up">
+              ¡Empieza a Viajar!
+            </Link>
+          </Button>
+          
+          <Button 
+            asChild 
+            variant="ghost" 
+            className="w-full text-neutral-black dark:text-neutral-white hover:text-primary dark:hover:text-primary-light font-body text-base transition-colors"
+          >
+            <Link href="/auth/login">
+              Ya tengo cuenta
+            </Link>
+          </Button>
         </div>
       </div>
 
-      <section className="w-full max-w-6xl mx-auto">
-        <DesignSystemDemo />
-      </section>
-
-      <section className="w-full max-w-6xl mx-auto">
-        <ButtonDemo />
-      </section>
-
-      <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-8">
-        <p className="font-body text-neutral-gray">
-          Built with{" "}
-          <a
-            href="https://supabase.com"
-            target="_blank"
-            className="font-bold hover:underline text-primary"
-            rel="noreferrer"
-          >
-            Supabase
-          </a>
-          {" & "}
-          <a
-            href="https://nextjs.org"
-            target="_blank"
-            className="font-bold hover:underline text-primary"
-            rel="noreferrer"
-          >
-            Next.js
-          </a>
-        </p>
-        <ThemeSwitcher />
+      {/* Footer */}
+      <footer className="w-full border-t border-neutral-gray dark:border-neutral-gray py-6">
+        <div className="max-w-md mx-auto px-8">
+          <div className="flex justify-center items-center gap-6 text-sm text-neutral-gray dark:text-neutral-light">
+            <Link href="/demo" className="hover:text-primary dark:hover:text-primary-light transition-colors">
+              Demo
+            </Link>
+            <span>|</span>
+            <Link href="#" className="hover:text-primary dark:hover:text-primary-light transition-colors">
+              Privacidad
+            </Link>
+            <span>|</span>
+            <Link href="#" className="hover:text-primary dark:hover:text-primary-light transition-colors">
+              Términos
+            </Link>
+          </div>
+        </div>
       </footer>
     </main>
   );

@@ -1,105 +1,238 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# The Orange Mate
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+The Orange Mate (TOM) is a modern web application starter kit designed to connect solo travelers, helping them share experiences, split costs on accommodation and transport, and find like-minded companions for their adventures. Built with the powerful combination of Next.js 15, Tailwind CSS 4, and Supabase, TOM provides a solid foundation to make solo travel more accessible, affordable, and enjoyable.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+## ✨ Features
 
-## Features
+- **Robust Authentication**: Secure user login and registration powered by Supabase with email/password authentication
+- **Modern UI Components**: Beautiful and accessible components built with Radix UI and styled with Tailwind CSS
+- **Design System**: Comprehensive design system with custom color palette optimized for travel applications
+- **Dark Mode Toggle**: User-friendly option to switch between light and dark themes using next-themes
+- **Responsive Design**: Optimized for seamless experience across various devices using Tailwind CSS 4
+- **Protected Routes**: Secure dashboard areas accessible only to authenticated users
+- **TypeScript Support**: Full TypeScript support for better development experience and type safety
+- **Modern Next.js**: Built with Next.js 15 App Router for optimal performance and developer experience
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Components with [shadcn/ui](https://ui.shadcn.com/)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+## 🚀 Getting Started
 
-## Demo
+Follow these steps to set up and run The Orange Mate locally on your machine.
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+### Prerequisites
 
-## Deploy to Vercel
+Ensure you have the following installed:
 
-Vercel deployment will guide you through creating a Supabase account and project.
+- **Node.js** (version 18 or higher)
+- **pnpm** (recommended package manager)
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+### 1. Clone the Repository
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This+starter+configures+Supabase+Auth+to+use+cookies%2C+making+the+user%27s+session+available+throughout+the+entire+Next.js+app+-+Client+Components%2C+Server+Components%2C+Route+Handlers%2C+Server+Actions+and+Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png)
+```bash
+git clone <YOUR_PROJECT_REPOSITORY_URL>
+cd the-orange-mate
+```
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+### 2. Install Dependencies
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+```bash
+pnpm install
+```
 
-## Clone and run locally
+### 3. Supabase Setup
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+#### Create a Supabase Project:
 
-2. Create a Next.js app using the Supabase Starter template npx command
+1. Go to [Supabase](https://supabase.com) and sign up or log in
+2. Create a new project
+3. Once your project is created, navigate to **Project Settings > API**
 
-   ```bash
-   npx create-next-app --example with-supabase with-supabase-app
-   ```
+#### Environment Variables:
 
-   ```bash
-   yarn create next-app --example with-supabase with-supabase-app
-   ```
+1. Create a `.env.local` file in the root of your project
+2. Copy the following variables and paste your Supabase project's values:
 
-   ```bash
-   pnpm create next-app --example with-supabase with-supabase-app
-   ```
+```env
+NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```
 
-3. Use `cd` to change into the app's directory
+Where:
+- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL (e.g., `https://abcdefghijk.supabase.co`)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your project's "public anon key"
 
-   ```bash
-   cd with-supabase-app
-   ```
+#### Database Schema & Policies:
 
-4. Rename `.env.example` to `.env.local` and update the following:
+For the app to function correctly, you will need to set up your Supabase database schema and Row Level Security (RLS) policies.
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+**Recommended Tables** (for future development):
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+- `profiles`: `id` (UUID, primary key, references auth.users), `username`, `avatar_url`, `bio`, `age`, `country`, `interests` (JSONB or array of text)
+- `travel_plans`: `id` (UUID, primary key), `user_id` (UUID, references profiles.id), `title`, `type`, `destination`, `dates`, `status`, `description`, `share_accommodation`, `share_transport`, `share_tours`
+- `plan_notes`: `id`, `plan_id`, `user_id`, `content`, `is_private`
+- `comments`: `id`, `plan_id`, `user_id`, `content`
+- `chats`: `id`, `user1_id`, `user2_id`
+- `messages`: `id`, `chat_id`, `sender_id`, `content`, `created_at`
 
-5. You can now run the Next.js local development server:
+**RLS**: Ensure you have appropriate RLS policies enabled for each table to secure user data (e.g., users can only view/edit their own profile, but can view public plans).
 
-   ```bash
-   npm run dev
-   ```
+### 4. Run the Application
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+```bash
+pnpm dev
+```
 
-6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
+This will start the application in development mode. Open [http://localhost:3000](http://localhost:3000) in your browser to see The Orange Mate in action.
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+## 📁 Project Structure
 
-## Feedback and issues
+```
+.
+├── app/                    # Next.js App Router (routes, layouts, pages)
+│   ├── auth/              # Authentication pages (login, sign-up, etc.)
+│   │   ├── login/         # Login page
+│   │   ├── sign-up/       # Registration page
+│   │   ├── confirm/       # Email confirmation
+│   │   └── ...           # Other auth-related pages
+│   ├── protected/         # Protected dashboard pages
+│   ├── globals.css        # Global styles and design system variables
+│   ├── layout.tsx         # Root layout with theme provider
+│   └── page.tsx           # Homepage
+├── components/            # Reusable React components
+│   ├── ui/               # Base UI components (Button, Input, etc.)
+│   ├── auth-button.tsx   # Authentication button component
+│   ├── login-form.tsx    # Login form component
+│   ├── sign-up-form.tsx  # Registration form component
+│   └── ...               # Other reusable components
+├── lib/                  # Utility functions and configurations
+│   ├── supabase/         # Supabase client configurations
+│   │   ├── client.ts     # Browser client
+│   │   ├── server.ts     # Server client
+│   │   └── middleware.ts # Middleware client
+│   └── utils.ts          # Utility functions
+├── .env.local            # Local environment variables (DO NOT COMMIT)
+├── components.json       # shadcn/ui configuration
+├── middleware.ts         # Next.js middleware for auth
+├── next.config.ts        # Next.js configuration
+├── package.json          # Dependencies and scripts
+├── postcss.config.mjs    # PostCSS configuration
+├── tailwind.config.js    # Tailwind CSS configuration (auto-generated)
+└── tsconfig.json         # TypeScript configuration
+```
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+## 💡 Usage & Key Concepts
 
-## More Supabase examples
+### Supabase Integration
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+The Supabase client is configured with multiple instances for different environments:
+
+#### Server Components/API Routes:
+
+```typescript
+import { createClient } from '@/lib/supabase/server';
+
+export default async function Page() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  return (
+    <div>
+      {user ? `Welcome, ${user.email}!` : 'Please log in'}
+    </div>
+  );
+}
+```
+
+#### Client Components:
+
+```typescript
+'use client';
+import { createClient } from '@/lib/supabase/client';
+
+function MyComponent() {
+  const [user, setUser] = useState(null);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function getUser() {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    }
+    getUser();
+  }, []);
+
+  return <div>{user ? user.email : 'Loading...'}</div>;
+}
+```
+
+### Tailwind CSS Styling
+
+The project uses Tailwind CSS 4 with a custom design system. The color palette is optimized for travel applications:
+
+```jsx
+<button className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-[--radius] transition-colors">
+  Create New Plan
+</button>
+```
+
+Custom design system colors available:
+- **Primary**: `primary-light`, `primary`, `primary-dark` (Orange tones)
+- **Secondary**: `secondary-light`, `secondary`, `secondary-dark` (Blue tones)
+- **Accent**: `accent-light`, `accent`, `accent-dark` (Brown tones)
+- **Neutral**: `neutral-white`, `neutral-light`, `neutral-gray`, `neutral-black`
+- **Status**: `error`, `success`
+
+### Authentication Flow
+
+The application includes a complete authentication system with:
+
+- **Login/Registration** forms with validation
+- **Email confirmation** workflow
+- **Password reset** functionality
+- **Protected routes** with automatic redirects
+- **Session management** across the entire app
+
+### Theme System
+
+Dark mode is implemented using `next-themes`:
+
+```jsx
+import { ThemeSwitcher } from '@/components/theme-switcher';
+
+// Use the theme switcher component
+<ThemeSwitcher />
+```
+
+## 🧪 Available Scripts
+
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Build the application for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint for code quality
+
+## 🤝 Contributing
+
+Contributions are highly encouraged! If you find a bug, have a feature request, or want to improve the codebase, please open an issue or submit a pull request.
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature-name`)
+3. Make your changes and commit them (`git commit -m 'feat: adds new feature'`)
+4. Push to the branch (`git push origin feature/your-feature-name`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License. See the LICENSE file for more details.
+
+## 🔗 Built With
+
+- [Next.js 15](https://nextjs.org) - React framework with App Router
+- [Supabase](https://supabase.com) - Backend as a Service with authentication
+- [Tailwind CSS 4](https://tailwindcss.com) - Utility-first CSS framework
+- [Radix UI](https://radix-ui.com) - Accessible component primitives
+- [TypeScript](https://typescriptlang.org) - Type-safe JavaScript
+- [next-themes](https://github.com/pacocoursey/next-themes) - Theme management
+
+---
+
+**Happy Coding with The Orange Mate!** 🍊
+
+(README created by Claude)

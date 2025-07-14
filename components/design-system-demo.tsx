@@ -4,21 +4,21 @@ export function DesignSystemDemo() {
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-4">
-        <h1 className="text-4xl font-heading text-primary">
+        <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
           Design System Demo
         </h1>
-        <p className="text-lg font-body text-neutral-gray">
+        <p className="text-lg font-body text-neutral-gray dark:text-neutral-light">
           Demostración de los colores y tipografía del sistema de diseño
         </p>
       </div>
 
       {/* Primary Colors */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Primary Colors
         </h2>
         <div className="flex gap-4">
-          <div className="w-20 h-20 bg-primary-light rounded-[--radius] flex items-center justify-center text-white font-bold">
+          <div className="w-20 h-20 bg-primary-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
           <div className="w-20 h-20 bg-primary rounded-[--radius] flex items-center justify-center text-white font-bold">
@@ -32,11 +32,11 @@ export function DesignSystemDemo() {
 
       {/* Accent Colors */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Accent Colors
         </h2>
         <div className="flex gap-4">
-          <div className="w-20 h-20 bg-accent-light rounded-[--radius] flex items-center justify-center text-white font-bold">
+          <div className="w-20 h-20 bg-accent-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
           <div className="w-20 h-20 bg-accent rounded-[--radius] flex items-center justify-center text-white font-bold">
@@ -50,11 +50,11 @@ export function DesignSystemDemo() {
 
       {/* Secondary Colors */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Secondary Colors
         </h2>
         <div className="flex gap-4">
-          <div className="w-20 h-20 bg-secondary-light rounded-[--radius] flex items-center justify-center text-white font-bold">
+          <div className="w-20 h-20 bg-secondary-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
           <div className="w-20 h-20 bg-secondary rounded-[--radius] flex items-center justify-center text-white font-bold">
@@ -68,7 +68,7 @@ export function DesignSystemDemo() {
 
       {/* Neutral Colors */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Neutral Colors
         </h2>
         <div className="flex gap-4">
@@ -89,7 +89,7 @@ export function DesignSystemDemo() {
 
       {/* State Colors */}
       <div className="space-y-2">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           State Colors
         </h2>
         <div className="flex gap-4">
@@ -104,20 +104,20 @@ export function DesignSystemDemo() {
 
       {/* Typography Examples */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Typography
         </h2>
         <div className="space-y-2">
-          <h1 className="text-4xl font-heading text-primary">
+          <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
             Bebas Neue Heading
           </h1>
-          <h2 className="text-2xl font-heading text-accent">
+          <h2 className="text-2xl font-heading text-accent dark:text-accent-light">
             Bebas Neue Subheading
           </h2>
-          <p className="text-lg font-body text-neutral-black">
+          <p className="text-lg font-body text-neutral-black dark:text-neutral-white">
             Oxanium body text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>
-          <p className="text-base font-body text-neutral-gray">
+          <p className="text-base font-body text-neutral-gray dark:text-neutral-light">
             Oxanium regular text - Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
         </div>
@@ -125,7 +125,7 @@ export function DesignSystemDemo() {
 
       {/* Buttons with Design System */}
       <div className="space-y-4">
-        <h2 className="text-2xl font-heading text-neutral-black">
+        <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Buttons
         </h2>
         <div className="flex gap-4">

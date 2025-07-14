@@ -6,15 +6,15 @@ export function ButtonDemo() {
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-4">
-        <h2 className="text-3xl font-heading text-primary">Button Components</h2>
-        <p className="text-lg font-body text-neutral-gray">
+        <h2 className="text-3xl font-heading text-primary dark:text-primary-light">Button Components</h2>
+        <p className="text-lg font-body text-neutral-gray dark:text-neutral-light">
           Showcasing all button variants and states from your design system
         </p>
       </div>
 
       {/* Base State */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">Base State</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">Base State</h3>
         <div className="flex flex-wrap gap-4">
           <Button variant="secondary" size="default">
             Registrarse
@@ -33,7 +33,7 @@ export function ButtonDemo() {
 
       {/* Different Sizes */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">Sizes</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">Sizes</h3>
         <div className="flex flex-wrap items-center gap-4">
           <Button variant="primary" size="sm">
             Small
@@ -52,7 +52,7 @@ export function ButtonDemo() {
 
       {/* All Variants */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">All Variants</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">All Variants</h3>
         <div className="flex flex-wrap gap-4">
           <Button variant="primary">Primary</Button>
           <Button variant="secondary">Secondary</Button>
@@ -66,7 +66,7 @@ export function ButtonDemo() {
 
       {/* Disabled State */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">Disabled State</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">Disabled State</h3>
         <div className="flex flex-wrap gap-4">
           <Button variant="primary" disabled>
             Disabled Primary
@@ -85,7 +85,7 @@ export function ButtonDemo() {
 
       {/* Interactive Examples */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">Interactive Examples</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">Interactive Examples</h3>
         <div className="flex flex-wrap gap-4">
           <Button 
             variant="primary" 
@@ -116,7 +116,7 @@ export function ButtonDemo() {
 
       {/* Usage Examples */}
       <div className="space-y-4">
-        <h3 className="text-xl font-heading text-neutral-black">Usage Examples</h3>
+        <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white">Usage Examples</h3>
         <div className="space-y-4">
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm">

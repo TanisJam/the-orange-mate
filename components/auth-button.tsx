@@ -12,16 +12,18 @@ export async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <span className="font-body text-neutral-gray">Welcome, {user.email?.split('@')[0]}!</span>
+      <span className="font-body text-neutral-gray dark:text-neutral-white">
+        ¡Hola, {user.email?.split('@')[0]}!
+      </span>
       <LogoutButton />
     </div>
   ) : (
     <div className="flex gap-2">
       <Button asChild size="sm" variant="outline">
-        <Link href="/auth/login">Sign in</Link>
+        <Link href="/auth/login">Iniciar Sesión</Link>
       </Button>
       <Button asChild size="sm" variant="primary">
-        <Link href="/auth/sign-up">Sign up</Link>
+        <Link href="/auth/sign-up">Registrarse</Link>
       </Button>
     </div>
   );

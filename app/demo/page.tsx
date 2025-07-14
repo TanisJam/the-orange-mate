@@ -1,12 +1,10 @@
+import { DesignSystemDemo } from "@/components/design-system-demo";
+import { ButtonDemo } from "@/components/button-demo";
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
 
-export default function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function DemoPage() {
   return (
     <main className="min-h-screen flex flex-col bg-neutral-light dark:bg-neutral-gray">
       <nav className="w-full flex justify-center border-b border-neutral-gray dark:border-neutral-gray h-16">
@@ -15,6 +13,7 @@ export default function ProtectedLayout({
             <Link href={"/"} className="font-heading text-xl text-primary dark:text-primary-light">
               The Orange Mate
             </Link>
+            <span className="text-neutral-gray dark:text-neutral-white">/ Demo</span>
           </div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
@@ -24,8 +23,23 @@ export default function ProtectedLayout({
       </nav>
       
       <div className="flex-1 flex flex-col items-center p-8">
-        <div className="w-full max-w-4xl">
-          {children}
+        <div className="max-w-4xl w-full text-center space-y-8 mb-12">
+          <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
+            Design System Demo
+          </h1>
+          <p className="text-lg font-body text-neutral-gray dark:text-neutral-white max-w-2xl mx-auto">
+            Explora los componentes y elementos del sistema de diseño de The Orange Mate.
+          </p>
+        </div>
+
+        <div className="w-full max-w-6xl space-y-12">
+          <section>
+            <DesignSystemDemo />
+          </section>
+
+          <section>
+            <ButtonDemo />
+          </section>
         </div>
       </div>
 
@@ -54,4 +68,4 @@ export default function ProtectedLayout({
       </footer>
     </main>
   );
-}
+} 
