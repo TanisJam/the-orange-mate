@@ -5,30 +5,34 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--radius)] font-body font-medium transition-colors duration-100 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:bg-neutral-light disabled:text-neutral-gray disabled:border-neutral-gray disabled:shadow-none [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
   {
     variants: {
       variant: {
-        default:
-          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background shadow-xs hover:bg-accent hover:text-accent-foreground",
+        primary:
+          "bg-primary text-neutral-black border-2 border-neutral-black shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:bg-primary-light active:bg-primary-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
         secondary:
-          "bg-secondary text-secondary-foreground shadow-xs hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+          "bg-secondary text-white border-2 border-neutral-black shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:bg-secondary-light active:bg-secondary-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
+        accent:
+          "bg-accent text-white border-2 border-neutral-black shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:bg-accent-light active:bg-accent-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
+        outline:
+          "bg-neutral-white text-neutral-black border-2 border-neutral-black shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:text-secondary active:text-secondary active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
+        destructive:
+          "bg-error text-white border-2 border-neutral-black shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:bg-error active:bg-error active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
+        ghost: 
+          "bg-transparent text-neutral-black border-none hover:bg-neutral-light active:bg-neutral-gray active:text-white",
+        link: 
+          "bg-transparent text-primary border-none underline-offset-4 hover:underline active:text-primary-dark",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 rounded-md px-3 text-xs",
-        lg: "h-10 rounded-md px-8",
-        icon: "h-9 w-9",
+        sm: "h-8 px-3 text-sm",
+        default: "h-10 px-6 text-base",
+        lg: "h-12 px-8 text-lg",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {
-      variant: "default",
+      variant: "primary",
       size: "default",
     },
   },

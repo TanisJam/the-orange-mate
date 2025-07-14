@@ -1,6 +1,7 @@
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import { DesignSystemDemo } from "@/components/design-system-demo";
+import { ButtonDemo } from "@/components/button-demo";
 import Link from "next/link";
 
 export default function Home() {
@@ -30,6 +31,10 @@ export default function Home() {
 
       <section className="w-full max-w-6xl mx-auto">
         <DesignSystemDemo />
+      </section>
+
+      <section className="w-full max-w-6xl mx-auto">
+        <ButtonDemo />
       </section>
 
       <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-xs gap-8 py-8">

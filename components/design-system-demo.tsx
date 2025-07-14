@@ -1,3 +1,5 @@
+import { Button } from "./ui/button";
+
 export function DesignSystemDemo() {
   return (
     <div className="p-8 space-y-8">
@@ -127,15 +129,15 @@ export function DesignSystemDemo() {
           Buttons
         </h2>
         <div className="flex gap-4">
-          <button className="px-6 py-3 bg-primary text-white rounded-[--radius] font-body border-[--stroke-width] border-primary hover:bg-primary-dark transition-colors">
+          <Button variant="primary" size="default">
             Primary Button
-          </button>
-          <button className="px-6 py-3 bg-secondary text-white rounded-[--radius] font-body border-[--stroke-width] border-secondary hover:bg-secondary-dark transition-colors">
+          </Button>
+          <Button variant="secondary" size="default">
             Secondary Button
-          </button>
-          <button className="px-6 py-3 bg-transparent text-primary rounded-[--radius] font-body border-[--stroke-width] border-primary hover:bg-primary hover:text-white transition-colors">
+          </Button>
+          <Button variant="outline" size="default">
             Outline Button
-          </button>
+          </Button>
         </div>
       </div>
     </div>

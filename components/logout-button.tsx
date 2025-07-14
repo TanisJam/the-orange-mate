@@ -16,9 +16,8 @@ export function LogoutButton() {
   return (
     <Button 
       onClick={logout} 
-      variant="outline" 
-      size="sm" 
-      className="border-error text-error hover:bg-error hover:text-white"
+      variant="destructive" 
+      size="sm"
     >
       Logout
     </Button>
