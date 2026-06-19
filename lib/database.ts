@@ -66,7 +66,7 @@ export async function createUserProfile(
   isServer = false
 ): Promise<UserProfile | null> {
   const supabase = isServer ? await createServerClient() : createClient();
-  
+   
   const { data, error } = await supabase
     .from('user_profiles')
     .insert({ id: userId, ...profileData })
@@ -79,6 +79,53 @@ export async function createUserProfile(
   }
 
   return data;
+}
+
+export async function getUserProfileByUsername(username: string, isServer = false): Promise<UserProfile | null> {
+  const supabase = isServer ? await createServerClient() : createClient();
+  
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user profile by username:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getUserPlanStats(userId: string, isServer = false): Promise<{ created: number; participating: number }> {
+  const supabase = isServer ? await createServerClient() : createClient();
+  
+  const [createdResult, participatingResult] = await Promise.all([
+    supabase
+      .from('travel_plans')
+      .select('*', { count: 'exact', head: true })
+      .eq('creator_id', userId),
+    supabase
+      .from('plan_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId),
+  ]);
+
+  if (createdResult.error) {
+    console.error('Error counting created plans:', createdResult.error);
+    return { created: 0, participating: 0 };
+  }
+
+  if (participatingResult.error) {
+    console.error('Error counting participating plans:', participatingResult.error);
+    return { created: 0, participating: 0 };
+  }
+
+  return {
+    created: createdResult.count || 0,
+    participating: participatingResult.count || 0,
+  };
 }
 
 // Interest Operations

@@ -60,7 +60,7 @@ export async function createUserProfile(
   profileData: CreateUserProfileData
 ): Promise<UserProfile | null> {
   const supabase = createClient();
-  
+   
   const { data, error } = await supabase
     .from('user_profiles')
     .insert({ id: userId, ...profileData })
@@ -73,6 +73,83 @@ export async function createUserProfile(
   }
 
   return data;
+}
+
+export async function getUserProfileByUsername(username: string): Promise<UserProfile | null> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('user_profiles')
+    .select('*')
+    .eq('username', username)
+    .single();
+
+  if (error) {
+    console.error('Error fetching user profile by username:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getUserPlanStats(userId: string): Promise<{ created: number; participating: number }> {
+  const supabase = createClient();
+  
+  const [createdResult, participatingResult] = await Promise.all([
+    supabase
+      .from('travel_plans')
+      .select('*', { count: 'exact', head: true })
+      .eq('creator_id', userId),
+    supabase
+      .from('plan_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId),
+  ]);
+
+  if (createdResult.error) {
+    console.error('Error counting created plans:', createdResult.error);
+    return { created: 0, participating: 0 };
+  }
+
+  if (participatingResult.error) {
+    console.error('Error counting participating plans:', participatingResult.error);
+    return { created: 0, participating: 0 };
+  }
+
+  return {
+    created: createdResult.count || 0,
+    participating: participatingResult.count || 0,
+  };
+}
+
+export async function uploadAvatar(userId: string, file: File): Promise<string | null> {
+  try {
+    const supabase = createClient();
+    const ext = file.name.split('.').pop();
+    const path = `${userId}/avatar.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(path, file, { upsert: true });
+
+    if (uploadError) {
+      console.error('Error uploading avatar:', uploadError);
+      return null;
+    }
+
+    const { data: urlData } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(path);
+
+    const publicUrl = urlData.publicUrl;
+
+    await updateUserProfile(userId, { avatar_url: publicUrl });
+
+    return publicUrl;
+  } catch (error) {
+    console.error('Error in uploadAvatar:', error);
+    return null;
+  }
 }
 
 // Interest Operations (Client-side)
