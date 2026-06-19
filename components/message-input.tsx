@@ -38,11 +38,10 @@ export default function MessageInput({
         return;
       }
 
-      const message = await sendMessage(
-        user.id,
-        { chat_id: chatId, content: trimmed },
-        false,
-      );
+      const message = await sendMessage(user.id, {
+        chat_id: chatId,
+        content: trimmed,
+      });
 
       if (!message) {
         toast.error("No se pudo enviar el mensaje. Intenta de nuevo.");

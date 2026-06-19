@@ -62,7 +62,7 @@ export default function ChatWindow({
   useEffect(() => {
     const interval = setInterval(async () => {
       try {
-        const newMessages = await getChatMessages(chatId, false);
+        const newMessages = await getChatMessages(chatId);
         const lastKnown = lastTimestampRef.current;
 
         if (lastKnown) {
