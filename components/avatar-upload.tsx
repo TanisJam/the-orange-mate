@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { uploadAvatar } from '@/lib/database-client';
 import { Upload, X, User } from 'lucide-react';
@@ -21,6 +21,20 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
   const [error, setError] = useState<string | null>(null);
   const [displayUrl, setDisplayUrl] = useState<string | null>(currentAvatarUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Sync displayUrl when parent loads currentAvatarUrl asynchronously
+  useEffect(() => {
+    if (currentAvatarUrl) {
+      setDisplayUrl(currentAvatarUrl);
+    }
+  }, [currentAvatarUrl]);
+
+  // Sync displayUrl when parent loads currentAvatarUrl asynchronously
+  useEffect(() => {
+    if (currentAvatarUrl) {
+      setDisplayUrl(currentAvatarUrl);
+    }
+  }, [currentAvatarUrl]);
 
   const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
@@ -46,6 +60,8 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
 
     setError(null);
     setSelectedFile(file);
+    // Revoke previous preview URL to avoid memory leaks
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     const objectUrl = URL.createObjectURL(file);
     setPreviewUrl(objectUrl);
   };
@@ -60,6 +76,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
       const url = await uploadAvatar(userId, selectedFile);
       if (url) {
         setDisplayUrl(url);
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
         setPreviewUrl(null);
         setSelectedFile(null);
         onUploadComplete(url);
@@ -75,6 +92,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
 
   const handleClear = () => {
     setSelectedFile(null);
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
     setError(null);
     if (fileInputRef.current) {
@@ -142,6 +160,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
                   onClick={handleClear}
                   className="p-1 rounded-full hover:bg-neutral-light dark:hover:bg-neutral-gray transition-colors"
                   title="Cancelar selección"
+                  aria-label="Cancelar selección"
                 >
                   <X className="w-4 h-4 text-neutral-gray" />
                 </button>
