@@ -272,8 +272,14 @@ create policy "Users can manage own photos" on public.user_photos
 
 -- Travel plans policies
 create policy "Users can view public plans" on public.travel_plans
-  for select using (is_public = true or creator_id = auth.uid() or 
-    exists (select 1 from public.plan_participants where plan_id = id and user_id = auth.uid()));
+  for select using (
+    is_public = true
+    or creator_id = auth.uid() or 
+    exists (
+      select 1 from public.plan_participants pp
+      where pp.plan_id = travel_plans.id and pp.user_id = auth.uid()
+    )
+  );
 
 create policy "Users can create plans" on public.travel_plans
   for insert with check (auth.uid() = creator_id);
@@ -286,9 +292,18 @@ create policy "Creators can delete own plans" on public.travel_plans
 
 -- Plan participants policies
 create policy "Users can view plan participants" on public.plan_participants
-  for select using (exists (select 1 from public.travel_plans where id = plan_id and 
-    (is_public = true or creator_id = auth.uid() or 
-     exists (select 1 from public.plan_participants pp where pp.plan_id = plan_id and pp.user_id = auth.uid()))));
+  for select using (
+    exists (
+      select 1 from public.travel_plans tp
+      where tp.id = plan_participants.plan_id and (
+        tp.is_public = true or tp.creator_id = auth.uid() or
+        exists (
+          select 1 from public.plan_participants pp
+          where pp.plan_id = tp.id and pp.user_id = auth.uid()
+        )
+      )
+    )
+  );
 
 create policy "Plan creators can manage participants" on public.plan_participants
   for all using (exists (select 1 from public.travel_plans where id = plan_id and creator_id = auth.uid()));

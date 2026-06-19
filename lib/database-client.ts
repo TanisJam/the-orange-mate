@@ -252,7 +252,7 @@ export async function createTravelPlan(
 
   // Auto-enroll creator as participant with editar permission
   if (data) {
-    await supabase
+    const { error: participantError } = await supabase
       .from('plan_participants')
       .insert({
         plan_id: data.id,
@@ -260,11 +260,28 @@ export async function createTravelPlan(
         permission_level: 'editar'
       });
 
-    // Update participant count
-    await supabase
+    if (participantError) {
+      console.error('Error enrolling creator as participant:', participantError);
+    }
+
+    // Count actual participants and update the plan
+    const { count: participantCount, error: countError } = await supabase
+      .from('plan_participants')
+      .select('*', { count: 'exact', head: true })
+      .eq('plan_id', data.id);
+
+    if (countError) {
+      console.error('Error counting participants:', countError);
+    }
+
+    const { error: updateError } = await supabase
       .from('travel_plans')
-      .update({ current_participants: 1 })
+      .update({ current_participants: participantCount || 1 })
       .eq('id', data.id);
+
+    if (updateError) {
+      console.error('Error updating participant count:', updateError);
+    }
 
     // Re-fetch to include the new participant record
     const { data: refreshed } = await supabase
@@ -466,7 +483,7 @@ export async function createJoinRequest(
 
 export async function updateJoinRequest(
   requestId: string,
-  status: 'accepted' | 'rejected',
+  status: 'accepted' | 'rejected' | 'waiting_list',
   permission_level: PermissionLevel = 'solo_ver'
 ): Promise<PlanJoinRequest | null> {
   const supabase = createClient();
@@ -492,24 +509,36 @@ export async function updateJoinRequest(
 
   // If accepted, add user to plan participants with the specified permission
   if (status === 'accepted' && data) {
-    await supabase
+    const { error: upsertError } = await supabase
       .from('plan_participants')
-      .insert({
+      .upsert({
         plan_id: data.plan_id,
         user_id: data.requester_id,
         permission_level
-      });
+      }, { onConflict: 'plan_id,user_id' });
+
+    if (upsertError) {
+      console.error('Error upserting plan participant:', upsertError);
+    }
 
     // Update participant count based on actual participants
-    const { count: participantCount } = await supabase
+    const { count: participantCount, error: countError } = await supabase
       .from('plan_participants')
       .select('*', { count: 'exact', head: true })
       .eq('plan_id', data.plan_id);
 
-    await supabase
+    if (countError) {
+      console.error('Error counting participants:', countError);
+    }
+
+    const { error: updateError } = await supabase
       .from('travel_plans')
       .update({ current_participants: participantCount || 0 })
       .eq('id', data.plan_id);
+
+    if (updateError) {
+      console.error('Error updating participant count:', updateError);
+    }
   }
 
   return data;
