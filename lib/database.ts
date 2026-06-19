@@ -8,6 +8,8 @@ import type {
   CreateTravelPlanData,
   PlanNote,
   CreatePlanNoteData,
+  PlanComment,
+  CreatePlanCommentData,
   PlanJoinRequest,
   CreateJoinRequestData,
   PermissionLevel,
@@ -776,4 +778,68 @@ export async function createPlanNote(
   }
 
   return data;
+}
+
+// Plan Comments Operations
+export async function getPlanComments(planId: string, isServer = false): Promise<PlanComment[]> {
+  const supabase = isServer ? await getServerClient() : createClient();
+  
+  const { data, error } = await supabase
+    .from('plan_comments')
+    .select(`
+      *,
+      author:user_profiles!author_id(id, username, full_name, avatar_url)
+    `)
+    .eq('plan_id', planId)
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching plan comments:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+export async function createPlanComment(
+  userId: string,
+  commentData: CreatePlanCommentData,
+  isServer = false
+): Promise<PlanComment | null> {
+  const supabase = isServer ? await getServerClient() : createClient();
+  
+  const { data, error } = await supabase
+    .from('plan_comments')
+    .insert({
+      author_id: userId,
+      ...commentData
+    })
+    .select(`
+      *,
+      author:user_profiles!author_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error creating plan comment:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function deletePlanComment(commentId: string, isServer = false): Promise<boolean> {
+  const supabase = isServer ? await getServerClient() : createClient();
+  
+  const { error } = await supabase
+    .from('plan_comments')
+    .delete()
+    .eq('id', commentId);
+
+  if (error) {
+    console.error('Error deleting plan comment:', error);
+    return false;
+  }
+
+  return true;
 } 

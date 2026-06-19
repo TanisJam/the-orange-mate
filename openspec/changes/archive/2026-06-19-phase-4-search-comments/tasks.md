@@ -37,23 +37,23 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Slice 2 — Comment Data Layer
 
-- [ ] 3.1 Add `getPlanComments(planId, isServer)` to `lib/database.ts` — query `plan_comments` with author join, `created_at ASC`
-- [ ] 3.2 Add `createPlanComment(userId, data, isServer)` to `lib/database.ts` — insert with author join return
-- [ ] 3.3 Add `deletePlanComment(commentId, isServer)` to `lib/database.ts` — delete by id, return boolean
-- [ ] 3.4 Add browser wrappers for all three to `lib/database-client.ts` matching existing notes pattern
+- [x] 3.1 Add `getPlanComments(planId, isServer)` to `lib/database.ts` — query `plan_comments` with author join, `created_at ASC`
+- [x] 3.2 Add `createPlanComment(userId, data, isServer)` to `lib/database.ts` — insert with author join return
+- [x] 3.3 Add `deletePlanComment(commentId, isServer)` to `lib/database.ts` — delete by id, return boolean
+- [x] 3.4 Add browser wrappers for all three to `lib/database-client.ts` matching existing notes pattern
 
 ## Phase 4: Slice 2 — Comments UI
 
-- [ ] 4.1 Create `components/comment-item.tsx` — client: author, content, timestamp, reply toggle, delete button (own only)
-- [ ] 4.2 Create `components/comment-list.tsx` — client: fetch, `buildCommentTree()` (2 levels), render thread, form gated by `comments_enabled` + access, empty state
+- [x] 4.1 Create `components/comment-item.tsx` — client: author, content, timestamp, reply toggle, delete button (own only)
+- [x] 4.2 Create `components/comment-list.tsx` — client: fetch, `buildCommentTree()` (2 levels), render thread, form gated by `comments_enabled` + access, empty state
 
 ## Phase 5: Slice 2 — Notes UI + Plan Detail Restructure
 
-- [ ] 5.1 Create `components/note-item.tsx` — client: author, content, timestamp, "Privada" badge
-- [ ] 5.2 Create `components/note-list.tsx` — client: fetch `getPlanNotes`, filter private-non-own, create form with `is_private` toggle, empty state
-- [ ] 5.3 Modify `components/plan-detail.tsx` — replace combined section 4 (lines 315–375) with `<CommentList>` (section 4) + `<NoteList>` (section 5), renumber participants to 6
+- [x] 5.1 Create `components/note-item.tsx` — client: author, content, timestamp, "Privada" badge
+- [x] 5.2 Create `components/note-list.tsx` — client: fetch `getPlanNotes`, filter private-non-own, create form with `is_private` toggle, empty state
+- [x] 5.3 Modify `components/plan-detail.tsx` — replace combined section 4 (lines 315–375) with `<CommentList>` (section 4) + `<NoteList>` (section 5), renumber participants to 6
 
 ## Phase 6: Dashboard + Verification
 
 - [x] 6.1 Modify `components/dashboard-content.tsx` — replace "Descubrir" tab content with link card to `/discover`
-- [ ] 6.2 Verify: `npm run build` (zero TS errors, zero ESLint warnings)
+- [x] 6.2 Verify: `npm run build` (zero TS errors, zero ESLint warnings)

@@ -1,10 +1,6 @@
-# Plan Detail Specification
+# Delta for Plan Detail
 
-## Purpose
-
-Server-rendered page at `/plans/[id]` displaying all plan information in a defined content order. Controls access based on plan visibility and participation status. Includes threaded comments (create/delete) and notes with privacy toggle for participants.
-
-## Requirements
+## MODIFIED Requirements
 
 ### Requirement: Content Order
 
@@ -67,6 +63,8 @@ The system MUST allow participants and creator of private plans to view AND crea
 - GIVEN a private plan with `comments_enabled=true` and an authenticated participant
 - WHEN they submit a comment
 - THEN the INSERT RLS policy passes participant check and the comment is persisted
+
+## ADDED Requirements
 
 ### Requirement: Notes Privacy Toggle
 
