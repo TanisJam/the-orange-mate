@@ -81,12 +81,12 @@ export function PublicProfileDisplay({
             {/* Edit button — only for owner */}
             {isOwner && (
               <div className="sm:self-start">
-                <Link href="/dashboard?tab=profile">
-                  <Button variant="outline" size="sm">
+                <Button asChild variant="outline" size="sm">
+                  <Link href="/dashboard?tab=profile">
                     <Pencil className="w-4 h-4" />
                     Editar perfil
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               </div>
             )}
           </div>
