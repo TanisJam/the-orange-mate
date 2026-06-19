@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
-import { getChatMessages } from "@/lib/database";
+import { getChatMessages } from "@/lib/chat-client";
 import MessageBubble from "@/components/message-bubble";
 import MessageInput from "@/components/message-input";
-import type { Message, UserProfile } from "@/lib/types";
+import type { Message } from "@/lib/types";
 
 interface ChatWindowProps {
   chatId: string;

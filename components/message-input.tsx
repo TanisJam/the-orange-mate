@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
-import { sendMessage } from "@/lib/database";
+import { sendMessage } from "@/lib/chat-client";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
 import type { Message } from "@/lib/types";
