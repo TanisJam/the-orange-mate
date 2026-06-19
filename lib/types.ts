@@ -6,7 +6,7 @@ export type PlanStatus = 'buscando_companero' | 'planeado' | 'flexible' | 'tenta
 
 export type PermissionLevel = 'solo_ver' | 'agregar_notas_privadas' | 'sugerir_cambios' | 'editar';
 
-export type FriendStatus = 'pending' | 'accepted' | 'blocked';
+export type FriendStatus = 'pending' | 'accepted' | 'blocked' | 'rejected';
 
 export type JoinRequestStatus = 'pending' | 'accepted' | 'rejected' | 'waiting_list';
 
@@ -131,6 +131,15 @@ export interface UserFriend {
   status: FriendStatus;
   created_at: string;
   friend?: UserProfile; // for joined queries
+}
+
+export interface EnrichedFriend {
+  id: string;
+  user_id: string;
+  friend_id: string;
+  status: FriendStatus;
+  created_at: string;
+  friend?: UserProfile; // the OTHER user's profile (aliased as 'friend' in all queries)
 }
 
 export interface Chat {

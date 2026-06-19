@@ -13,6 +13,9 @@ import type {
   PlanJoinRequest,
   CreateJoinRequestData,
   PermissionLevel,
+  UserFriend,
+  EnrichedFriend,
+  FriendStatus,
   SearchFilters,
   PaginationParams,
   ApiResponse,
@@ -749,4 +752,210 @@ export async function deletePlanComment(commentId: string): Promise<boolean> {
   }
 
   return true;
-} 
+}
+
+// Friend Operations (Client-side)
+
+export async function sendFriendRequest(
+  userId: string,
+  friendId: string
+): Promise<UserFriend | null> {
+  if (userId === friendId) return null;
+
+  const supabase = createClient();
+
+  // Check for existing relationship in either direction
+  const { data: existing, error: checkError } = await supabase
+    .from('user_friends')
+    .select('id, user_id, friend_id, status')
+    .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error('Error checking existing relationship:', checkError);
+    return null;
+  }
+
+  if (existing) {
+    if (existing.status !== 'rejected' || existing.user_id !== userId) {
+      return null;
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .upsert({
+      user_id: userId,
+      friend_id: friendId,
+      status: 'pending',
+    }, { onConflict: 'user_id,friend_id' })
+    .select(`
+      *,
+      friend:user_profiles!friend_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error sending friend request:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function acceptFriendRequest(
+  requestId: string,
+  userId: string
+): Promise<UserFriend | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .update({ status: 'accepted' })
+    .eq('id', requestId)
+    .eq('status', 'pending')
+    .eq('friend_id', userId)
+    .select(`
+      *,
+      friend:user_profiles!friend_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error accepting friend request:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function rejectFriendRequest(
+  requestId: string,
+  userId: string
+): Promise<UserFriend | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .update({ status: 'rejected' })
+    .eq('id', requestId)
+    .eq('status', 'pending')
+    .eq('friend_id', userId)
+    .select(`
+      *,
+      friend:user_profiles!friend_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error rejecting friend request:', error);
+    return null;
+  }
+
+  return data;
+}
+
+export async function getFriendStatus(
+  userId: string,
+  peerId: string
+): Promise<{ id: string; status: FriendStatus; isSender: boolean } | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select('id, status, user_id, friend_id')
+    .or(
+      `and(user_id.eq.${userId},friend_id.eq.${peerId}),and(user_id.eq.${peerId},friend_id.eq.${userId})`
+    )
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching friend status:', error);
+    return null;
+  }
+
+  if (!data) return null;
+
+  return {
+    id: data.id,
+    status: data.status as FriendStatus,
+    isSender: data.user_id === userId,
+  };
+}
+
+export async function getFriends(
+  userId: string
+): Promise<EnrichedFriend[]> {
+  const supabase = createClient();
+
+  const [sentResult, receivedResult] = await Promise.all([
+    supabase
+      .from('user_friends')
+      .select(`*, friend:user_profiles!friend_id(id, username, full_name, avatar_url)`)
+      .eq('user_id', userId)
+      .eq('status', 'accepted')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('user_friends')
+      .select(`*, friend:user_profiles!user_id(id, username, full_name, avatar_url)`)
+      .eq('friend_id', userId)
+      .eq('status', 'accepted')
+      .order('created_at', { ascending: false }),
+  ]);
+
+  if (sentResult.error) {
+    console.error('Error fetching sent friends:', sentResult.error);
+  }
+  if (receivedResult.error) {
+    console.error('Error fetching received friends:', receivedResult.error);
+  }
+
+  const sentFriends = (sentResult.data || []) as EnrichedFriend[];
+  const receivedFriends = (receivedResult.data || []) as EnrichedFriend[];
+
+  const allFriends = [...sentFriends, ...receivedFriends].sort(
+    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  );
+
+  return allFriends;
+}
+
+export async function getPendingRequests(
+  userId: string
+): Promise<EnrichedFriend[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select(`*, friend:user_profiles!user_id(id, username, full_name, avatar_url)`)
+    .eq('friend_id', userId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching pending requests:', error);
+    return [];
+  }
+
+  return (data || []) as EnrichedFriend[];
+}
+
+export async function getSentRequests(
+  userId: string
+): Promise<EnrichedFriend[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_friends')
+    .select(`*, friend:user_profiles!friend_id(id, username, full_name, avatar_url)`)
+    .eq('user_id', userId)
+    .eq('status', 'pending')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching sent requests:', error);
+    return [];
+  }
+
+  return (data || []) as EnrichedFriend[];
+}
