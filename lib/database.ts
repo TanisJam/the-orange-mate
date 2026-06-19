@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/client';
-import { createClient as createServerClient } from '@/lib/supabase/server';
 import type {
   UserProfile,
   CreateUserProfileData,
@@ -20,9 +19,15 @@ import type {
   ApiResponse,
 } from './types';
 
+// Lazy import to avoid bundling server-only code in client components
+async function getServerClient() {
+  const { createClient: createServerClient } = await import('@/lib/supabase/server');
+  return await createServerClient();
+}
+
 // User Profile Operations
 export async function getUserProfile(userId: string, isServer = false): Promise<UserProfile | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -43,7 +48,7 @@ export async function updateUserProfile(
   profileData: CreateUserProfileData,
   isServer = false
 ): Promise<UserProfile | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -65,7 +70,7 @@ export async function createUserProfile(
   profileData: CreateUserProfileData,
   isServer = false
 ): Promise<UserProfile | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
    
   const { data, error } = await supabase
     .from('user_profiles')
@@ -82,7 +87,7 @@ export async function createUserProfile(
 }
 
 export async function getUserProfileByUsername(username: string, isServer = false): Promise<UserProfile | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('user_profiles')
@@ -99,7 +104,7 @@ export async function getUserProfileByUsername(username: string, isServer = fals
 }
 
 export async function getUserPlanStats(userId: string, isServer = false): Promise<{ created: number; participating: number }> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const [createdResult, participatingResult] = await Promise.all([
     supabase
@@ -124,7 +129,7 @@ export async function getUserPlanStats(userId: string, isServer = false): Promis
 
 // Interest Operations
 export async function getAllInterests(isServer = false): Promise<Interest[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('interests')
@@ -140,7 +145,7 @@ export async function getAllInterests(isServer = false): Promise<Interest[]> {
 }
 
 export async function getUserInterests(userId: string, isServer = false): Promise<UserInterest[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('user_interests')
@@ -165,7 +170,7 @@ export async function addUserInterest(
   customName?: string,
   isServer = false
 ): Promise<UserInterest | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('user_interests')
@@ -190,7 +195,7 @@ export async function addUserInterest(
 }
 
 export async function removeUserInterest(userInterestId: string, isServer = false): Promise<boolean> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { error } = await supabase
     .from('user_interests')
@@ -207,7 +212,7 @@ export async function removeUserInterest(userInterestId: string, isServer = fals
 
 // Travel Plan Operations
 export async function getUserTravelPlans(userId: string, isServer = false): Promise<TravelPlan[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('travel_plans')
@@ -231,7 +236,7 @@ export async function getUserTravelPlans(userId: string, isServer = false): Prom
 }
 
 export async function getParticipatingPlans(userId: string, isServer = false): Promise<TravelPlan[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   // First get the plan IDs where user is a participant
   const { data: participantPlans, error: participantError } = await supabase
@@ -276,7 +281,7 @@ export async function createTravelPlan(
   planData: CreateTravelPlanData,
   isServer = false
 ): Promise<TravelPlan | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('travel_plans')
@@ -357,7 +362,7 @@ export async function updateTravelPlan(
   planData: Partial<CreateTravelPlanData>,
   isServer = false
 ): Promise<TravelPlan | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('travel_plans')
@@ -382,7 +387,7 @@ export async function updateTravelPlan(
 }
 
 export async function deleteTravelPlan(planId: string, isServer = false): Promise<boolean> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { error } = await supabase
     .from('travel_plans')
@@ -403,7 +408,7 @@ export async function searchTravelPlans(
   pagination: PaginationParams = { page: 1, limit: 10 },
   isServer = false
 ): Promise<ApiResponse<TravelPlan[]>> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   let query = supabase
     .from('travel_plans')
@@ -481,7 +486,7 @@ export async function searchTravelPlans(
 }
 
 export async function getTravelPlan(planId: string, isServer = false): Promise<TravelPlan | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('travel_plans')
@@ -510,7 +515,7 @@ export async function createJoinRequest(
   requestData: CreateJoinRequestData,
   isServer = false
 ): Promise<PlanJoinRequest | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('plan_join_requests')
@@ -540,7 +545,7 @@ export async function updateJoinRequest(
   isServer = false,
   permission_level: PermissionLevel = 'solo_ver'
 ): Promise<PlanJoinRequest | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('plan_join_requests')
@@ -599,7 +604,7 @@ export async function updateJoinRequest(
 }
 
 export async function getPlanJoinRequests(planId: string, isServer = false): Promise<PlanJoinRequest[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('plan_join_requests')
@@ -620,7 +625,7 @@ export async function getPlanJoinRequests(planId: string, isServer = false): Pro
 
 // Chat Operations
 export async function getOrCreateChat(userId1: string, userId2: string, isServer = false): Promise<Chat | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   // Use the database function
   const { data: chatId, error } = await supabase
@@ -651,15 +656,15 @@ export async function getOrCreateChat(userId1: string, userId2: string, isServer
 }
 
 export async function getUserChats(userId: string, isServer = false): Promise<Chat[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('chats')
     .select(`
       *,
-      participant_1:user_profiles!participant_1_id(*),
-      participant_2:user_profiles!participant_2_id(*),
-      last_message:messages(content, created_at)
+      participant_1:user_profiles!participant_1_id(id, username, full_name, avatar_url),
+      participant_2:user_profiles!participant_2_id(id, username, full_name, avatar_url),
+      last_message:messages(content, created_at, sender_id)
     `)
     .or(`participant_1_id.eq.${userId},participant_2_id.eq.${userId}`)
     .order('updated_at', { ascending: false });
@@ -673,13 +678,13 @@ export async function getUserChats(userId: string, isServer = false): Promise<Ch
 }
 
 export async function getChatMessages(chatId: string, isServer = false): Promise<Message[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('messages')
     .select(`
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `)
     .eq('chat_id', chatId)
     .order('created_at', { ascending: true });
@@ -697,7 +702,7 @@ export async function sendMessage(
   messageData: CreateMessageData,
   isServer = false
 ): Promise<Message | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('messages')
@@ -707,7 +712,7 @@ export async function sendMessage(
     })
     .select(`
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `)
     .maybeSingle();
 
@@ -727,7 +732,7 @@ export async function sendMessage(
 
 // Plan Notes Operations
 export async function getPlanNotes(planId: string, isServer = false): Promise<PlanNote[]> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('plan_notes')
@@ -751,7 +756,7 @@ export async function createPlanNote(
   noteData: CreatePlanNoteData,
   isServer = false
 ): Promise<PlanNote | null> {
-  const supabase = isServer ? await createServerClient() : createClient();
+  const supabase = isServer ? await getServerClient() : createClient();
   
   const { data, error } = await supabase
     .from('plan_notes')

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -17,6 +19,7 @@ import {
   getPlanNotes,
   getPlanJoinRequests,
 } from "@/lib/database-client";
+import { createOrGetChat } from "@/lib/chat-client";
 import type { TravelPlan, PlanJoinRequest, PlanNote } from "@/lib/types";
 import {
   PLAN_TYPES,
@@ -34,6 +37,7 @@ import {
   Globe,
   Lock,
   Plane,
+  Send,
 } from "lucide-react";
 
 interface PlanDetailProps {
@@ -47,6 +51,7 @@ export function PlanDetail({
   currentUserId,
   initialRequests,
 }: PlanDetailProps) {
+  const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
   const [notes, setNotes] = useState<PlanNote[]>([]);
   const [notesLoading, setNotesLoading] = useState(true);
@@ -66,6 +71,22 @@ export function PlanDetail({
 
   // Only participants or public plan viewers can see full content
   const canViewFullContent = isParticipant || isCreator || currentPlan.is_public;
+
+  const handleMessageCreator = async () => {
+    try {
+      const chatId = await createOrGetChat(
+        currentUserId,
+        currentPlan.creator_id,
+      );
+      if (chatId) {
+        router.push(`/messages/${chatId}`);
+      } else {
+        toast.error("No se pudo iniciar la conversación");
+      }
+    } catch {
+      toast.error("Error al iniciar la conversación");
+    }
+  };
 
   useEffect(() => {
     if (!canViewFullContent) {
@@ -186,6 +207,16 @@ export function PlanDetail({
               >
                 <Globe className="w-4 h-4 mr-2" />
                 {publishing ? "Publicando..." : "Publicar Plan"}
+              </Button>
+            )}
+            {!isCreator && isParticipant && (
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={handleMessageCreator}
+              >
+                <Send className="w-4 h-4" />
+                Enviar mensaje al creador
               </Button>
             )}
           </div>
