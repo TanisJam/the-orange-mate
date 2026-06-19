@@ -94,7 +94,12 @@ export default function ChatWindow({
             setMessages((prev) => {
               // Prevent duplicates
               if (prev.some((m) => m.id === newMsg.id)) return prev;
-              return [...prev, newMsg as unknown as Message];
+              // Enrich with otherParticipant as sender — realtime
+              // payloads lack the joined sender profile
+              return [
+                ...prev,
+                { ...newMsg, sender: otherParticipant } as unknown as Message,
+              ];
             });
 
             // Mark as read if the window is visible

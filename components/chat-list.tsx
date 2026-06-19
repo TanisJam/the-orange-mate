@@ -76,7 +76,16 @@ export default function ChatList({ chats, currentUserId }: ChatListProps) {
     <div className="space-y-2">
       {chats.map((chat) => {
         const other = getOtherParticipant(chat, currentUserId);
-        const lastMsg = chat.last_message;
+        // last_message is a one-to-many embedded relation — pick the most recent
+        const messagesArr = chat.last_message as unknown as
+          | { content: string; created_at: string; sender_id: string }[]
+          | undefined;
+        const lastMsg =
+          messagesArr && messagesArr.length > 0
+            ? messagesArr.reduce((a, b) =>
+                new Date(a.created_at) > new Date(b.created_at) ? a : b,
+              )
+            : null;
         const isOwnLast =
           lastMsg && lastMsg.sender_id === currentUserId;
         const preview = lastMsg

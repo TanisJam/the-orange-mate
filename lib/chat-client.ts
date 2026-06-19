@@ -9,7 +9,7 @@ export async function getChatMessages(chatId: string): Promise<Message[]> {
     .select(
       `
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `,
     )
     .eq("chat_id", chatId)
@@ -38,7 +38,7 @@ export async function sendMessage(
     .select(
       `
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `,
     )
     .maybeSingle();

@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getChatMessages, getUserChats } from "@/lib/database";
+import { getChatMessages } from "@/lib/database";
 import { redirect, notFound } from "next/navigation";
 import ChatWindow from "@/components/chat-window";
 
@@ -18,9 +18,19 @@ export default async function ChatPage({ params }: Props) {
     redirect("/auth/login");
   }
 
-  // Fetch user's chats to verify participation
-  const chats = await getUserChats(user.id, true);
-  const chat = chats.find((c) => c.id === chatId);
+  // Verify participation — query chat directly by id + participant filter
+  const { data: chat } = await supabase
+    .from("chats")
+    .select(
+      `*,
+      participant_1:user_profiles!participant_1_id(id, username, full_name, avatar_url),
+      participant_2:user_profiles!participant_2_id(id, username, full_name, avatar_url)`,
+    )
+    .eq("id", chatId)
+    .or(
+      `participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`,
+    )
+    .maybeSingle();
 
   if (!chat) {
     notFound();

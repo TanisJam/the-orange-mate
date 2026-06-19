@@ -662,8 +662,8 @@ export async function getUserChats(userId: string, isServer = false): Promise<Ch
     .from('chats')
     .select(`
       *,
-      participant_1:user_profiles!participant_1_id(*),
-      participant_2:user_profiles!participant_2_id(*),
+      participant_1:user_profiles!participant_1_id(id, username, full_name, avatar_url),
+      participant_2:user_profiles!participant_2_id(id, username, full_name, avatar_url),
       last_message:messages(content, created_at, sender_id)
     `)
     .or(`participant_1_id.eq.${userId},participant_2_id.eq.${userId}`)
@@ -684,7 +684,7 @@ export async function getChatMessages(chatId: string, isServer = false): Promise
     .from('messages')
     .select(`
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `)
     .eq('chat_id', chatId)
     .order('created_at', { ascending: true });
@@ -712,7 +712,7 @@ export async function sendMessage(
     })
     .select(`
       *,
-      sender:user_profiles!sender_id(*)
+      sender:user_profiles!sender_id(id, username, full_name, avatar_url)
     `)
     .maybeSingle();
 
