@@ -1,0 +1,161 @@
+"use client";
+
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import Link from "next/link";
+import type { UserProfile, UserInterest } from "@/lib/types";
+import {
+  User,
+  MapPin,
+  Calendar,
+  Flag,
+  Globe,
+  Pencil,
+} from "lucide-react";
+
+interface PublicProfileDisplayProps {
+  profile: UserProfile;
+  interests: UserInterest[];
+  stats: { created: number; participating: number };
+  isOwner: boolean;
+}
+
+export function PublicProfileDisplay({
+  profile,
+  interests,
+  stats,
+  isOwner,
+}: PublicProfileDisplayProps) {
+  const interestLabel = (ui: UserInterest): string => {
+    if (ui.is_custom && ui.custom_name) return ui.custom_name;
+    if (ui.interest?.name) return ui.interest.name;
+    return ui.interest_id;
+  };
+
+  const interestIcon = (ui: UserInterest): string | undefined => {
+    return ui.interest?.icon;
+  };
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header — Avatar + Name + Username */}
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
+            {/* Avatar */}
+            <div className="w-24 h-24 rounded-full border-2 border-neutral-black bg-secondary/20 flex items-center justify-center overflow-hidden shrink-0 dark:border-neutral-gray">
+              {profile.avatar_url ? (
+                <img
+                  src={profile.avatar_url}
+                  alt={profile.full_name || profile.username || "Avatar"}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User className="w-12 h-12 text-neutral-gray" />
+              )}
+            </div>
+
+            {/* Name + Username + Bio */}
+            <div className="flex-1 text-center sm:text-left space-y-2">
+              {profile.full_name && (
+                <h1 className="text-3xl font-heading text-primary dark:text-primary-light">
+                  {profile.full_name}
+                </h1>
+              )}
+              <p className="text-lg text-neutral-gray">
+                @{profile.username}
+              </p>
+              {profile.bio && (
+                <p className="text-sm text-neutral-black dark:text-neutral-white whitespace-pre-wrap">
+                  {profile.bio}
+                </p>
+              )}
+            </div>
+
+            {/* Edit button — only for owner */}
+            {isOwner && (
+              <div className="sm:self-start">
+                <Link href="/dashboard?tab=profile">
+                  <Button variant="outline" size="sm">
+                    <Pencil className="w-4 h-4" />
+                    Editar perfil
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Metadata row — age, country, city */}
+      {(profile.age || profile.country || profile.city) && (
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-gray">
+              {profile.age && (
+                <span className="flex items-center gap-1.5">
+                  <Calendar className="w-4 h-4" />
+                  {profile.age} años
+                </span>
+              )}
+              {profile.country && (
+                <span className="flex items-center gap-1.5">
+                  <Flag className="w-4 h-4" />
+                  {profile.country}
+                </span>
+              )}
+              {profile.city && (
+                <span className="flex items-center gap-1.5">
+                  <MapPin className="w-4 h-4" />
+                  {profile.city}
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Interests */}
+      {interests.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Globe className="w-5 h-5" />
+              Intereses
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {interests.map((ui) => (
+                <Badge
+                  key={ui.id}
+                  variant="default"
+                  className="text-sm px-3 py-1"
+                >
+                  {interestIcon(ui)} {interestLabel(ui)}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Plan Stats */}
+      <Card>
+        <CardContent className="p-6">
+          <p className="text-sm font-semibold text-neutral-black dark:text-neutral-white">
+            Planes creados: {stats.created}
+            {" · "}
+            Participando: {stats.participating}
+          </p>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
