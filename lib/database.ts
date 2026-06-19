@@ -664,7 +664,7 @@ export async function getUserChats(userId: string, isServer = false): Promise<Ch
       *,
       participant_1:user_profiles!participant_1_id(*),
       participant_2:user_profiles!participant_2_id(*),
-      last_message:messages(content, created_at)
+      last_message:messages(content, created_at, sender_id)
     `)
     .or(`participant_1_id.eq.${userId},participant_2_id.eq.${userId}`)
     .order('updated_at', { ascending: false });
