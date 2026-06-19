@@ -6,6 +6,7 @@ import {
   getUserProfile,
   getUserInterests,
   getUserPlanStats,
+  getFriendStatus,
 } from "@/lib/database";
 import type { Metadata } from "next";
 
@@ -53,6 +54,12 @@ export default async function PublicProfilePage({ params }: Props) {
 
   const isOwner = user?.id === profile.id;
 
+  // Fetch friend relationship if viewer is authenticated and not the owner
+  let friendStatus = null;
+  if (user && !isOwner) {
+    friendStatus = await getFriendStatus(user.id, profile.id, true);
+  }
+
   // Strip phone before serializing to client — never leak to public view
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { phone: _phone, ...publicProfile } = profile;
@@ -64,6 +71,7 @@ export default async function PublicProfilePage({ params }: Props) {
       stats={stats}
       isOwner={isOwner}
       currentUserId={user?.id ?? null}
+      friendStatus={friendStatus}
     />
   );
 }

@@ -11,8 +11,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import type { UserProfile, UserInterest } from "@/lib/types";
+import type { UserProfile, UserInterest, FriendStatus } from "@/lib/types";
 import { createOrGetChat } from "@/lib/chat-client";
+import FriendRequestButton from "@/components/friend-request-button";
 import {
   User,
   MapPin,
@@ -23,12 +24,19 @@ import {
   Send,
 } from "lucide-react";
 
+interface FriendStatusResult {
+  id: string;
+  status: FriendStatus;
+  isSender: boolean;
+}
+
 interface PublicProfileDisplayProps {
   profile: UserProfile;
   interests: UserInterest[];
   stats: { created: number; participating: number };
   isOwner: boolean;
   currentUserId?: string | null;
+  friendStatus?: FriendStatusResult | null;
 }
 
 export function PublicProfileDisplay({
@@ -37,6 +45,7 @@ export function PublicProfileDisplay({
   stats,
   isOwner,
   currentUserId,
+  friendStatus,
 }: PublicProfileDisplayProps) {
   const router = useRouter();
 
@@ -188,6 +197,18 @@ export function PublicProfileDisplay({
           </p>
         </CardContent>
       </Card>
+
+      {/* Friend interaction — authenticated non-owners only */}
+      {!isOwner && currentUserId && (
+        <div className="flex justify-end">
+          <FriendRequestButton
+            currentUserId={currentUserId}
+            profileUserId={profile.id}
+            isOwnProfile={isOwner}
+            initialStatus={friendStatus ?? null}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -766,11 +766,11 @@ export async function sendFriendRequest(
 
   const { data, error } = await supabase
     .from('user_friends')
-    .insert({
+    .upsert({
       user_id: userId,
       friend_id: friendId,
       status: 'pending',
-    })
+    }, { onConflict: 'user_id,friend_id' })
     .select(`
       *,
       friend:user_profiles!friend_id(id, username, full_name, avatar_url)
