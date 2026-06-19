@@ -171,6 +171,7 @@ export interface UserReview {
 export interface CreateUserProfileData {
   username?: string;
   full_name?: string;
+  avatar_url?: string;
   bio?: string;
   age?: number;
   country?: string;
