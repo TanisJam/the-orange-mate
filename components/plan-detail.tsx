@@ -67,8 +67,13 @@ export function PlanDetail({
   const canViewFullContent = isParticipant || isCreator || currentPlan.is_public;
 
   useEffect(() => {
+    if (!canViewFullContent) {
+      setNotes([]);
+      setNotesLoading(false);
+      return;
+    }
     loadNotes();
-  }, [currentPlan.id]);
+  }, [currentPlan.id, canViewFullContent]);
 
   const loadNotes = async () => {
     setNotesLoading(true);
@@ -338,7 +343,7 @@ export function PlanDetail({
           <CardTitle className="flex items-center gap-2">
             <Users className="w-5 h-5" />
             Participantes ({currentPlan.current_participants ?? 0}/
-            {currentPlan.max_participants})
+            {currentPlan.max_participants ?? "∞"})
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">

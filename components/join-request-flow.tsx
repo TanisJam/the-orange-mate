@@ -63,6 +63,7 @@ export function JoinRequestFlow({
       const result = await createJoinRequest(userId, {
         plan_id: planId,
         message: message.trim() || undefined,
+        status: isAtCapacity ? "waiting_list" : "pending",
       });
       if (result) {
         setSuccess(
@@ -118,7 +119,7 @@ export function JoinRequestFlow({
   };
 
   // Creator view: pending requests to manage
-  if (isCreator && pendingRequests.length > 0) {
+  if (isCreator) {
     const pending = pendingRequests.filter((r) => r.status === "pending");
 
     return (

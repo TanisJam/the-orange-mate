@@ -212,6 +212,7 @@ export interface CreateMessageData {
 export interface CreateJoinRequestData {
   plan_id: string;
   message?: string;
+  status?: 'pending' | 'waiting_list';
 }
 
 // Utility types

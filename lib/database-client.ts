@@ -462,10 +462,11 @@ export async function createJoinRequest(
   
   const { data, error } = await supabase
     .from('plan_join_requests')
-    .insert({
+    .upsert({
       requester_id: userId,
+      status: requestData.status || 'pending',
       ...requestData
-    })
+    }, { onConflict: 'plan_id,requester_id' })
     .select(`
       *,
       requester:user_profiles!requester_id(*),
