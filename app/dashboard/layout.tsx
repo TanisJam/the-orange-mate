@@ -1,6 +1,7 @@
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
+import { MessagesSquare } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -14,6 +15,13 @@ export default function DashboardLayout({
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"} className="font-heading text-xl text-primary dark:text-primary-light">
               SoloTravelers
+            </Link>
+            <Link
+              href="/messages"
+              className="flex items-center gap-1.5 text-sm font-body text-neutral-gray hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
+            >
+              <MessagesSquare className="size-4" />
+              Mensajes
             </Link>
           </div>
           <div className="flex items-center gap-4">
