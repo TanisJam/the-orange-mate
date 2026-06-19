@@ -2,7 +2,7 @@
 
 export type PlanType = 'alojamiento' | 'actividad' | 'viaje_completo' | 'transporte' | 'salida_local';
 
-export type PlanStatus = 'buscando_companero' | 'planeado' | 'flexible' | 'tentativo' | 'cerrado';
+export type PlanStatus = 'buscando_companero' | 'planeado' | 'flexible' | 'tentativo' | 'cerrado' | 'completado';
 
 export type PermissionLevel = 'solo_ver' | 'agregar_notas_privadas' | 'sugerir_cambios' | 'editar';
 
@@ -75,6 +75,7 @@ export interface TravelPlan {
   comments_enabled: boolean;
   created_at: string;
   updated_at: string;
+  completed_at?: string;
   creator?: UserProfile; // for joined queries
   participants?: PlanParticipant[]; // for joined queries
 }
@@ -171,6 +172,7 @@ export interface UserReview {
   rating: number;
   comment?: string;
   created_at: string;
+  edited_at?: string;
   reviewer?: UserProfile; // for joined queries
   reviewed?: UserProfile; // for joined queries
   plan?: TravelPlan; // for joined queries
@@ -231,6 +233,18 @@ export interface CreateJoinRequestData {
   status?: 'pending' | 'waiting_list';
 }
 
+export interface CreateReviewData {
+  reviewed_id: string;
+  plan_id: string;
+  rating: number;
+  comment?: string;
+}
+
+export interface UpdateReviewData {
+  rating?: number;
+  comment?: string;
+}
+
 // Utility types
 export interface SearchFilters {
   plan_type?: PlanType;
@@ -273,6 +287,7 @@ export const PLAN_STATUSES: { value: PlanStatus; label: string; color: string }[
   { value: 'flexible', label: 'Flexible', color: 'bg-accent' },
   { value: 'tentativo', label: 'Tentativo', color: 'bg-neutral-gray' },
   { value: 'cerrado', label: 'Cerrado', color: 'bg-error' },
+  { value: 'completado', label: 'Completado', color: 'bg-success' },
 ];
 
 export const PERMISSION_LEVELS: { value: PermissionLevel; label: string }[] = [

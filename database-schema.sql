@@ -18,7 +18,8 @@ create type plan_status_enum as enum (
   'planeado',
   'flexible',
   'tentativo',
-  'cerrado'
+  'cerrado',
+  'completado'
 );
 
 create type permission_level_enum as enum (
@@ -97,7 +98,8 @@ create table public.travel_plans (
   is_public boolean default true,
   comments_enabled boolean default true,
   created_at timestamp with time zone default now(),
-  updated_at timestamp with time zone default now()
+  updated_at timestamp with time zone default now(),
+  completed_at timestamp with time zone
 );
 
 -- Plan participants (who joined the plan)
@@ -186,6 +188,7 @@ create table public.user_reviews (
   rating integer check (rating >= 1 and rating <= 5),
   comment text,
   created_at timestamp with time zone default now(),
+  edited_at timestamp with time zone,
   unique(reviewer_id, reviewed_id, plan_id),
   check (reviewer_id != reviewed_id)
 );
@@ -399,9 +402,9 @@ create policy "Users can send messages in their chats" on public.messages
       (participant_1_id = auth.uid() or participant_2_id = auth.uid()))
   );
 
--- User reviews policies (for future)
+-- User reviews policies
 create policy "Users can view all reviews" on public.user_reviews
-  for select using (true);
+  for select using (auth.uid() IS NOT NULL);
 
 create policy "Users can create reviews" on public.user_reviews
   for insert with check (auth.uid() = reviewer_id);
