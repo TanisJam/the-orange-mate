@@ -205,6 +205,12 @@ export interface CreatePlanNoteData {
   is_private?: boolean;
 }
 
+export interface CreatePlanCommentData {
+  plan_id: string;
+  content: string;
+  parent_comment_id?: string;
+}
+
 export interface CreateMessageData {
   chat_id: string;
   content: string;

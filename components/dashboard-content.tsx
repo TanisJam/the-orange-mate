@@ -474,93 +474,30 @@ export function DashboardContent({ userId }: DashboardContentProps) {
         </TabsContent>
 
         {/* Discover Tab */}
-        <TabsContent value="discover" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-2xl font-heading">Descubrir Planes</h2>
-              <p className="text-neutral-gray">Encuentra compañeros de viaje y únete a aventuras increíbles</p>
-            </div>
-            <Button variant="outline">
-              <Search className="w-4 h-4 mr-2" />
-              Filtros Avanzados
-            </Button>
-          </div>
-
+        <TabsContent value="discover">
           <Card>
             <CardHeader>
-              <CardTitle>Planes Disponibles</CardTitle>
-              <CardDescription>Planes públicos buscando compañeros de viaje</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="w-5 h-5" />
+                Descubrir Planes
+              </CardTitle>
+              <CardDescription>
+                Buscá planes públicos con filtros avanzados, encontrá compañeros de
+                viaje y unite a nuevas aventuras.
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              {suggestedPlans.length === 0 ? (
-                <div className="text-center py-12">
-                  <Search className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">No hay planes disponibles</h3>
-                  <p className="text-neutral-gray">Prueba creando el tuyo propio para atraer a otros viajeros</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {suggestedPlans.map((plan) => {
-                    const typeInfo = getPlanTypeInfo(plan.plan_type);
-                    const statusInfo = getPlanStatusInfo(plan.status);
-                    
-                    return (
-                      <div key={plan.id} className="p-4 border-2 border-neutral-black rounded-lg bg-neutral-white hover:shadow-lg transition-shadow dark:border-neutral-gray dark:bg-neutral-light">
-                        <div className="flex justify-between items-start mb-3">
-                          <div className="flex items-center gap-2">
-                            <span className="text-lg">{typeInfo.icon}</span>
-                            <h3 className="font-semibold line-clamp-1">{plan.title}</h3>
-                          </div>
-                          <Badge className={statusInfo.color + " text-white text-xs"}>
-                            {statusInfo.label}
-                          </Badge>
-                        </div>
-                        
-                        <p className="text-sm text-neutral-gray mb-2">
-                          por{' '}
-                          <Link
-                            href={`/profile/${plan.creator?.username || plan.creator_id}`}
-                            className="hover:underline"
-                          >
-                            {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
-                          </Link>
-                        </p>
-                        
-                        <div className="space-y-2 text-sm mb-3">
-                          <div className="flex items-center gap-1 text-neutral-gray">
-                            <MapPin className="w-4 h-4" />
-                            <span className="line-clamp-1">{plan.destinations.join(", ")}</span>
-                          </div>
-                          
-                          {plan.start_date && (
-                            <div className="flex items-center gap-1 text-neutral-gray">
-                              <Calendar className="w-4 h-4" />
-                              <span>{formatDate(plan.start_date)}</span>
-                            </div>
-                          )}
-                          
-                          <div className="flex items-center gap-1 text-neutral-gray">
-                            <Users className="w-4 h-4" />
-                            <span>{plan.current_participants}/{plan.max_participants} participantes</span>
-                          </div>
-                        </div>
-                        
-                        {plan.description && (
-                          <p className="text-sm text-neutral-gray mb-3 line-clamp-2">
-                            {plan.description}
-                          </p>
-                        )}
-                        
-                        <Button asChild size="sm" variant="primary" className="w-full">
-                          <Link href={`/plans/${plan.id}`}>
-                            Ver Detalles
-                          </Link>
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
+            <CardContent className="text-center">
+              <Search className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
+              <p className="text-neutral-gray mb-6">
+                La nueva página de descubrimiento tiene filtros por tipo de plan,
+                destino, fechas, presupuesto y más.
+              </p>
+              <Button asChild variant="primary" size="lg">
+                <Link href="/discover">
+                  <Search className="w-4 h-4" />
+                  Explorar Planes
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </TabsContent>

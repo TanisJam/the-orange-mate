@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,11 +16,12 @@ import {
 import { JoinRequestFlow } from "@/components/join-request-flow";
 import {
   updateTravelPlan,
-  getPlanNotes,
   getPlanJoinRequests,
 } from "@/lib/database-client";
 import { createOrGetChat } from "@/lib/chat-client";
-import type { TravelPlan, PlanJoinRequest, PlanNote } from "@/lib/types";
+import type { TravelPlan, PlanJoinRequest } from "@/lib/types";
+import CommentList from "@/components/comment-list";
+import NoteList from "@/components/note-list";
 import {
   PLAN_TYPES,
   PLAN_STATUSES,
@@ -36,8 +37,8 @@ import {
   MessageSquare,
   Globe,
   Lock,
-  Plane,
   Send,
+  StickyNote,
 } from "lucide-react";
 
 interface PlanDetailProps {
@@ -53,8 +54,6 @@ export function PlanDetail({
 }: PlanDetailProps) {
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
-  const [notes, setNotes] = useState<PlanNote[]>([]);
-  const [notesLoading, setNotesLoading] = useState(true);
   const [joinRequests, setJoinRequests] =
     useState<PlanJoinRequest[]>(initialRequests);
   const [publishing, setPublishing] = useState(false);
@@ -85,27 +84,6 @@ export function PlanDetail({
       }
     } catch {
       toast.error("Error al iniciar la conversación");
-    }
-  };
-
-  useEffect(() => {
-    if (!canViewFullContent) {
-      setNotes([]);
-      setNotesLoading(false);
-      return;
-    }
-    loadNotes();
-  }, [currentPlan.id, canViewFullContent]);
-
-  const loadNotes = async () => {
-    setNotesLoading(true);
-    try {
-      const data = await getPlanNotes(currentPlan.id);
-      setNotes(data);
-    } catch (error) {
-      console.error("Error loading notes:", error);
-    } finally {
-      setNotesLoading(false);
     }
   };
 
@@ -312,69 +290,54 @@ export function PlanDetail({
         </CardContent>
       </Card>
 
-      {/* 4. Comments / Notes */}
+      {/* 4. Comments */}
       {canViewFullContent && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              Notas y Comentarios
+              Comentarios
             </CardTitle>
-            <CardDescription>
-              Notas compartidas entre los participantes del plan
-            </CardDescription>
+            {!currentPlan.comments_enabled && (
+              <CardDescription>
+                Los comentarios están deshabilitados para este plan
+              </CardDescription>
+            )}
           </CardHeader>
           <CardContent>
-            {notesLoading ? (
-              <div className="flex items-center justify-center py-8">
-                <Plane className="w-6 h-6 animate-pulse text-neutral-gray" />
-              </div>
-            ) : notes.length === 0 ? (
-              <p className="text-neutral-gray text-center py-8">
-                No hay notas todavía. ¡Sé el primero en comentar!
-              </p>
-            ) : (
-              <div className="space-y-4">
-                {notes.map((note) => (
-                  <div
-                    key={note.id}
-                    className="p-4 border-2 border-neutral-black rounded-lg dark:border-neutral-gray"
-                  >
-                    <div className="flex items-start gap-3">
-                      <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary shrink-0">
-                        {(note.author?.full_name || note.author?.username || "U")[0]}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-sm">
-                            {note.author?.full_name ||
-                              note.author?.username ||
-                              "Usuario"}
-                          </span>
-                          {note.is_private && (
-                            <Badge variant="outline" className="text-xs">
-                              <Lock className="w-3 h-3 mr-1" />
-                              Privada
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm mt-1 whitespace-pre-wrap">
-                          {note.content}
-                        </p>
-                        <p className="text-xs text-neutral-gray mt-2">
-                          {formatDate(note.created_at)}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
+            <CommentList
+              planId={currentPlan.id}
+              currentUserId={currentUserId}
+              canComment={
+                currentPlan.comments_enabled && canViewFullContent
+              }
+            />
           </CardContent>
         </Card>
       )}
 
-      {/* 5. Participants */}
+      {/* 5. Notes */}
+      {(isParticipant || isCreator) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <StickyNote className="w-5 h-5" />
+              Notas
+            </CardTitle>
+            <CardDescription>
+              Notas para participantes (podés marcarlas como privadas para que solo las veas vos)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <NoteList
+              planId={currentPlan.id}
+              currentUserId={currentUserId}
+            />
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 6. Participants */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
