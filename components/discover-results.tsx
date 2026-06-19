@@ -133,7 +133,7 @@ export function DiscoverResults({
       <div className="text-center py-16">
         <Search className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
         <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white mb-2">
-          No se encontraron planes
+          No se encontraron planes con estos filtros
         </h3>
         <p className="text-neutral-gray max-w-md mx-auto">
           Intentá con otros filtros o volvé más tarde para ver nuevos planes
@@ -182,7 +182,7 @@ function PlanCard({
   const typeInfo = getPlanTypeInfo(plan.plan_type);
 
   if (!isAuthenticated) {
-    return <UnauthenticatedCard plan={plan} typeInfo={typeInfo} />;
+    return <UnauthenticatedCard plan={plan} />;
   }
 
   return <AuthenticatedCard plan={plan} typeInfo={typeInfo} />;
@@ -192,18 +192,12 @@ function PlanCard({
 
 function UnauthenticatedCard({
   plan,
-  typeInfo,
 }: {
   plan: TravelPlan;
-  typeInfo: { value: string; label: string; icon: string };
 }) {
   return (
     <div className="p-4 border-2 border-neutral-black rounded-lg bg-neutral-white shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] dark:border-neutral-gray dark:bg-neutral-light flex flex-col">
-      {/* Type badge */}
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-lg">{typeInfo.icon}</span>
-        <Badge variant="outline">{typeInfo.label}</Badge>
-      </div>
+      {/* Type badge intentionally hidden for anonymous users per spec */}
 
       {/* Destinations */}
       <div className="flex flex-wrap gap-1.5 mb-3">
@@ -215,13 +209,11 @@ function UnauthenticatedCard({
         ))}
       </div>
 
-      {/* Dates */}
-      {plan.start_date && (
-        <div className="flex items-center gap-1.5 text-sm text-neutral-gray mb-3">
-          <Calendar className="w-4 h-4" />
-          <span>{formatApproxDateRange(plan.start_date, plan.end_date)}</span>
-        </div>
-      )}
+      {/* Dates (always show — dates or flexible message) */}
+      <div className="flex items-center gap-1.5 text-sm text-neutral-gray mb-3">
+        <Calendar className="w-4 h-4" />
+        <span>{formatApproxDateRange(plan.start_date, plan.end_date)}</span>
+      </div>
 
       {/* Login prompt */}
       <div className="mt-auto pt-3 border-t border-neutral-gray/30">
@@ -297,10 +289,12 @@ function AuthenticatedCard({
       {(plan.budget_range_min !== undefined ||
         plan.budget_range_max !== undefined) && (
         <p className="text-sm font-medium text-neutral-black dark:text-neutral-white mb-3">
-          {plan.currency}{" "}
-          {plan.budget_range_min?.toLocaleString("es-ES") || "0"}
-          {" – "}
-          {plan.budget_range_max?.toLocaleString("es-ES") || "∞"}
+          {plan.budget_range_min !== undefined
+            ? `${plan.currency} ${plan.budget_range_min.toLocaleString("es-ES")}`
+            : "Sin mínimo"}
+          {plan.budget_range_max !== undefined
+            ? ` – ${plan.currency} ${plan.budget_range_max.toLocaleString("es-ES")}`
+            : ""}
         </p>
       )}
 

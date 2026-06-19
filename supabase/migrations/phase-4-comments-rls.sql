@@ -7,7 +7,7 @@ create policy "Participants and creator can comment on private plans" on public.
     auth.uid() = author_id and 
     exists (
       select 1 from public.travel_plans
-      where id = plan_id and (
+      where id = plan_id and comments_enabled = true and (
         creator_id = auth.uid() or
         exists (
           select 1 from public.plan_participants

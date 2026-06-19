@@ -108,7 +108,7 @@ export default function NoteList({ planId, currentUserId }: NoteListProps) {
       ) : visibleNotes.length === 0 ? (
         <div className="text-center py-8">
           <StickyNote className="w-10 h-10 mx-auto text-neutral-gray mb-2" />
-          <p className="text-neutral-gray">No hay notas aún.</p>
+          <p className="text-neutral-gray">No hay notas. ¡Agrega una!</p>
         </div>
       ) : (
         <div className="space-y-3">

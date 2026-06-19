@@ -33,6 +33,7 @@ interface CommentItemProps {
   comment: PlanComment & { replies?: PlanComment[] };
   currentUserId: string;
   planId: string;
+  canReply?: boolean;
   isReply?: boolean;
   onCommentChanged: () => void;
 }
@@ -41,6 +42,7 @@ export default function CommentItem({
   comment,
   currentUserId,
   planId,
+  canReply = true,
   isReply = false,
   onCommentChanged,
 }: CommentItemProps) {
@@ -55,6 +57,10 @@ export default function CommentItem({
   const authorInitial = (author?.full_name || author?.username || "U")[0];
 
   const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "¿Eliminar este comentario? Esta acción también eliminará sus respuestas.",
+    );
+    if (!confirmed) return;
     setDeleting(true);
     try {
       const ok = await deletePlanComment(comment.id);
@@ -131,7 +137,7 @@ export default function CommentItem({
           {/* Actions */}
           <div className="flex items-center gap-2 mt-1.5">
             {/* Reply button — only for top-level comments (cap at 2 levels) */}
-            {!isReply && (
+            {!isReply && canReply && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -163,7 +169,7 @@ export default function CommentItem({
           </div>
 
           {/* Reply form */}
-          {showReplyForm && (
+          {showReplyForm && canReply && (
             <div className="mt-2 flex gap-2 items-start">
               <Textarea
                 value={replyContent}

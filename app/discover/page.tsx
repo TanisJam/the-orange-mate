@@ -62,7 +62,7 @@ export default async function DiscoverPage({
     filters.share_tours = params.share_tours === "true";
   }
 
-  const page = typeof params.page === "string" ? parseInt(params.page, 10) || 1 : 1;
+  const page = typeof params.page === "string" ? Math.max(1, parseInt(params.page, 10) || 1) : 1;
   const pagination: PaginationParams = { page, limit: 10 };
 
   const result = await searchTravelPlans(filters, pagination, true);

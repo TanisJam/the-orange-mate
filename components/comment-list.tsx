@@ -135,6 +135,7 @@ export default function CommentList({
               comment={comment}
               currentUserId={currentUserId}
               planId={planId}
+              canReply={canComment}
               onCommentChanged={loadComments}
             />
           ))}

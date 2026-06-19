@@ -325,7 +325,7 @@ export function PlanDetail({
               Notas
             </CardTitle>
             <CardDescription>
-              Notas compartidas entre los participantes del plan
+              Notas para participantes (podés marcarlas como privadas para que solo las veas vos)
             </CardDescription>
           </CardHeader>
           <CardContent>
