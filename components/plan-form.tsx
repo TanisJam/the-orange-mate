@@ -71,7 +71,11 @@ export function PlanForm({ userId }: PlanFormProps) {
       newErrors.title = "El título es obligatorio";
     }
 
-    if (!destinations.trim()) {
+    const parsedDestinations = destinations
+      .split(",")
+      .map((d) => d.trim())
+      .filter(Boolean);
+    if (parsedDestinations.length === 0) {
       newErrors.destinations = "Al menos un destino es obligatorio";
     }
 
@@ -178,7 +182,7 @@ export function PlanForm({ userId }: PlanFormProps) {
               <div>
                 <Label htmlFor="plan_type">Tipo de Plan</Label>
                 <Select value={planType} onValueChange={(v) => setPlanType(v as PlanType)}>
-                  <SelectTrigger>
+                  <SelectTrigger id="plan_type">
                     <SelectValue placeholder="Selecciona el tipo de plan" />
                   </SelectTrigger>
                   <SelectContent>
@@ -383,7 +387,7 @@ export function PlanForm({ userId }: PlanFormProps) {
               <div>
                 <Label htmlFor="currency">Moneda</Label>
                 <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger>
+                  <SelectTrigger id="currency">
                     <SelectValue placeholder="Selecciona moneda" />
                   </SelectTrigger>
                   <SelectContent>
