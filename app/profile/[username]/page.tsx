@@ -43,9 +43,12 @@ export default async function PublicProfilePage({ params }: Props) {
 
   const isOwner = user?.id === profile.id;
 
+  // Strip phone before serializing to client — never leak to public view
+  const { phone: _, ...publicProfile } = profile;
+
   return (
     <PublicProfileDisplay
-      profile={profile}
+      profile={publicProfile}
       interests={userInterests}
       stats={stats}
       isOwner={isOwner}

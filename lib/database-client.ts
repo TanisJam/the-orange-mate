@@ -82,7 +82,7 @@ export async function getUserProfileByUsername(username: string): Promise<UserPr
     .from('user_profiles')
     .select('*')
     .eq('username', username)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching user profile by username:', error);
@@ -106,31 +106,25 @@ export async function getUserPlanStats(userId: string): Promise<{ created: numbe
       .eq('user_id', userId),
   ]);
 
-  if (createdResult.error) {
-    console.error('Error counting created plans:', createdResult.error);
-    return { created: 0, participating: 0 };
-  }
-
-  if (participatingResult.error) {
-    console.error('Error counting participating plans:', participatingResult.error);
-    return { created: 0, participating: 0 };
-  }
-
   return {
-    created: createdResult.count || 0,
-    participating: participatingResult.count || 0,
+    created: createdResult.error
+      ? (console.error('Error counting created plans:', createdResult.error), 0)
+      : (createdResult.count || 0),
+    participating: participatingResult.error
+      ? (console.error('Error counting participating plans:', participatingResult.error), 0)
+      : (participatingResult.count || 0),
   };
 }
 
 export async function uploadAvatar(userId: string, file: File): Promise<string | null> {
   try {
     const supabase = createClient();
-    const ext = file.name.split('.').pop();
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
     const path = `${userId}/avatar.${ext}`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')
-      .upload(path, file, { upsert: true });
+      .upload(path, file, { upsert: true, contentType: file.type });
 
     if (uploadError) {
       console.error('Error uploading avatar:', uploadError);
@@ -143,7 +137,11 @@ export async function uploadAvatar(userId: string, file: File): Promise<string |
 
     const publicUrl = urlData.publicUrl;
 
-    await updateUserProfile(userId, { avatar_url: publicUrl });
+    const updatedProfile = await updateUserProfile(userId, { avatar_url: publicUrl });
+    if (!updatedProfile) {
+      console.error('Error persisting avatar_url to profile');
+      return null;
+    }
 
     return publicUrl;
   } catch (error) {

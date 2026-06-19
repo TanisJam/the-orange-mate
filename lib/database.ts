@@ -88,7 +88,7 @@ export async function getUserProfileByUsername(username: string, isServer = fals
     .from('user_profiles')
     .select('*')
     .eq('username', username)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching user profile by username:', error);
@@ -112,19 +112,13 @@ export async function getUserPlanStats(userId: string, isServer = false): Promis
       .eq('user_id', userId),
   ]);
 
-  if (createdResult.error) {
-    console.error('Error counting created plans:', createdResult.error);
-    return { created: 0, participating: 0 };
-  }
-
-  if (participatingResult.error) {
-    console.error('Error counting participating plans:', participatingResult.error);
-    return { created: 0, participating: 0 };
-  }
-
   return {
-    created: createdResult.count || 0,
-    participating: participatingResult.count || 0,
+    created: createdResult.error
+      ? (console.error('Error counting created plans:', createdResult.error), 0)
+      : (createdResult.count || 0),
+    participating: participatingResult.error
+      ? (console.error('Error counting participating plans:', participatingResult.error), 0)
+      : (participatingResult.count || 0),
   };
 }
 
