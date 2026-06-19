@@ -28,7 +28,7 @@ export async function getUserProfile(userId: string, isServer = false): Promise<
     .from('user_profiles')
     .select('*')
     .eq('id', userId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching user profile:', error);
@@ -50,7 +50,7 @@ export async function updateUserProfile(
     .update(profileData)
     .eq('id', userId)
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error updating user profile:', error);
@@ -71,7 +71,7 @@ export async function createUserProfile(
     .from('user_profiles')
     .insert({ id: userId, ...profileData })
     .select()
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error creating user profile:', error);
@@ -88,7 +88,7 @@ export async function getUserProfileByUsername(username: string, isServer = fals
     .from('user_profiles')
     .select('*')
     .eq('username', username)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching user profile by username:', error);
@@ -112,19 +112,13 @@ export async function getUserPlanStats(userId: string, isServer = false): Promis
       .eq('user_id', userId),
   ]);
 
-  if (createdResult.error) {
-    console.error('Error counting created plans:', createdResult.error);
-    return { created: 0, participating: 0 };
-  }
-
-  if (participatingResult.error) {
-    console.error('Error counting participating plans:', participatingResult.error);
-    return { created: 0, participating: 0 };
-  }
-
   return {
-    created: createdResult.count || 0,
-    participating: participatingResult.count || 0,
+    created: createdResult.error
+      ? (console.error('Error counting created plans:', createdResult.error), 0)
+      : (createdResult.count || 0),
+    participating: participatingResult.error
+      ? (console.error('Error counting participating plans:', participatingResult.error), 0)
+      : (participatingResult.count || 0),
   };
 }
 
@@ -185,7 +179,7 @@ export async function addUserInterest(
       *,
       interest:interests(*)
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error adding user interest:', error);
@@ -298,7 +292,7 @@ export async function createTravelPlan(
         user:user_profiles(*)
       )
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error creating travel plan:', error);
@@ -350,7 +344,7 @@ export async function createTravelPlan(
         )
       `)
       .eq('id', data.id)
-      .single();
+      .maybeSingle();
 
     return refreshed ?? data;
   }
@@ -377,7 +371,7 @@ export async function updateTravelPlan(
         user:user_profiles(*)
       )
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error updating travel plan:', error);
@@ -500,7 +494,7 @@ export async function getTravelPlan(planId: string, isServer = false): Promise<T
       )
     `)
     .eq('id', planId)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error fetching travel plan:', error);
@@ -530,7 +524,7 @@ export async function createJoinRequest(
       requester:user_profiles!requester_id(*),
       plan:travel_plans(*)
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error creating join request:', error);
@@ -560,7 +554,7 @@ export async function updateJoinRequest(
       requester:user_profiles!requester_id(*),
       plan:travel_plans(*)
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error updating join request:', error);
@@ -646,7 +640,7 @@ export async function getOrCreateChat(userId1: string, userId2: string, isServer
       participant_2:user_profiles!participant_2_id(*)
     `)
     .eq('id', chatId)
-    .single();
+    .maybeSingle();
 
   if (fetchError) {
     console.error('Error fetching chat data:', fetchError);
@@ -715,7 +709,7 @@ export async function sendMessage(
       *,
       sender:user_profiles!sender_id(*)
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error sending message:', error);
@@ -769,7 +763,7 @@ export async function createPlanNote(
       *,
       author:user_profiles!author_id(*)
     `)
-    .single();
+    .maybeSingle();
 
   if (error) {
     console.error('Error creating plan note:', error);
