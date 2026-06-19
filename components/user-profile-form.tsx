@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, User } from "lucide-react";
+import { AvatarUpload } from "@/components/avatar-upload";
 import {
   getUserProfile,
   updateUserProfile,
@@ -45,6 +46,7 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [newCustomInterest, setNewCustomInterest] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(undefined);
 
   // Form data
   const [formData, setFormData] = useState({
@@ -84,6 +86,7 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
           city: profileData.city || "",
           phone: profileData.phone || "",
         });
+        setAvatarUrl(profileData.avatar_url);
       }
     } catch (error) {
       console.error("Error loading profile data:", error);
@@ -191,6 +194,13 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {/* Avatar Upload */}
+      <AvatarUpload
+        userId={userId}
+        currentAvatarUrl={avatarUrl}
+        onUploadComplete={(url) => setAvatarUrl(url)}
+      />
+
       {/* Personal Information */}
       <Card>
         <CardHeader>

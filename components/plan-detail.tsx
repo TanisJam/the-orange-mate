@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -165,9 +166,20 @@ export function PlanDetail({
               </div>
               <p className="text-sm text-neutral-gray">
                 Creado por{" "}
-                {currentPlan.creator?.full_name ||
-                  currentPlan.creator?.username ||
-                  "Usuario"}
+                {currentPlan.creator?.username ? (
+                  <Link
+                    href={`/profile/${currentPlan.creator.username}`}
+                    className="hover:underline"
+                  >
+                    {currentPlan.creator?.full_name ||
+                      currentPlan.creator?.username ||
+                      "Usuario"}
+                  </Link>
+                ) : (
+                  currentPlan.creator?.full_name ||
+                    currentPlan.creator?.username ||
+                    "Usuario"
+                )}
                 {" · "}
                 {formatDate(currentPlan.created_at)}
               </p>
