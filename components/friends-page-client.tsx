@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import FriendCard from "@/components/friend-card";
@@ -25,9 +26,11 @@ export default function FriendsPageClient({
   const [friends, setFriends] = useState<EnrichedFriend[]>(initialFriends);
   const [pending, setPending] = useState<EnrichedFriend[]>(initialPending);
   const [sent] = useState<EnrichedFriend[]>(initialSent);
+  const searchParams = useSearchParams();
+  const defaultTab = searchParams.get("tab") ?? "amigos";
 
   const handleAccept = async (requestId: string) => {
-    const result = await acceptFriendRequest(requestId);
+    const result = await acceptFriendRequest(requestId, currentUserId);
     if (result) {
       const accepted = pending.find((r) => r.id === requestId);
       if (accepted) {
@@ -37,18 +40,18 @@ export default function FriendsPageClient({
           ...prev,
         ]);
       }
-      toast.success("Solicitud aceptada");
+      toast.success("Solicitud de amistad aceptada", { duration: 3000 });
     }
   };
 
   const handleReject = async (requestId: string) => {
-    await rejectFriendRequest(requestId);
+    await rejectFriendRequest(requestId, currentUserId);
     setPending((prev) => prev.filter((r) => r.id !== requestId));
   };
 
   return (
     <div className="max-w-2xl mx-auto py-8 px-4">
-      <Tabs defaultValue="amigos" className="w-full">
+      <Tabs defaultValue={defaultTab} className="w-full">
         <TabsList className="w-full">
           <TabsTrigger value="amigos" className="flex-1">
             Amigos

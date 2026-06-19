@@ -54,7 +54,7 @@ export default function FriendRequestButton({
   const handleAccept = async () => {
     if (!status?.id) return;
     setLoading(true);
-    const result = await acceptFriendRequest(status.id);
+    const result = await acceptFriendRequest(status.id, currentUserId);
     setLoading(false);
     if (result) {
       setStatus({
@@ -62,7 +62,7 @@ export default function FriendRequestButton({
         status: "accepted",
         isSender: false,
       });
-      toast.success("Solicitud aceptada");
+      toast.success("Solicitud de amistad aceptada", { duration: 3000 });
     } else {
       toast.error("No se pudo aceptar la solicitud");
     }
@@ -71,7 +71,7 @@ export default function FriendRequestButton({
   const handleReject = async () => {
     if (!status?.id) return;
     setLoading(true);
-    await rejectFriendRequest(status.id);
+    await rejectFriendRequest(status.id, currentUserId);
     setLoading(false);
     // Transition to rejected — re-apply is allowed
     setStatus({

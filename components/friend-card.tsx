@@ -73,7 +73,7 @@ export default function FriendCard({
       <div className="flex-1 min-w-0">
         {profileId ? (
           <Link
-            href={`/profile/${profileId}`}
+            href={`/profile/${friendProfile?.username || profileId}`}
             className="font-heading text-sm text-neutral-black dark:text-neutral-white hover:underline truncate block"
           >
             {displayName}

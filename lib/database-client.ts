@@ -764,6 +764,24 @@ export async function sendFriendRequest(
 
   const supabase = createClient();
 
+  // Check for existing relationship in either direction
+  const { data: existing, error: checkError } = await supabase
+    .from('user_friends')
+    .select('id, user_id, friend_id, status')
+    .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`)
+    .maybeSingle();
+
+  if (checkError) {
+    console.error('Error checking existing relationship:', checkError);
+    return null;
+  }
+
+  if (existing) {
+    if (existing.status !== 'rejected' || existing.user_id !== userId) {
+      return null;
+    }
+  }
+
   const { data, error } = await supabase
     .from('user_friends')
     .upsert({
@@ -786,7 +804,8 @@ export async function sendFriendRequest(
 }
 
 export async function acceptFriendRequest(
-  requestId: string
+  requestId: string,
+  userId: string
 ): Promise<UserFriend | null> {
   const supabase = createClient();
 
@@ -794,6 +813,8 @@ export async function acceptFriendRequest(
     .from('user_friends')
     .update({ status: 'accepted' })
     .eq('id', requestId)
+    .eq('status', 'pending')
+    .eq('friend_id', userId)
     .select(`
       *,
       friend:user_profiles!friend_id(id, username, full_name, avatar_url)
@@ -809,7 +830,8 @@ export async function acceptFriendRequest(
 }
 
 export async function rejectFriendRequest(
-  requestId: string
+  requestId: string,
+  userId: string
 ): Promise<UserFriend | null> {
   const supabase = createClient();
 
@@ -817,6 +839,8 @@ export async function rejectFriendRequest(
     .from('user_friends')
     .update({ status: 'rejected' })
     .eq('id', requestId)
+    .eq('status', 'pending')
+    .eq('friend_id', userId)
     .select(`
       *,
       friend:user_profiles!friend_id(id, username, full_name, avatar_url)
