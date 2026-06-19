@@ -56,3 +56,55 @@ export async function sendMessage(
 
   return data;
 }
+
+export async function getUnreadCount(userId: string): Promise<number> {
+  const supabase = createClient();
+
+  // Get user's chat IDs
+  const { data: userChats, error: chatsError } = await supabase
+    .from("chats")
+    .select("id")
+    .or(`participant_1_id.eq.${userId},participant_2_id.eq.${userId}`);
+
+  if (chatsError) {
+    console.error("Error fetching user chats for unread count:", chatsError);
+    return 0;
+  }
+
+  const chatIds = userChats?.map((c) => c.id) ?? [];
+  if (chatIds.length === 0) return 0;
+
+  const { count, error } = await supabase
+    .from("messages")
+    .select("*", { count: "exact", head: true })
+    .eq("is_read", false)
+    .neq("sender_id", userId)
+    .in("chat_id", chatIds);
+
+  if (error) {
+    console.error("Error counting unread messages:", error);
+    return 0;
+  }
+
+  return count ?? 0;
+}
+
+export async function markMessagesAsRead(
+  chatId: string,
+  userId: string,
+): Promise<boolean> {
+  const supabase = createClient();
+
+  const { error } = await supabase
+    .from("messages")
+    .update({ is_read: true })
+    .eq("chat_id", chatId)
+    .neq("sender_id", userId);
+
+  if (error) {
+    console.error("Error marking messages as read:", error);
+    return false;
+  }
+
+  return true;
+}

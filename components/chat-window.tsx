@@ -3,7 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
-import { getChatMessages } from "@/lib/chat-client";
+import { createClient } from "@/lib/supabase/client";
+import { markMessagesAsRead } from "@/lib/chat-client";
 import MessageBubble from "@/components/message-bubble";
 import MessageInput from "@/components/message-input";
 import type { Message } from "@/lib/types";
@@ -38,11 +39,6 @@ export default function ChatWindow({
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const lastTimestampRef = useRef<string | null>(
-    initialMessages.length > 0
-      ? initialMessages[initialMessages.length - 1].created_at
-      : null,
-  );
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,47 +54,66 @@ export default function ChatWindow({
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  // Polling every 5 seconds
+  // Mark messages as read on chat open
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const newMessages = await getChatMessages(chatId);
-        const lastKnown = lastTimestampRef.current;
+    markMessagesAsRead(chatId, currentUserId);
+  }, [chatId, currentUserId]);
 
-        if (lastKnown) {
-          const later = newMessages.filter(
-            (m) => m.created_at > lastKnown,
-          );
-          if (later.length > 0) {
-            setMessages((prev) => {
-              // Deduplicate by id
-              const existingIds = new Set(prev.map((m) => m.id));
-              const unique = later.filter((m) => !existingIds.has(m.id));
-              return [...prev, ...unique];
-            });
-            lastTimestampRef.current =
-              later[later.length - 1].created_at;
-          }
-        } else if (newMessages.length > 0) {
-          setMessages(newMessages);
-          lastTimestampRef.current =
-            newMessages[newMessages.length - 1].created_at;
-        }
-      } catch {
-        // Polling is best-effort; silent failure
+  // Mark as read when user returns to this tab
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        markMessagesAsRead(chatId, currentUserId);
       }
-    }, 5000);
+    };
 
-    return () => clearInterval(interval);
-  }, [chatId]);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [chatId, currentUserId]);
 
-  const handleMessageSent = useCallback(
-    (message: Message) => {
-      setMessages((prev) => [...prev, message]);
-      lastTimestampRef.current = message.created_at;
-    },
-    [],
-  );
+  // Realtime subscription — replaces polling
+  useEffect(() => {
+    const supabase = createClient();
+
+    const channel = supabase
+      .channel(`chat-${chatId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chat_id=eq.${chatId}`,
+        },
+        (payload) => {
+          const newMsg = payload.new as Record<string, unknown>;
+          // Only append messages from the other participant
+          // (own messages are already appended via the send callback)
+          if (newMsg && newMsg.sender_id !== currentUserId) {
+            setMessages((prev) => {
+              // Prevent duplicates
+              if (prev.some((m) => m.id === newMsg.id)) return prev;
+              return [...prev, newMsg as unknown as Message];
+            });
+
+            // Mark as read if the window is visible
+            if (document.visibilityState === "visible") {
+              markMessagesAsRead(chatId, currentUserId);
+            }
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [chatId, currentUserId]);
+
+  const handleMessageSent = useCallback((message: Message) => {
+    setMessages((prev) => [...prev, message]);
+  }, []);
 
   return (
     <div className="flex flex-col h-[calc(100vh-8rem)] border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] overflow-hidden">
