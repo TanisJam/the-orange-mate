@@ -2,7 +2,7 @@ import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import Link from "next/link";
 
-export default function ProtectedLayout({
+export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export default function ProtectedLayout({
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"} className="font-heading text-xl text-primary dark:text-primary-light">
-              The Orange Mate
+              SoloTravelers
             </Link>
           </div>
           <div className="flex items-center gap-4">
@@ -24,7 +24,7 @@ export default function ProtectedLayout({
       </nav>
       
       <div className="flex-1 flex flex-col items-center p-8">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-6xl">
           {children}
         </div>
       </div>
@@ -54,4 +54,4 @@ export default function ProtectedLayout({
       </footer>
     </main>
   );
-}
+} 

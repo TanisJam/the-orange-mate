@@ -1,0 +1,30 @@
+schema: spec-driven
+
+context: |
+  Tech stack: Next.js 15 App Router (Turbopack), TypeScript (strict), Tailwind CSS 4, shadcn/ui (new-york)
+  Architecture: Supabase SSR (cloud) with middleware auth; browser/server/middleware client pattern
+  Testing: No test runner configured. ESLint (next/core-web-vitals, next/typescript), TypeScript strict mode.
+  Style: shadcn/ui new-york, neutral base, lucide icons, next-themes dark mode, Bebas Neue + Oxanium fonts
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns (App Router route groups, Supabase client pattern, shadcn/ui conventions)
+    tdd: false
+    test_command: ""
+  verify:
+    test_command: ""
+    build_command: "npm run build"
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
