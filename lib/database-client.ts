@@ -119,8 +119,7 @@ export async function getUserPlanStats(userId: string): Promise<{ created: numbe
 export async function uploadAvatar(userId: string, file: File): Promise<string | null> {
   try {
     const supabase = createClient();
-    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg';
-    const path = `${userId}/avatar.${ext}`;
+    const path = `${userId}/avatar`;
 
     const { error: uploadError } = await supabase.storage
       .from('avatars')

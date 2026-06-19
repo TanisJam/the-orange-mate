@@ -166,20 +166,14 @@ export function PlanDetail({
               </div>
               <p className="text-sm text-neutral-gray">
                 Creado por{" "}
-                {currentPlan.creator?.username ? (
-                  <Link
-                    href={`/profile/${currentPlan.creator.username}`}
-                    className="hover:underline"
-                  >
-                    {currentPlan.creator?.full_name ||
-                      currentPlan.creator?.username ||
-                      "Usuario"}
-                  </Link>
-                ) : (
-                  currentPlan.creator?.full_name ||
+                <Link
+                  href={`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`}
+                  className="hover:underline"
+                >
+                  {currentPlan.creator?.full_name ||
                     currentPlan.creator?.username ||
-                    "Usuario"
-                )}
+                    "Usuario"}
+                </Link>
                 {" · "}
                 {formatDate(currentPlan.created_at)}
               </p>

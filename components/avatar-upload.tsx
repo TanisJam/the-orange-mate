@@ -47,6 +47,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
     if (validationError) {
       setError(validationError);
       setSelectedFile(null);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
       setPreviewUrl(null);
       return;
     }

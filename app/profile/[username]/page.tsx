@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PublicProfileDisplay } from "@/components/public-profile-display";
 import {
   getUserProfileByUsername,
+  getUserProfile,
   getUserInterests,
   getUserPlanStats,
 } from "@/lib/database";
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { username } = await params;
   return {
     title: `@${username} — The Orange Mate`,
-    description: `Perfil público de ${username} en The Orange Mate`,
+    description: `Perfil público en The Orange Mate`,
   };
 }
 
@@ -29,8 +30,17 @@ export default async function PublicProfilePage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch profile by username
-  const profile = await getUserProfileByUsername(username, true);
+  // Fetch profile — try username first, then userId fallback
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(username);
+  let profile = isUuid
+    ? await getUserProfile(username, true)
+    : await getUserProfileByUsername(username, true);
+  if (!profile) {
+    // Try the other lookup as fallback
+    profile = isUuid
+      ? await getUserProfileByUsername(username, true)
+      : await getUserProfile(username, true);
+  }
   if (!profile) {
     notFound();
   }

@@ -69,7 +69,7 @@ export function PublicProfileDisplay({
                 </h1>
               )}
               <p className="text-lg text-neutral-gray">
-                @{profile.username}
+                @{profile.username ?? profile.id}
               </p>
               {profile.bio && (
                 <p className="text-sm text-neutral-black dark:text-neutral-white whitespace-pre-wrap">

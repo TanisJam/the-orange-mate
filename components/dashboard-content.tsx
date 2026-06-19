@@ -268,16 +268,12 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                               <span>{typeInfo.icon}</span>
                               <span>{typeInfo.label}</span>
                               <span>• por{' '}
-                                {plan.creator?.username ? (
-                                  <Link
-                                    href={`/profile/${plan.creator.username}`}
-                                    className="hover:underline"
-                                  >
-                                    {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
-                                  </Link>
-                                ) : (
-                                  plan.creator?.full_name || plan.creator?.username || 'Usuario'
-                                )}
+                                <Link
+                                  href={`/profile/${plan.creator?.username || plan.creator_id}`}
+                                  className="hover:underline"
+                                >
+                                  {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
+                                </Link>
                               </span>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-neutral-gray mt-1">
@@ -433,16 +429,12 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         
                         <p className="text-sm text-neutral-gray mb-2">
                           Creado por{' '}
-                          {plan.creator?.username ? (
-                            <Link
-                              href={`/profile/${plan.creator.username}`}
-                              className="hover:underline"
-                            >
-                              {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
-                            </Link>
-                          ) : (
-                            plan.creator?.full_name || plan.creator?.username || 'Usuario'
-                          )}
+                          <Link
+                            href={`/profile/${plan.creator?.username || plan.creator_id}`}
+                            className="hover:underline"
+                          >
+                            {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
+                          </Link>
                         </p>
                         
                         <div className="space-y-2 text-sm">
@@ -526,16 +518,12 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         
                         <p className="text-sm text-neutral-gray mb-2">
                           por{' '}
-                          {plan.creator?.username ? (
-                            <Link
-                              href={`/profile/${plan.creator.username}`}
-                              className="hover:underline"
-                            >
-                              {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
-                            </Link>
-                          ) : (
-                            plan.creator?.full_name || plan.creator?.username || 'Usuario'
-                          )}
+                          <Link
+                            href={`/profile/${plan.creator?.username || plan.creator_id}`}
+                            className="hover:underline"
+                          >
+                            {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
+                          </Link>
                         </p>
                         
                         <div className="space-y-2 text-sm mb-3">
