@@ -63,6 +63,7 @@ export default async function PublicProfilePage({ params }: Props) {
       interests={userInterests}
       stats={stats}
       isOwner={isOwner}
+      currentUserId={user?.id ?? null}
     />
   );
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -10,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import Link from "next/link";
 import type { UserProfile, UserInterest } from "@/lib/types";
+import { createOrGetChat } from "@/lib/chat-client";
 import {
   User,
   MapPin,
@@ -17,6 +20,7 @@ import {
   Flag,
   Globe,
   Pencil,
+  Send,
 } from "lucide-react";
 
 interface PublicProfileDisplayProps {
@@ -24,6 +28,7 @@ interface PublicProfileDisplayProps {
   interests: UserInterest[];
   stats: { created: number; participating: number };
   isOwner: boolean;
+  currentUserId?: string | null;
 }
 
 export function PublicProfileDisplay({
@@ -31,7 +36,10 @@ export function PublicProfileDisplay({
   interests,
   stats,
   isOwner,
+  currentUserId,
 }: PublicProfileDisplayProps) {
+  const router = useRouter();
+
   const interestLabel = (ui: UserInterest): string => {
     if (ui.is_custom && ui.custom_name) return ui.custom_name;
     if (ui.interest?.name) return ui.interest.name;
@@ -40,6 +48,20 @@ export function PublicProfileDisplay({
 
   const interestIcon = (ui: UserInterest): string | undefined => {
     return ui.interest?.icon;
+  };
+
+  const handleSendMessage = async () => {
+    if (!currentUserId) return;
+    try {
+      const chatId = await createOrGetChat(currentUserId, profile.id);
+      if (chatId) {
+        router.push(`/messages/${chatId}`);
+      } else {
+        toast.error("No se pudo iniciar la conversación");
+      }
+    } catch {
+      toast.error("Error al iniciar la conversación");
+    }
   };
 
   return (
@@ -86,6 +108,16 @@ export function PublicProfileDisplay({
                     <Pencil className="w-4 h-4" />
                     Editar perfil
                   </Link>
+                </Button>
+              </div>
+            )}
+
+            {/* Send message button — only for authenticated non-owners */}
+            {!isOwner && currentUserId && (
+              <div className="sm:self-start">
+                <Button variant="primary" size="sm" onClick={handleSendMessage}>
+                  <Send className="w-4 h-4" />
+                  Enviar mensaje
                 </Button>
               </div>
             )}

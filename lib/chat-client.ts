@@ -108,3 +108,22 @@ export async function markMessagesAsRead(
 
   return true;
 }
+
+export async function createOrGetChat(
+  userId1: string,
+  userId2: string,
+): Promise<string | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase.rpc("get_or_create_chat", {
+    user1_id: userId1,
+    user2_id: userId2,
+  });
+
+  if (error) {
+    console.error("Error creating or getting chat:", error);
+    return null;
+  }
+
+  return data as string | null;
+}
