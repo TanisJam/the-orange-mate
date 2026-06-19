@@ -54,6 +54,7 @@ export default async function PublicProfilePage({ params }: Props) {
   const isOwner = user?.id === profile.id;
 
   // Strip phone before serializing to client — never leak to public view
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { phone: _phone, ...publicProfile } = profile;
 
   return (
