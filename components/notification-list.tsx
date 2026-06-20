@@ -52,11 +52,14 @@ export default function NotificationList() {
   }, [userId, page, fetchPage]);
 
   async function handleToggleRead(notif: Notification) {
+    // markAsRead is one-way (only sets is_read=true). Don't toggle
+    // visually in the opposite direction — that causes UI/DB mismatch.
+    if (notif.is_read) return;
     const ok = await markAsRead(notif.id);
     if (ok) {
       setNotifications((prev) =>
         prev.map((n) =>
-          n.id === notif.id ? { ...n, is_read: !n.is_read } : n
+          n.id === notif.id ? { ...n, is_read: true } : n
         )
       );
     }
