@@ -460,8 +460,8 @@ create policy "Users can update own reviews" on public.user_reviews
 create policy "Users can view own notifications" on public.notifications
   for select using (auth.uid() = user_id);
 
-create policy "Authenticated users can insert notifications" on public.notifications
-  for insert with check (auth.uid() is not null);
+create policy "Users can insert notifications as themselves" on public.notifications
+  for insert with check (auth.uid() = actor_id and is_read = false);
 
 create policy "Users can update own notification read status" on public.notifications
   for update using (auth.uid() = user_id);
@@ -536,5 +536,10 @@ begin
 end; $$;
 
 -- Schedule cleanup daily at 3 AM (requires pg_cron extension)
-select cron.schedule('cleanup-notifications', '0 3 * * *',
-  'select public.cleanup_old_notifications();');
+do $$
+begin
+  if exists (select 1 from pg_extension where extname = 'pg_cron') then
+    perform cron.schedule('cleanup-notifications', '0 3 * * *',
+      'select public.cleanup_old_notifications();');
+  end if;
+end $$;

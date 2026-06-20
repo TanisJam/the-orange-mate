@@ -604,6 +604,7 @@ export async function updateJoinRequest(
 
     if (upsertError) {
       console.error('Error upserting plan participant:', upsertError);
+      return null;
     }
 
     // Update participant count based on actual participants
@@ -888,8 +889,8 @@ export async function acceptFriendRequest(
       requesterData.requester?.full_name ||
       requesterData.requester?.username ||
       "Someone";
-    const accepterUsername = requesterData.friend?.username ?? "";
-    const requesterUsername = requesterData.requester?.username ?? "";
+    const accepterUsername = requesterData.friend?.username || requesterData.friend?.id || userId;
+    const requesterUsername = requesterData.requester?.username || requesterData.requester?.id || requesterData.user_id;
 
     // Notify original requester
     await createNotification({
@@ -1141,7 +1142,7 @@ export async function submitReview(
       review.reviewer?.full_name ||
       review.reviewer?.username ||
       "Someone";
-    const reviewedUsername = review.reviewed?.username ?? "";
+    const reviewedUsername = review.reviewed?.username || review.reviewed_id;
     await createNotification({
       user_id: review.reviewed_id,
       actor_id: reviewerId,
