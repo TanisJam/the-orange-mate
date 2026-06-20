@@ -1,6 +1,6 @@
 /**
  * Returns a human-readable relative timestamp in Spanish.
- * Mirrors the implementation in components/comment-item.tsx.
+ * Based on the implementation in components/comment-item.tsx (adds a guard for future timestamps).
  */
 export function formatRelativeDate(dateStr: string): string {
   const date = new Date(dateStr);

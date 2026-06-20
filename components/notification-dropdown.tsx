@@ -44,14 +44,11 @@ export default function NotificationDropdown({
       <DropdownMenuSeparator />
 
       {notifications.map((notif) => (
-        <DropdownMenuItem
-          key={notif.id}
-          className="p-0 cursor-default"
-          onSelect={(e) => e.preventDefault()}
-        >
+        <DropdownMenuItem key={notif.id} asChild className="p-0">
           <NotificationItem notification={notif} onRead={onRead} />
         </DropdownMenuItem>
       ))}
+
 
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
@@ -60,7 +57,10 @@ export default function NotificationDropdown({
         </Link>
       </DropdownMenuItem>
       <DropdownMenuItem
-        onClick={onMarkAllRead}
+        onSelect={(e) => {
+          e.preventDefault();
+          onMarkAllRead();
+        }}
         className="cursor-pointer"
       >
         Marcar todas leídas

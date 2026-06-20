@@ -28,7 +28,7 @@ export default function NotificationList() {
       setTotalCount(count);
       setLoading(false);
     },
-    [userId]
+    [userId, limit]
   );
 
   // Get userId on mount
