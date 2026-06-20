@@ -1136,6 +1136,23 @@ export async function submitReview(
     return null;
   }
 
+  // Create notification for the reviewed user
+  if (review) {
+    const reviewerName =
+      review.reviewer?.full_name ||
+      review.reviewer?.username ||
+      "Someone";
+    const reviewedUsername = review.reviewed?.username ?? "";
+    await createNotification({
+      user_id: review.reviewed_id,
+      actor_id: reviewerId,
+      type: "review_received",
+      title: `${reviewerName} te dejó una reseña`,
+      body: `${review.rating} estrellas — ${review.comment?.slice(0, 80) ?? "Sin comentario"}`,
+      link: `/profile/${reviewedUsername}`,
+    });
+  }
+
   return review;
 }
 
