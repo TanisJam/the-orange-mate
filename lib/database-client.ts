@@ -23,6 +23,7 @@ import type {
   CreateReviewData,
   UpdateReviewData,
 } from './types';
+import { createNotification } from '@/lib/notification-client';
 
 // User Profile Operations (Client-side)
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -567,7 +568,8 @@ export async function createJoinRequest(
 export async function updateJoinRequest(
   requestId: string,
   status: 'accepted' | 'rejected' | 'waiting_list',
-  permission_level: PermissionLevel = 'solo_ver'
+  permission_level: PermissionLevel = 'solo_ver',
+  callerId?: string
 ): Promise<PlanJoinRequest | null> {
   const supabase = createClient();
   
@@ -581,7 +583,7 @@ export async function updateJoinRequest(
     .select(`
       *,
       requester:user_profiles!requester_id(*),
-      plan:travel_plans(*)
+      plan:travel_plans(*, creator:user_profiles!creator_id(id, username, full_name))
     `)
     .maybeSingle();
 
@@ -602,6 +604,7 @@ export async function updateJoinRequest(
 
     if (upsertError) {
       console.error('Error upserting plan participant:', upsertError);
+      return null;
     }
 
     // Update participant count based on actual participants
@@ -621,6 +624,22 @@ export async function updateJoinRequest(
 
     if (updateError) {
       console.error('Error updating participant count:', updateError);
+    }
+
+    // Create notification for the requester
+    if (callerId) {
+      const creatorName =
+        data.plan?.creator?.full_name ||
+        data.plan?.creator?.username ||
+        "Someone";
+      await createNotification({
+        user_id: data.requester_id,
+        actor_id: callerId,
+        type: "join_accepted",
+        title: `${creatorName} aceptó tu solicitud`,
+        body: `Te has unido al plan ${data.plan?.title ?? ""}`,
+        link: `/plans/${data.plan_id}`,
+      });
     }
   }
 
@@ -738,6 +757,30 @@ export async function createPlanComment(
     return null;
   }
 
+  // Notify parent comment author on reply
+  if (data && commentData.parent_comment_id) {
+    const { data: parentComment } = await supabase
+      .from('plan_comments')
+      .select('author_id')
+      .eq('id', commentData.parent_comment_id)
+      .maybeSingle();
+
+    if (parentComment && parentComment.author_id !== userId) {
+      const actorName =
+        data.author?.full_name ||
+        data.author?.username ||
+        "Someone";
+      await createNotification({
+        user_id: parentComment.author_id,
+        actor_id: userId,
+        type: "comment_reply",
+        title: `${actorName} respondió a tu comentario`,
+        body: commentData.content.slice(0, 100),
+        link: `/plans/${commentData.plan_id}`,
+      });
+    }
+  }
+
   return data;
 }
 
@@ -820,13 +863,54 @@ export async function acceptFriendRequest(
     .eq('friend_id', userId)
     .select(`
       *,
-      friend:user_profiles!friend_id(id, username, full_name, avatar_url)
+      friend:user_profiles!friend_id(id, username, full_name, avatar_url),
+      requester:user_profiles!user_id(id, username, full_name, avatar_url)
     `)
     .maybeSingle();
 
   if (error) {
     console.error('Error accepting friend request:', error);
     return null;
+  }
+
+  // Create notifications after successful accept
+  if (data) {
+    const requesterData = data as unknown as {
+      user_id: string;
+      friend?: UserProfile;
+      requester?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
+    };
+
+    const accepterName =
+      requesterData.friend?.full_name ||
+      requesterData.friend?.username ||
+      "Someone";
+    const requesterName =
+      requesterData.requester?.full_name ||
+      requesterData.requester?.username ||
+      "Someone";
+    const accepterUsername = requesterData.friend?.username || requesterData.friend?.id || userId;
+    const requesterUsername = requesterData.requester?.username || requesterData.requester?.id || requesterData.user_id;
+
+    // Notify original requester
+    await createNotification({
+      user_id: requesterData.user_id,
+      actor_id: userId,
+      type: "friend_accepted",
+      title: `${accepterName} aceptó tu solicitud de amistad`,
+      body: "Ahora son amigos en SoloTravelers",
+      link: `/profile/${accepterUsername}`,
+    });
+
+    // Self-notification for accepter
+    await createNotification({
+      user_id: userId,
+      actor_id: userId,
+      type: "friend_accepted",
+      title: `Aceptaste la solicitud de ${requesterName}`,
+      body: "Ahora son amigos en SoloTravelers",
+      link: `/profile/${requesterUsername}`,
+    });
   }
 
   return data;
@@ -1050,6 +1134,23 @@ export async function submitReview(
   if (error) {
     console.error('Error submitting review:', error);
     return null;
+  }
+
+  // Create notification for the reviewed user
+  if (review) {
+    const reviewerName =
+      review.reviewer?.full_name ||
+      review.reviewer?.username ||
+      "Someone";
+    const reviewedUsername = review.reviewed?.username || review.reviewed_id;
+    await createNotification({
+      user_id: review.reviewed_id,
+      actor_id: reviewerId,
+      type: "review_received",
+      title: `${reviewerName} te dejó una reseña`,
+      body: `${review.rating} estrellas — ${review.comment?.slice(0, 80) ?? "Sin comentario"}`,
+      link: `/profile/${reviewedUsername}`,
+    });
   }
 
   return review;
