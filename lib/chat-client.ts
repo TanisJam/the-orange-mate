@@ -80,7 +80,7 @@ export async function sendMessage(
           type: "new_message",
           title: `Nuevo mensaje de ${senderName}`,
           body: messageData.content.slice(0, 100),
-          link: "/messages",
+          link: `/messages/${messageData.chat_id}`,
         });
       }
     }
