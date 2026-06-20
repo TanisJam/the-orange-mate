@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   getUnreadCount,
   getNotifications,
+  getNotificationById,
   markAllAsRead,
 } from "@/lib/notification-client";
 import {
@@ -24,6 +25,7 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
+  const clientRef = useRef<ReturnType<typeof createClient> | null>(null);
 
   const refreshUnread = useCallback(async () => {
     try {
@@ -57,10 +59,10 @@ export default function NotificationBell() {
   // Safety net: cleanup channel on unmount (even if dropdown is open)
   useEffect(() => {
     return () => {
-      if (channelRef.current) {
-        const supabase = createClient();
-        supabase.removeChannel(channelRef.current);
+      if (channelRef.current && clientRef.current) {
+        clientRef.current.removeChannel(channelRef.current);
         channelRef.current = null;
+        clientRef.current = null;
       }
     };
   }, []);
@@ -76,8 +78,10 @@ export default function NotificationBell() {
           setNotifications(data);
         });
 
-        // Subscribe to realtime channel
+        // Create ONE client instance for both channel creation and removal
         const supabase = createClient();
+        clientRef.current = supabase;
+
         const channel = supabase
           .channel(`notifications-${userId}`)
           .on(
@@ -88,28 +92,35 @@ export default function NotificationBell() {
               table: "notifications",
               filter: `user_id=eq.${userId}`,
             },
-            (payload) => {
+            async (payload) => {
               if (payload.new) {
-                setNotifications((prev) =>
-                  [payload.new as Notification, ...prev].slice(0, 5)
+                // Re-fetch with actor join — realtime payload has no join data
+                const fullNotification = await getNotificationById(
+                  payload.new.id,
+                  userId,
                 );
+                if (fullNotification) {
+                  setNotifications((prev) =>
+                    [fullNotification, ...prev].slice(0, 5),
+                  );
+                }
                 setUnreadCount((prev) => prev + 1);
               }
-            }
+            },
           )
           .subscribe();
 
         channelRef.current = channel;
       } else {
-        // Close: remove channel
-        if (channelRef.current) {
-          const supabase = createClient();
-          supabase.removeChannel(channelRef.current);
+        // Close: remove channel using the SAME client instance
+        if (channelRef.current && clientRef.current) {
+          clientRef.current.removeChannel(channelRef.current);
           channelRef.current = null;
+          clientRef.current = null;
         }
       }
     },
-    [userId]
+    [userId],
   );
 
   const handleMarkAllRead = useCallback(async () => {
