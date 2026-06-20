@@ -14,14 +14,16 @@ import { createClient } from "@/lib/supabase/server";
  * Security: requires `Authorization: Bearer <CRON_SECRET>` header.
  */
 export async function GET(request: Request) {
-  // Verify cron secret for non-Vercel environments
+  // Verify cron secret — fail closed if not configured
   const cronSecret = process.env.CRON_SECRET;
-  if (cronSecret) {
-    const authHeader = request.headers.get("authorization");
-    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
-    if (token !== cronSecret) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  if (!cronSecret) {
+    return NextResponse.json({ error: "CRON_SECRET not configured" }, { status: 401 });
+  }
+
+  const authHeader = request.headers.get("authorization");
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (token !== cronSecret) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
