@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getChatMessages } from "@/lib/database";
 import { redirect, notFound } from "next/navigation";
 import ChatWindow from "@/components/chat-window";
+import { BackButton } from "@/components/back-button";
 
 type Props = {
   params: Promise<{ chatId: string }>;
@@ -49,15 +50,18 @@ export default async function ChatPage({ params }: Props) {
   const initialMessages = await getChatMessages(chatId, true);
 
   return (
-    <ChatWindow
-      chatId={chatId}
-      initialMessages={initialMessages}
-      currentUserId={user.id}
-      otherParticipant={{
-        id: otherParticipant.id,
-        full_name: otherParticipant.full_name,
-        avatar_url: otherParticipant.avatar_url,
-      }}
-    />
+    <div className="flex flex-col h-[calc(100dvh-4rem)] w-full max-w-4xl mx-auto px-4 py-3 gap-3">
+      <BackButton fallbackHref="/messages" label="Volver a Mensajes" />
+      <ChatWindow
+        chatId={chatId}
+        initialMessages={initialMessages}
+        currentUserId={user.id}
+        otherParticipant={{
+          id: otherParticipant.id,
+          full_name: otherParticipant.full_name,
+          avatar_url: otherParticipant.avatar_url,
+        }}
+      />
+    </div>
   );
 }
