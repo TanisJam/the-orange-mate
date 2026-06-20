@@ -3,7 +3,7 @@
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Send, Loader2 } from "lucide-react";
+import { Send, Loader2, X } from "lucide-react";
 import { sendMessage } from "@/lib/chat-client";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
@@ -79,6 +79,16 @@ export default function MessageInput({
         className="min-h-10 max-h-32 resize-none"
         disabled={sending}
       />
+      {content.trim().length > 0 && !sending && (
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setContent("")}
+          aria-label="Descartar mensaje"
+        >
+          <X className="size-4" />
+        </Button>
+      )}
       <Button
         variant="primary"
         size="icon"

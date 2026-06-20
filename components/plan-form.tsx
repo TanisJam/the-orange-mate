@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Button } from "@/components/ui/button";
+import { useBackNavigation } from "@/components/back-button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -107,6 +108,7 @@ interface PlanFormProps {
 
 export function PlanForm({ userId }: PlanFormProps) {
   const router = useRouter();
+  const goBack = useBackNavigation("/dashboard");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<PlanValues>({
@@ -520,8 +522,16 @@ export function PlanForm({ userId }: PlanFormProps) {
                 </div>
               )}
 
-              {/* Submit Button */}
-              <div className="flex justify-end pt-4 border-t-2 border-ink dark:border-neutral-gray">
+              {/* Actions */}
+              <div className="flex justify-end gap-3 pt-4 border-t-2 border-ink dark:border-neutral-gray">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={goBack}
+                  disabled={form.formState.isSubmitting}
+                >
+                  Cancelar
+                </Button>
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}

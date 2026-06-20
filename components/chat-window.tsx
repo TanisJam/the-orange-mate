@@ -121,7 +121,7 @@ export default function ChatWindow({
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] border-2 border-ink rounded-[var(--radius)] bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] overflow-hidden">
+    <div className="flex flex-col flex-1 min-h-0 border-2 border-ink rounded-[var(--radius)] bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 p-3 border-b border-neutral-gray bg-neutral-light dark:bg-background">
         <Link

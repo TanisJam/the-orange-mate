@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getFriends, getPendingRequests, getSentRequests } from "@/lib/database";
 import { redirect } from "next/navigation";
 import FriendsPageClient from "@/components/friends-page-client";
+import { BackButton } from "@/components/back-button";
 
 export default async function FriendsPage() {
   const supabase = await createClient();
@@ -20,11 +21,14 @@ export default async function FriendsPage() {
   ]);
 
   return (
-    <FriendsPageClient
-      initialFriends={friends}
-      initialPending={pending}
-      initialSent={sent}
-      currentUserId={user.id}
-    />
+    <div className="space-y-6">
+      <BackButton fallbackHref="/dashboard" />
+      <FriendsPageClient
+        initialFriends={friends}
+        initialPending={pending}
+        initialSent={sent}
+        currentUserId={user.id}
+      />
+    </div>
   );
 }
