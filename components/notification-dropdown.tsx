@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   DropdownMenuItem,
   DropdownMenuSeparator,
@@ -21,8 +20,6 @@ export default function NotificationDropdown({
   onMarkAllRead,
   onRead,
 }: NotificationDropdownProps) {
-  const router = useRouter();
-
   if (notifications.length === 0) {
     return (
       <>
