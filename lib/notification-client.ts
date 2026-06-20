@@ -48,6 +48,29 @@ export async function getNotifications(
   return { data: data || [], count: count || 0 };
 }
 
+export async function getNotificationById(
+  notificationId: string,
+  userId: string,
+): Promise<Notification | null> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("notifications")
+    .select(
+      "*, actor:user_profiles!actor_id(id, username, full_name, avatar_url)",
+    )
+    .eq("id", notificationId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Error fetching notification by id:", error);
+    return null;
+  }
+
+  return data;
+}
+
 export async function getUnreadCount(userId: string): Promise<number> {
   const supabase = createClient();
 
@@ -65,13 +88,14 @@ export async function getUnreadCount(userId: string): Promise<number> {
   return count || 0;
 }
 
-export async function markAsRead(notificationId: string): Promise<boolean> {
+export async function markAsRead(notificationId: string, userId: string): Promise<boolean> {
   const supabase = createClient();
 
   const { error } = await supabase
     .from("notifications")
     .update({ is_read: true })
-    .eq("id", notificationId);
+    .eq("id", notificationId)
+    .eq("user_id", userId);
 
   if (error) {
     console.error("Error marking notification as read:", error);

@@ -759,11 +759,15 @@ export async function createPlanComment(
 
   // Notify parent comment author on reply
   if (data && commentData.parent_comment_id) {
-    const { data: parentComment } = await supabase
+    const { data: parentComment, error: parentQueryError } = await supabase
       .from('plan_comments')
       .select('author_id')
       .eq('id', commentData.parent_comment_id)
       .maybeSingle();
+
+    if (parentQueryError) {
+      console.error('Error fetching parent comment:', parentQueryError);
+    }
 
     if (parentComment && parentComment.author_id !== userId) {
       const actorName =
@@ -849,6 +853,13 @@ export async function sendFriendRequest(
   return data;
 }
 
+/** Row shape returned by the acceptFriendRequest query with joined profiles. */
+interface AcceptedFriendRequestRow {
+  user_id: string;
+  friend?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
+  requester?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
+}
+
 export async function acceptFriendRequest(
   requestId: string,
   userId: string
@@ -875,26 +886,25 @@ export async function acceptFriendRequest(
 
   // Create notifications after successful accept
   if (data) {
-    const requesterData = data as unknown as {
-      user_id: string;
-      friend?: UserProfile;
-      requester?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
-    };
+    // data is typed as UserFriend | null, but the query joins requester.
+    // Use a named type and direct cast (TypeScript validates the overlap
+    // via shared user_id) instead of as unknown as which bypasses all checks.
+    const row = data as AcceptedFriendRequestRow;
 
     const accepterName =
-      requesterData.friend?.full_name ||
-      requesterData.friend?.username ||
+      row.friend?.full_name ||
+      row.friend?.username ||
       "Someone";
     const requesterName =
-      requesterData.requester?.full_name ||
-      requesterData.requester?.username ||
+      row.requester?.full_name ||
+      row.requester?.username ||
       "Someone";
-    const accepterUsername = requesterData.friend?.username || requesterData.friend?.id || userId;
-    const requesterUsername = requesterData.requester?.username || requesterData.requester?.id || requesterData.user_id;
+    const accepterUsername = row.friend?.username || row.friend?.id || userId;
+    const requesterUsername = row.requester?.username || row.requester?.id || row.user_id;
 
     // Notify original requester
     await createNotification({
-      user_id: requesterData.user_id,
+      user_id: row.user_id,
       actor_id: userId,
       type: "friend_accepted",
       title: `${accepterName} aceptó tu solicitud de amistad`,
@@ -1142,14 +1152,13 @@ export async function submitReview(
       review.reviewer?.full_name ||
       review.reviewer?.username ||
       "Someone";
-    const reviewedUsername = review.reviewed?.username || review.reviewed_id;
     await createNotification({
       user_id: review.reviewed_id,
       actor_id: reviewerId,
       type: "review_received",
       title: `${reviewerName} te dejó una reseña`,
       body: `${review.rating} estrellas — ${review.comment?.slice(0, 80) ?? "Sin comentario"}`,
-      link: `/profile/${reviewedUsername}`,
+      link: `/plans/${review.plan_id}`,
     });
   }
 

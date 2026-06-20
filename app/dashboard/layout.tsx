@@ -1,6 +1,7 @@
 import { AuthButton } from "@/components/auth-button";
 import { ThemeSwitcher } from "@/components/theme-switcher";
 import ChatNavLink from "@/components/chat-nav-link";
+import NotificationBell from "@/components/notification-bell";
 import Link from "next/link";
 
 export default function DashboardLayout({
@@ -17,6 +18,7 @@ export default function DashboardLayout({
               SoloTravelers
             </Link>
             <ChatNavLink />
+            <NotificationBell />
           </div>
           <div className="flex items-center gap-4">
             <ThemeSwitcher />
