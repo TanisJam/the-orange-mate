@@ -17,9 +17,11 @@ import { JoinRequestFlow } from "@/components/join-request-flow";
 import {
   updateTravelPlan,
   getPlanJoinRequests,
+  completeTrip,
 } from "@/lib/database-client";
 import { createOrGetChat } from "@/lib/chat-client";
-import type { TravelPlan, PlanJoinRequest } from "@/lib/types";
+import type { TravelPlan, PlanJoinRequest, UserReview } from "@/lib/types";
+import { ReviewsSection } from "@/components/reviews-section";
 import CommentList from "@/components/comment-list";
 import NoteList from "@/components/note-list";
 import {
@@ -39,24 +41,31 @@ import {
   Lock,
   Send,
   StickyNote,
+  CheckCircle,
+  Loader2,
 } from "lucide-react";
 
 interface PlanDetailProps {
   plan: TravelPlan;
   currentUserId: string;
   initialRequests: PlanJoinRequest[];
+  reviews?: UserReview[];
+  averageRating?: { average: number; count: number };
 }
 
 export function PlanDetail({
   plan,
   currentUserId,
   initialRequests,
+  reviews = [],
+  averageRating = { average: 0, count: 0 },
 }: PlanDetailProps) {
   const router = useRouter();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
   const [joinRequests, setJoinRequests] =
     useState<PlanJoinRequest[]>(initialRequests);
   const [publishing, setPublishing] = useState(false);
+  const [completing, setCompleting] = useState(false);
 
   const isCreator = currentUserId === currentPlan.creator_id;
   const isParticipant =
@@ -109,6 +118,24 @@ export function PlanDetail({
       console.error("Error publishing plan:", error);
     } finally {
       setPublishing(false);
+    }
+  };
+
+  const handleComplete = async () => {
+    setCompleting(true);
+    try {
+      const updated = await completeTrip(currentPlan.id, currentUserId);
+      if (updated) {
+        setCurrentPlan(updated);
+        toast.success("¡Viaje marcado como completado!");
+      } else {
+        toast.error("No se pudo completar el viaje");
+      }
+    } catch (error) {
+      console.error("Error completing trip:", error);
+      toast.error("Error al completar el viaje");
+    } finally {
+      setCompleting(false);
     }
   };
 
@@ -177,7 +204,7 @@ export function PlanDetail({
                 {formatDate(currentPlan.created_at)}
               </p>
             </div>
-            {isCreator && !currentPlan.is_public && (
+            {isCreator && !currentPlan.is_public && currentPlan.status !== 'completado' && (
               <Button
                 variant="primary"
                 onClick={handlePublish}
@@ -186,6 +213,31 @@ export function PlanDetail({
                 <Globe className="w-4 h-4 mr-2" />
                 {publishing ? "Publicando..." : "Publicar Plan"}
               </Button>
+            )}
+            {isCreator &&
+              currentPlan.status !== "completado" &&
+              currentPlan.status !== "cerrado" && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleComplete}
+                  disabled={completing}
+                >
+                  {completing ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <CheckCircle className="w-4 h-4" />
+                  )}
+                  {completing
+                    ? "Completando..."
+                    : "Marcar viaje como completado"}
+                </Button>
+              )}
+            {currentPlan.status === "completado" && (
+              <Badge className="bg-success text-white">
+                <CheckCircle className="w-3 h-3 mr-1" />
+                Viaje completado
+              </Badge>
             )}
             {!isCreator && isParticipant && (
               <Button
@@ -431,6 +483,30 @@ export function PlanDetail({
           )}
         </CardContent>
       </Card>
+
+      {/* 7. Reviews — only on completed plans */}
+      {currentPlan.status === "completado" && (
+        <Card>
+          <CardContent className="p-6">
+            <ReviewsSection
+              reviews={reviews}
+              average={averageRating}
+              currentUserId={currentUserId}
+              planId={currentPlan.id}
+              canReview={isParticipant}
+              reviewableParticipants={
+                currentPlan.participants
+                  ?.filter((p) => p.user_id !== currentUserId)
+                  .map((p) => ({
+                    id: p.user_id,
+                    full_name: p.user?.full_name,
+                    username: p.user?.username,
+                  })) ?? []
+              }
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

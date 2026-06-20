@@ -19,6 +19,9 @@ import type {
   SearchFilters,
   PaginationParams,
   ApiResponse,
+  UserReview,
+  CreateReviewData,
+  UpdateReviewData,
 } from './types';
 
 // User Profile Operations (Client-side)
@@ -958,4 +961,195 @@ export async function getSentRequests(
   }
 
   return (data || []) as EnrichedFriend[];
+}
+
+// Trip Completion Operations (Client-side)
+export async function completeTrip(planId: string, userId: string): Promise<TravelPlan | null> {
+  const supabase = createClient();
+  
+  const { data, error } = await supabase
+    .from('travel_plans')
+    .update({ status: 'completado', completed_at: new Date().toISOString() })
+    .eq('id', planId)
+    .eq('creator_id', userId)
+    .not('status', 'in', '("completado","cerrado")')
+    .select(`
+      *,
+      creator:user_profiles!creator_id(*),
+      participants:plan_participants(
+        *,
+        user:user_profiles(*)
+      )
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error completing trip:', error);
+    return null;
+  }
+
+  return data;
+}
+
+// Review Operations (Client-side)
+export async function submitReview(
+  reviewerId: string,
+  data: CreateReviewData
+): Promise<UserReview | null> {
+  const supabase = createClient();
+
+  // Validate rating
+  if (data.rating < 1 || data.rating > 5) return null;
+
+  // Verify plan is completed
+  const { data: plan } = await supabase
+    .from('travel_plans')
+    .select('status')
+    .eq('id', data.plan_id)
+    .maybeSingle();
+
+  if (!plan || plan.status !== 'completado') return null;
+
+  // Verify reviewer is a participant
+  const { data: participant } = await supabase
+    .from('plan_participants')
+    .select('id')
+    .eq('plan_id', data.plan_id)
+    .eq('user_id', reviewerId)
+    .maybeSingle();
+
+  if (!participant) return null;
+
+  // Verify reviewed user is also a participant of this plan
+  const { data: reviewedParticipant } = await supabase
+    .from('plan_participants')
+    .select('id')
+    .eq('plan_id', data.plan_id)
+    .eq('user_id', data.reviewed_id)
+    .maybeSingle();
+
+  if (!reviewedParticipant) return null;
+
+  // Insert review
+  const { data: review, error } = await supabase
+    .from('user_reviews')
+    .insert({
+      reviewer_id: reviewerId,
+      plan_id: data.plan_id,
+      reviewed_id: data.reviewed_id,
+      rating: data.rating,
+      comment: data.comment,
+    })
+    .select(`
+      *,
+      reviewer:user_profiles!reviewer_id(id, username, full_name, avatar_url),
+      reviewed:user_profiles!reviewed_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error submitting review:', error);
+    return null;
+  }
+
+  return review;
+}
+
+export async function editReview(
+  reviewId: string,
+  reviewerId: string,
+  data: UpdateReviewData
+): Promise<UserReview | null> {
+  const supabase = createClient();
+
+  // Validate rating range
+  if (data.rating !== undefined && (data.rating < 1 || data.rating > 5)) return null;
+
+  const updateData: Record<string, unknown> = { edited_at: new Date().toISOString() };
+  if (data.rating !== undefined) updateData.rating = data.rating;
+  if (data.comment !== undefined) updateData.comment = data.comment;
+
+  const { data: review, error } = await supabase
+    .from('user_reviews')
+    .update(updateData)
+    .eq('id', reviewId)
+    .eq('reviewer_id', reviewerId)
+    .select(`
+      *,
+      reviewer:user_profiles!reviewer_id(id, username, full_name, avatar_url),
+      reviewed:user_profiles!reviewed_id(id, username, full_name, avatar_url)
+    `)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error editing review:', error);
+    return null;
+  }
+
+  return review;
+}
+
+export async function getPlanReviews(planId: string): Promise<UserReview[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_reviews')
+    .select(`
+      *,
+      reviewer:user_profiles!reviewer_id(id, username, full_name, avatar_url),
+      reviewed:user_profiles!reviewed_id(id, username, full_name, avatar_url)
+    `)
+    .eq('plan_id', planId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching plan reviews:', error);
+    return [];
+  }
+
+  return (data || []) as UserReview[];
+}
+
+export async function getUserReviews(userId: string): Promise<UserReview[]> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_reviews')
+    .select(`
+      *,
+      reviewer:user_profiles!reviewer_id(id, username, full_name, avatar_url),
+      plan:travel_plans!plan_id(title)
+    `)
+    .eq('reviewed_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching user reviews:', error);
+    return [];
+  }
+
+  return (data || []) as UserReview[];
+}
+
+export async function getAverageRating(userId: string): Promise<{ average: number; count: number }> {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from('user_reviews')
+    .select('rating')
+    .eq('reviewed_id', userId);
+
+  if (error) {
+    console.error('Error fetching ratings for average:', error);
+    return { average: 0, count: 0 };
+  }
+
+  if (!data || data.length === 0) {
+    return { average: 0, count: 0 };
+  }
+
+  const sum = data.reduce((acc, r) => acc + r.rating, 0);
+  const avg = Math.round((sum / data.length) * 10) / 10;
+
+  return { average: avg, count: data.length };
 }

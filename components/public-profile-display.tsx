@@ -11,9 +11,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
-import type { UserProfile, UserInterest, FriendStatus } from "@/lib/types";
+import type { UserProfile, UserInterest, FriendStatus, UserReview } from "@/lib/types";
 import { createOrGetChat } from "@/lib/chat-client";
 import FriendRequestButton from "@/components/friend-request-button";
+import { ReviewsSection } from "@/components/reviews-section";
 import {
   User,
   MapPin,
@@ -37,6 +38,8 @@ interface PublicProfileDisplayProps {
   isOwner: boolean;
   currentUserId?: string | null;
   friendStatus?: FriendStatusResult | null;
+  reviews?: UserReview[];
+  averageRating?: { average: number; count: number };
 }
 
 export function PublicProfileDisplay({
@@ -46,6 +49,8 @@ export function PublicProfileDisplay({
   isOwner,
   currentUserId,
   friendStatus,
+  reviews = [],
+  averageRating = { average: 0, count: 0 },
 }: PublicProfileDisplayProps) {
   const router = useRouter();
 
@@ -197,6 +202,21 @@ export function PublicProfileDisplay({
           </p>
         </CardContent>
       </Card>
+
+      {/* Reviews — authenticated users only */}
+      {currentUserId && (
+        <Card>
+          <CardContent className="p-6">
+            <ReviewsSection
+              reviews={reviews}
+              average={averageRating}
+              currentUserId={currentUserId}
+              reviewedId={profile.id}
+              canReview={false}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Friend interaction — authenticated non-owners only */}
       {!isOwner && currentUserId && (

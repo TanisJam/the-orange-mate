@@ -7,6 +7,8 @@ import {
   getUserInterests,
   getUserPlanStats,
   getFriendStatus,
+  getUserReviews,
+  getAverageRating,
 } from "@/lib/database";
 import type { Metadata } from "next";
 
@@ -52,6 +54,19 @@ export default async function PublicProfilePage({ params }: Props) {
     getUserPlanStats(profile.id, true),
   ]);
 
+  // Fetch reviews if viewer is authenticated
+  let reviews: import("@/lib/types").UserReview[] = [];
+  let averageRating = { average: 0, count: 0 };
+
+  if (user) {
+    const [fetchedReviews, avg] = await Promise.all([
+      getUserReviews(profile.id, true),
+      getAverageRating(profile.id, true),
+    ]);
+    reviews = fetchedReviews;
+    averageRating = avg;
+  }
+
   const isOwner = user?.id === profile.id;
 
   // Fetch friend relationship if viewer is authenticated and not the owner
@@ -72,6 +87,8 @@ export default async function PublicProfilePage({ params }: Props) {
       isOwner={isOwner}
       currentUserId={user?.id ?? null}
       friendStatus={friendStatus}
+      reviews={reviews}
+      averageRating={averageRating}
     />
   );
 }
