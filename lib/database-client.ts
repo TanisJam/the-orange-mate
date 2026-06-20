@@ -757,6 +757,30 @@ export async function createPlanComment(
     return null;
   }
 
+  // Notify parent comment author on reply
+  if (data && commentData.parent_comment_id) {
+    const { data: parentComment } = await supabase
+      .from('plan_comments')
+      .select('author_id')
+      .eq('id', commentData.parent_comment_id)
+      .maybeSingle();
+
+    if (parentComment && parentComment.author_id !== userId) {
+      const actorName =
+        data.author?.full_name ||
+        data.author?.username ||
+        "Someone";
+      await createNotification({
+        user_id: parentComment.author_id,
+        actor_id: userId,
+        type: "comment_reply",
+        title: `${actorName} respondió a tu comentario`,
+        body: commentData.content.slice(0, 100),
+        link: `/plans/${commentData.plan_id}`,
+      });
+    }
+  }
+
   return data;
 }
 
