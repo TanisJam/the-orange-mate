@@ -245,6 +245,36 @@ export interface UpdateReviewData {
   comment?: string;
 }
 
+// Notification types
+export type NotificationEventType =
+  | 'friend_accepted'
+  | 'new_message'
+  | 'comment_reply'
+  | 'join_accepted'
+  | 'review_received';
+
+export interface Notification {
+  id: string;
+  user_id: string;
+  actor_id: string;
+  type: NotificationEventType;
+  title: string;
+  body: string;
+  link: string | null;
+  is_read: boolean;
+  created_at: string;
+  actor?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
+}
+
+export interface CreateNotificationParams {
+  user_id: string;
+  actor_id: string;
+  type: NotificationEventType;
+  title: string;
+  body: string;
+  link?: string;
+}
+
 // Utility types
 export interface SearchFilters {
   plan_type?: PlanType;

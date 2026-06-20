@@ -29,6 +29,14 @@ create type permission_level_enum as enum (
   'editar'
 );
 
+create type notification_event_type_enum as enum (
+  'friend_accepted',
+  'new_message',
+  'comment_reply',
+  'join_accepted',
+  'review_received'
+);
+
 -- User profiles table
 create table public.user_profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -193,6 +201,19 @@ create table public.user_reviews (
   check (reviewer_id != reviewed_id)
 );
 
+-- Notifications
+create table public.notifications (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid not null references public.user_profiles(id) on delete cascade,
+  actor_id uuid not null references public.user_profiles(id) on delete cascade,
+  type notification_event_type_enum not null,
+  title text not null,
+  body text not null,
+  link text,
+  is_read boolean default false,
+  created_at timestamp with time zone default now()
+);
+
 -- Indexes for better performance
 create index idx_user_profiles_username on public.user_profiles(username);
 create index idx_user_profiles_country on public.user_profiles(country);
@@ -204,6 +225,9 @@ create index idx_plan_participants_plan on public.plan_participants(plan_id);
 create index idx_plan_participants_user on public.plan_participants(user_id);
 create index idx_messages_chat on public.messages(chat_id);
 create index idx_messages_created on public.messages(created_at);
+create index idx_notif_user_unread on public.notifications(user_id, is_read)
+  where is_read = false;
+create index idx_notif_user_created on public.notifications(user_id, created_at desc);
 
 -- Insert predefined interests
 insert into public.interests (name, icon) values
@@ -244,6 +268,11 @@ alter table public.user_friends enable row level security;
 alter table public.chats enable row level security;
 alter table public.messages enable row level security;
 alter table public.user_reviews enable row level security;
+alter table public.notifications enable row level security;
+
+-- Replica identity and realtime publication for notifications
+alter table public.notifications replica identity full;
+alter publication supabase_realtime add table public.notifications;
 
 -- User profiles policies
 create policy "Users can view all profiles" on public.user_profiles
@@ -427,6 +456,16 @@ create policy "Users can update own reviews" on public.user_reviews
   for update using (auth.uid() = reviewer_id)
   with check (auth.uid() = reviewer_id);
 
+-- Notifications policies
+create policy "Users can view own notifications" on public.notifications
+  for select using (auth.uid() = user_id);
+
+create policy "Authenticated users can insert notifications" on public.notifications
+  for insert with check (auth.uid() is not null);
+
+create policy "Users can update own notification read status" on public.notifications
+  for update using (auth.uid() = user_id);
+
 -- Functions for automatic profile creation
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -487,4 +526,15 @@ create trigger update_travel_plan_timestamp
 -- Trigger for user profiles updated_at
 create trigger update_user_profile_timestamp
   before update on public.user_profiles
-  for each row execute procedure public.update_travel_plan_timestamp(); 
+  for each row execute procedure public.update_travel_plan_timestamp();
+
+-- Notification cleanup: remove notifications older than 360 days
+create or replace function public.cleanup_old_notifications()
+returns void language plpgsql security definer as $$
+begin
+  delete from public.notifications where created_at < now() - interval '360 days';
+end; $$;
+
+-- Schedule cleanup daily at 3 AM (requires pg_cron extension)
+select cron.schedule('cleanup-notifications', '0 3 * * *',
+  'select public.cleanup_old_notifications();');
