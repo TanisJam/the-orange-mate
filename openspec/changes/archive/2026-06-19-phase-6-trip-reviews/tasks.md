@@ -61,4 +61,4 @@ Chain strategy: feature-branch-chain
 ## Phase 6: Verification
 
 - [x] 6.1 Run `npm run build` — verify no TypeScript errors, no ESLint issues
-- [ ] 6.2 Manual: verify all spec scenarios — completion button visibility, review submit/edit, average display, auth gating, empty states, "(editado)" indicator
+- [x] 6.2 Manual: verify all spec scenarios — completion button visibility, review submit/edit, average display, auth gating, empty states, "(editado)" indicator
