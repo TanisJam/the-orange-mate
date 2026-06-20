@@ -24,18 +24,18 @@ Chain strategy: feature-branch-chain
 
 ## Phase 1: Schema & Types (PR 1)
 
-- [ ] 1.1 Add `notification_event_type_enum`, `notifications` table (FKs: `user_id`, `actor_id` → `user_profiles`), indexes (`idx_notif_user_unread` partial WHERE `is_read = false`, `idx_notif_user_created`), RLS policies (SELECT/UPDATE: `user_id = auth.uid()`; INSERT: authenticated), `REPLICA IDENTITY FULL`, `supabase_realtime` publication, `cleanup_old_notifications()` function, pg_cron schedule to `database-schema.sql`
-- [ ] 1.2 Add `NotificationEventType`, `Notification` (with optional `actor?: Pick<UserProfile, 'id'|'username'|'full_name'|'avatar_url'>`), `CreateNotificationParams` to `lib/types.ts`
+- [x] 1.1 Add `notification_event_type_enum`, `notifications` table (FKs: `user_id`, `actor_id` → `user_profiles`), indexes (`idx_notif_user_unread` partial WHERE `is_read = false`, `idx_notif_user_created`), RLS policies (SELECT/UPDATE: `user_id = auth.uid()`; INSERT: authenticated), `REPLICA IDENTITY FULL`, `supabase_realtime` publication, `cleanup_old_notifications()` function, pg_cron schedule to `database-schema.sql`
+- [x] 1.2 Add `NotificationEventType`, `Notification` (with optional `actor?: Pick<UserProfile, 'id'|'username'|'full_name'|'avatar_url'>`), `CreateNotificationParams` to `lib/types.ts`
 
 ## Phase 2: Data Layer (PR 1)
 
-- [ ] 2.1 Create `lib/notification-client.ts` with five functions: `createNotification(params)→Notification|null`, `getNotifications(userId, page, limit=20)→{data,count}`, `getUnreadCount(userId)→number`, `markAsRead(id)→boolean`, `markAllAsRead(userId)→boolean`
-- [ ] 2.2 Modify `updateJoinRequest()` in `lib/database-client.ts`: add `callerId: string` parameter; update 2 call sites in `components/join-request-flow.tsx` (pass `userId`)
-- [ ] 2.3 Call `createNotification()` from `acceptFriendRequest()`: after update succeeds, notify requester (`user_id=data.user_id, type=friend_accepted`) + self-notify accepter (`user_id=userId`). Add `requester:user_profiles!user_id(id,username,full_name,avatar_url)` to SELECT
-- [ ] 2.4 Call `createNotification()` from `createPlanComment()`: when `parent_comment_id` exists, fetch parent author via `getPlanComments`, notify if author ≠ current user (`type=comment_reply`)
-- [ ] 2.5 Call `createNotification()` from `updateJoinRequest()`: inside `status==='accepted' && data` block, notify requester (`user_id=data.requester_id, actor_id=callerId, type=join_accepted`)
-- [ ] 2.6 Call `createNotification()` from `submitReview()`: after insert succeeds, notify reviewed user (`user_id=data.reviewed_id, type=review_received`)
-- [ ] 2.7 Call `createNotification()` from `sendMessage()` in `lib/chat-client.ts`: after insert succeeds, fetch chat to identify other participant, notify (`type=new_message`)
+- [x] 2.1 Create `lib/notification-client.ts` with five functions: `createNotification(params)→Notification|null`, `getNotifications(userId, page, limit=20)→{data,count}`, `getUnreadCount(userId)→number`, `markAsRead(id)→boolean`, `markAllAsRead(userId)→boolean`
+- [x] 2.2 Modify `updateJoinRequest()` in `lib/database-client.ts`: add `callerId: string` parameter; update 2 call sites in `components/join-request-flow.tsx` (pass `userId`)
+- [x] 2.3 Call `createNotification()` from `acceptFriendRequest()`: after update succeeds, notify requester (`user_id=data.user_id, type=friend_accepted`) + self-notify accepter (`user_id=userId`). Add `requester:user_profiles!user_id(id,username,full_name,avatar_url)` to SELECT
+- [x] 2.4 Call `createNotification()` from `createPlanComment()`: when `parent_comment_id` exists, fetch parent author via `getPlanComments`, notify if author ≠ current user (`type=comment_reply`)
+- [x] 2.5 Call `createNotification()` from `updateJoinRequest()`: inside `status==='accepted' && data` block, notify requester (`user_id=data.requester_id, actor_id=callerId, type=join_accepted`)
+- [x] 2.6 Call `createNotification()` from `submitReview()`: after insert succeeds, notify reviewed user (`user_id=data.reviewed_id, type=review_received`)
+- [x] 2.7 Call `createNotification()` from `sendMessage()` in `lib/chat-client.ts`: after insert succeeds, fetch chat to identify other participant, notify (`type=new_message`)
 
 ## Phase 3: UI Components (PR 2)
 

@@ -7,7 +7,7 @@ export function DesignSystemDemo() {
         <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
           Design System Demo
         </h1>
-        <p className="text-lg font-body text-neutral-gray dark:text-neutral-light">
+        <p className="text-lg font-body text-muted-foreground dark:text-neutral-light">
           Demostración de los colores y tipografía del sistema de diseño
         </p>
       </div>
@@ -117,7 +117,7 @@ export function DesignSystemDemo() {
           <p className="text-lg font-body text-neutral-black dark:text-neutral-white">
             Oxanium body text - Lorem ipsum dolor sit amet, consectetur adipiscing elit.
           </p>
-          <p className="text-base font-body text-neutral-gray dark:text-neutral-light">
+          <p className="text-base font-body text-muted-foreground dark:text-neutral-light">
             Oxanium regular text - Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
           </p>
         </div>

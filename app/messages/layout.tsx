@@ -18,12 +18,12 @@ export default async function MessagesLayout({
   }
 
   return (
-    <main className="min-h-screen bg-neutral-light dark:bg-neutral-gray">
+    <main className="min-h-screen bg-neutral-light dark:bg-background">
       <header className="w-full border-b border-neutral-gray dark:border-neutral-gray h-16 flex items-center">
         <div className="w-full max-w-4xl mx-auto flex items-center gap-4 px-4">
           <Link
             href="/dashboard"
-            className="flex items-center gap-1 text-sm font-body text-neutral-gray hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
+            className="flex items-center gap-1 text-sm font-body text-muted-foreground hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
           >
             <ArrowLeft className="size-4" />
             Volver

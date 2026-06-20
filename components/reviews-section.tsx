@@ -83,7 +83,7 @@ export function ReviewsSection({
           <span className="text-sm font-semibold text-neutral-black dark:text-neutral-white">
             {currentAverage.average}
           </span>
-          <span className="text-sm text-neutral-gray">
+          <span className="text-sm text-muted-foreground">
             — {currentAverage.count} review{currentAverage.count !== 1 ? "s" : ""}
           </span>
         </div>
@@ -119,7 +119,7 @@ export function ReviewsSection({
 
       {/* Review list */}
       {reviews.length === 0 ? (
-        <p className="text-neutral-gray text-center py-6">
+        <p className="text-muted-foreground text-center py-6">
           No hay reviews todavía
         </p>
       ) : (

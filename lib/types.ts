@@ -1,4 +1,4 @@
-// Database types for SoloTravelers application
+// Database types for The Orange Mate application
 
 export type PlanType = 'alojamiento' | 'actividad' | 'viaje_completo' | 'transporte' | 'salida_local';
 

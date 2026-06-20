@@ -92,7 +92,7 @@ function PaginationControls({
 
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8">
-      <p className="text-sm text-neutral-gray">
+      <p className="text-sm text-muted-foreground">
         {totalCount} {totalCount === 1 ? "plan encontrado" : "planes encontrados"}
       </p>
       <div className="flex items-center gap-2">
@@ -131,11 +131,11 @@ export function DiscoverResults({
   if (plans.length === 0) {
     return (
       <div className="text-center py-16">
-        <Search className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
+        <Search className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
         <h3 className="text-xl font-heading text-neutral-black dark:text-neutral-white mb-2">
           No se encontraron planes con estos filtros
         </h3>
-        <p className="text-neutral-gray max-w-md mx-auto">
+        <p className="text-muted-foreground max-w-md mx-auto">
           Intentá con otros filtros o volvé más tarde para ver nuevos planes
           disponibles.
         </p>
@@ -196,7 +196,7 @@ function UnauthenticatedCard({
   plan: TravelPlan;
 }) {
   return (
-    <div className="p-4 border-2 border-neutral-black rounded-lg bg-neutral-white shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] dark:border-neutral-gray dark:bg-neutral-light flex flex-col">
+    <div className="p-4 border-2 border-ink rounded-lg bg-card text-card-foreground shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] flex flex-col">
       {/* Type badge intentionally hidden for anonymous users per spec */}
 
       {/* Destinations */}
@@ -210,7 +210,7 @@ function UnauthenticatedCard({
       </div>
 
       {/* Dates (always show — dates or flexible message) */}
-      <div className="flex items-center gap-1.5 text-sm text-neutral-gray mb-3">
+      <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-3">
         <Calendar className="w-4 h-4" />
         <span>{formatApproxDateRange(plan.start_date, plan.end_date)}</span>
       </div>
@@ -238,7 +238,7 @@ function AuthenticatedCard({
   typeInfo: { value: string; label: string; icon: string };
 }) {
   return (
-    <div className="p-4 border-2 border-neutral-black rounded-lg bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] dark:border-neutral-gray hover:shadow-lg transition-shadow flex flex-col">
+    <div className="p-4 border-2 border-ink rounded-lg bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] dark:border-neutral-gray hover:shadow-lg transition-shadow flex flex-col">
       {/* Header: type + title */}
       <div className="flex items-start gap-2 mb-3">
         <span className="text-xl">{typeInfo.icon}</span>
@@ -252,7 +252,7 @@ function AuthenticatedCard({
             </Badge>
           </div>
           {/* Creator */}
-          <p className="text-sm text-neutral-gray mt-0.5">
+          <p className="text-sm text-muted-foreground mt-0.5">
             por{" "}
             <Link
               href={`/profile/${plan.creator?.username || plan.creator_id}`}
@@ -275,7 +275,7 @@ function AuthenticatedCard({
       </div>
 
       {/* Dates */}
-      <div className="flex items-center gap-1.5 text-sm text-neutral-gray mb-2">
+      <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-2">
         <Calendar className="w-4 h-4" />
         <span>
           {plan.start_date
@@ -300,7 +300,7 @@ function AuthenticatedCard({
 
       {/* Description */}
       {plan.description && (
-        <p className="text-sm text-neutral-gray mb-3 line-clamp-2">
+        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
           {plan.description}
         </p>
       )}

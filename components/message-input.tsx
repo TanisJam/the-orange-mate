@@ -68,7 +68,7 @@ export default function MessageInput({
   const canSend = content.trim().length > 0 && !sending;
 
   return (
-    <div className="flex gap-2 items-end p-3 border-t border-neutral-gray bg-neutral-white dark:bg-neutral-light">
+    <div className="flex gap-2 items-end p-3 border-t border-neutral-gray bg-card">
       <Textarea
         ref={textareaRef}
         value={content}

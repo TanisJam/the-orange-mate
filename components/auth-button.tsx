@@ -19,7 +19,7 @@ export async function AuthButton() {
 
   return user ? (
     <div className="flex items-center gap-4">
-      <span className="font-body text-neutral-gray dark:text-neutral-white">
+      <span className="font-body text-muted-foreground dark:text-neutral-white">
         ¡Hola, {user.email?.split('@')[0]}!
       </span>
       {profileUsername && (

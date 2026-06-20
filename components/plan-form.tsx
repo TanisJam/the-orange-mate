@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -21,119 +23,138 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { createTravelPlan } from "@/lib/database-client";
 import type { PlanType } from "@/lib/types";
 import { PLAN_TYPES, CURRENCIES } from "@/lib/types";
 import { MapPin, Calendar, Users, DollarSign, Share2 } from "lucide-react";
 
+const planSchema = z
+  .object({
+    title: z.string().min(1, "El título es obligatorio"),
+    plan_type: z.enum(
+      ["alojamiento", "actividad", "viaje_completo", "transporte", "salida_local"],
+      { message: "El tipo de plan es obligatorio" }
+    ),
+    destinations: z
+      .string()
+      .min(1, "Al menos un destino es obligatorio")
+      .refine(
+        (val) => val.split(",").map((d) => d.trim()).filter(Boolean).length > 0,
+        { message: "Al menos un destino es obligatorio" }
+      ),
+    start_date: z.string().optional(),
+    end_date: z.string().optional(),
+    flexible_dates: z.boolean(),
+    description: z.string().optional(),
+    max_participants: z
+      .string()
+      .min(1, "Debe ser al menos 1")
+      .refine((v) => {
+        const n = Number(v);
+        return Number.isInteger(n) && n >= 1;
+      }, "Debe ser un número entero mayor o igual a 1"),
+    share_accommodation: z.boolean(),
+    share_transport: z.boolean(),
+    share_tours: z.boolean(),
+    budget_range_min: z
+      .string()
+      .optional()
+      .refine((v) => !v || Number(v) >= 0, "Debe ser mayor o igual a 0"),
+    budget_range_max: z
+      .string()
+      .optional()
+      .refine((v) => !v || Number(v) >= 0, "Debe ser mayor o igual a 0"),
+    currency: z.string().min(1, "La moneda es obligatoria"),
+  })
+  .refine(
+    (data) => {
+      if (data.start_date && data.end_date) {
+        return new Date(data.end_date) >= new Date(data.start_date);
+      }
+      return true;
+    },
+    {
+      message: "La fecha de fin debe ser posterior a la de inicio",
+      path: ["end_date"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.budget_range_min && data.budget_range_max) {
+        return Number(data.budget_range_max) >= Number(data.budget_range_min);
+      }
+      return true;
+    },
+    {
+      message: "El máximo debe ser mayor o igual al mínimo",
+      path: ["budget_range_max"],
+    }
+  );
+
+type PlanValues = z.infer<typeof planSchema>;
+
 interface PlanFormProps {
   userId: string;
 }
 
-interface FormErrors {
-  title?: string;
-  plan_type?: string;
-  destinations?: string;
-  start_date?: string;
-  end_date?: string;
-  max_participants?: string;
-  budget_range_min?: string;
-  budget_range_max?: string;
-  currency?: string;
-}
-
 export function PlanForm({ userId }: PlanFormProps) {
   const router = useRouter();
-
-  const [title, setTitle] = useState("");
-  const [planType, setPlanType] = useState<PlanType>("viaje_completo");
-  const [destinations, setDestinations] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [flexibleDates, setFlexibleDates] = useState(false);
-  const [description, setDescription] = useState("");
-  const [maxParticipants, setMaxParticipants] = useState("1");
-  const [shareAccommodation, setShareAccommodation] = useState(false);
-  const [shareTransport, setShareTransport] = useState(false);
-  const [shareTours, setShareTours] = useState(false);
-  const [budgetMin, setBudgetMin] = useState("");
-  const [budgetMax, setBudgetMax] = useState("");
-  const [currency, setCurrency] = useState("USD");
-
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const validate = (): boolean => {
-    const newErrors: FormErrors = {};
+  const form = useForm<PlanValues>({
+    resolver: zodResolver(planSchema),
+    mode: "onTouched",
+    defaultValues: {
+      title: "",
+      plan_type: "viaje_completo" as PlanType,
+      destinations: "",
+      start_date: "",
+      end_date: "",
+      flexible_dates: false,
+      description: "",
+      max_participants: "1",
+      share_accommodation: false,
+      share_transport: false,
+      share_tours: false,
+      budget_range_min: "",
+      budget_range_max: "",
+      currency: "USD",
+    },
+  });
 
-    if (!title.trim()) {
-      newErrors.title = "El título es obligatorio";
-    }
-
-    const parsedDestinations = destinations
-      .split(",")
-      .map((d) => d.trim())
-      .filter(Boolean);
-    if (parsedDestinations.length === 0) {
-      newErrors.destinations = "Al menos un destino es obligatorio";
-    }
-
-    if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
-      newErrors.end_date = "La fecha de fin debe ser posterior a la de inicio";
-    }
-
-    const max = parseInt(maxParticipants, 10);
-    if (isNaN(max) || max < 1) {
-      newErrors.max_participants = "Debe ser al menos 1";
-    }
-
-    const bMin = budgetMin ? parseFloat(budgetMin) : null;
-    const bMax = budgetMax ? parseFloat(budgetMax) : null;
-    if (bMin !== null && isNaN(bMin)) {
-      newErrors.budget_range_min = "Debe ser un número válido";
-    }
-    if (bMax !== null && isNaN(bMax)) {
-      newErrors.budget_range_max = "Debe ser un número válido";
-    }
-    if (bMin !== null && bMax !== null && bMin > bMax) {
-      newErrors.budget_range_max = "El máximo debe ser mayor o igual al mínimo";
-    }
-
-    if (!currency.trim()) {
-      newErrors.currency = "La moneda es obligatoria";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (values: PlanValues) => {
     setSubmitError(null);
-
-    if (!validate()) return;
-
-    setLoading(true);
     try {
       const plan = await createTravelPlan(userId, {
-        title: title.trim(),
-        plan_type: planType,
-        destinations: destinations
+        title: values.title.trim(),
+        plan_type: values.plan_type,
+        destinations: values.destinations
           .split(",")
           .map((d) => d.trim())
           .filter(Boolean),
-        start_date: startDate || undefined,
-        end_date: endDate || undefined,
-        flexible_dates: flexibleDates,
-        description: description.trim() || undefined,
-        max_participants: parseInt(maxParticipants, 10),
-        share_accommodation: shareAccommodation,
-        share_transport: shareTransport,
-        share_tours: shareTours,
-        budget_range_min: budgetMin ? parseFloat(budgetMin) : undefined,
-        budget_range_max: budgetMax ? parseFloat(budgetMax) : undefined,
-        currency: currency.trim() || "USD",
+        start_date: values.start_date || undefined,
+        end_date: values.end_date || undefined,
+        flexible_dates: values.flexible_dates,
+        description: values.description?.trim() || undefined,
+        max_participants: Number(values.max_participants),
+        share_accommodation: values.share_accommodation,
+        share_transport: values.share_transport,
+        share_tours: values.share_tours,
+        budget_range_min: values.budget_range_min
+          ? Number(values.budget_range_min)
+          : undefined,
+        budget_range_max: values.budget_range_max
+          ? Number(values.budget_range_max)
+          : undefined,
+        currency: values.currency.trim() || "USD",
         is_public: false,
         comments_enabled: true,
       });
@@ -145,8 +166,6 @@ export function PlanForm({ userId }: PlanFormProps) {
       }
     } catch {
       setSubmitError("Error inesperado al crear el plan. Inténtalo de nuevo.");
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,271 +177,362 @@ export function PlanForm({ userId }: PlanFormProps) {
             <MapPin className="w-5 h-5" />
             Crear Nuevo Plan
           </CardTitle>
-          <CardDescription className="font-body text-neutral-gray dark:text-neutral-white">
+          <CardDescription className="font-body text-muted-foreground dark:text-neutral-white">
             Completa los detalles de tu plan de viaje para conectar con otros viajeros
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Basic Info */}
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="title">Título *</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Ej: Viaje a la Patagonia"
-                />
-                {errors.title && (
-                  <p className="text-sm text-error mt-1">{errors.title}</p>
-                )}
-              </div>
-
-              <div>
-                <Label htmlFor="plan_type">Tipo de Plan</Label>
-                <Select value={planType} onValueChange={(v) => setPlanType(v as PlanType)}>
-                  <SelectTrigger id="plan_type">
-                    <SelectValue placeholder="Selecciona el tipo de plan" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PLAN_TYPES.map((pt) => (
-                      <SelectItem key={pt.value} value={pt.value}>
-                        {pt.icon} {pt.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="destinations">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    Destinos *
-                  </span>
-                </Label>
-                <Input
-                  id="destinations"
-                  value={destinations}
-                  onChange={(e) => setDestinations(e.target.value)}
-                  placeholder="Separados por coma: Bariloche, El Calafate"
-                />
-                {errors.destinations && (
-                  <p className="text-sm text-error mt-1">{errors.destinations}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Dates */}
-            <div className="space-y-4">
-              <h3 className="font-heading text-lg flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                Fechas
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="start_date">Fecha de inicio</Label>
-                  <Input
-                    id="start_date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="end_date">Fecha de fin</Label>
-                  <Input
-                    id="end_date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                  />
-                  {errors.end_date && (
-                    <p className="text-sm text-error mt-1">{errors.end_date}</p>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              {/* Basic Info */}
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Título *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Ej: Viaje a la Patagonia"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="flexible_dates"
-                  checked={flexibleDates}
-                  onCheckedChange={(checked) => setFlexibleDates(checked === true)}
                 />
-                <Label
-                  htmlFor="flexible_dates"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Fechas flexibles
-                </Label>
-              </div>
-            </div>
 
-            {/* Description */}
-            <div>
-              <Label htmlFor="description">Descripción</Label>
-              <Textarea
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Describe tu plan: qué actividades harás, qué tipo de compañero buscas..."
-                rows={4}
+                <FormField
+                  control={form.control}
+                  name="plan_type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tipo de Plan</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona el tipo de plan" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {PLAN_TYPES.map((pt) => (
+                            <SelectItem key={pt.value} value={pt.value}>
+                              {pt.icon} {pt.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="destinations"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-4 h-4" />
+                          Destinos *
+                        </span>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Separados por coma: Bariloche, El Calafate"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Dates */}
+              <div className="space-y-4">
+                <h3 className="font-heading text-lg flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Fechas
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="start_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha de inicio</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="end_date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fecha de fin</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="flexible_dates"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Fechas flexibles
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Descripción</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Describe tu plan: qué actividades harás, qué tipo de compañero buscas..."
+                        rows={4}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Participants */}
-            <div className="space-y-4">
-              <h3 className="font-heading text-lg flex items-center gap-2">
-                <Users className="w-4 h-4" />
-                Participantes
-              </h3>
+              {/* Participants */}
+              <div className="space-y-4">
+                <h3 className="font-heading text-lg flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Participantes
+                </h3>
 
-              <div>
-                <Label htmlFor="max_participants">Máximo de participantes</Label>
-                <Input
-                  id="max_participants"
-                  type="number"
-                  min="1"
-                  value={maxParticipants}
-                  onChange={(e) => setMaxParticipants(e.target.value)}
-                />
-                {errors.max_participants && (
-                  <p className="text-sm text-error mt-1">{errors.max_participants}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Sharing Options */}
-            <div className="space-y-3">
-              <h3 className="font-heading text-lg flex items-center gap-2">
-                <Share2 className="w-4 h-4" />
-                Compartir
-              </h3>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="share_accommodation"
-                  checked={shareAccommodation}
-                  onCheckedChange={(checked) => setShareAccommodation(checked === true)}
-                />
-                <Label
-                  htmlFor="share_accommodation"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Compartir alojamiento
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="share_transport"
-                  checked={shareTransport}
-                  onCheckedChange={(checked) => setShareTransport(checked === true)}
-                />
-                <Label
-                  htmlFor="share_transport"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Compartir transporte
-                </Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="share_tours"
-                  checked={shareTours}
-                  onCheckedChange={(checked) => setShareTours(checked === true)}
-                />
-                <Label
-                  htmlFor="share_tours"
-                  className="text-sm font-normal cursor-pointer"
-                >
-                  Compartir tours / actividades
-                </Label>
-              </div>
-            </div>
-
-            {/* Budget */}
-            <div className="space-y-4">
-              <h3 className="font-heading text-lg flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Presupuesto
-              </h3>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="budget_min">Presupuesto mínimo</Label>
-                  <Input
-                    id="budget_min"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={budgetMin}
-                    onChange={(e) => setBudgetMin(e.target.value)}
-                    placeholder="0"
-                  />
-                  {errors.budget_range_min && (
-                    <p className="text-sm text-error mt-1">{errors.budget_range_min}</p>
+                <FormField
+                  control={form.control}
+                  name="max_participants"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Máximo de participantes</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min="1"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-                <div>
-                  <Label htmlFor="budget_max">Presupuesto máximo</Label>
-                  <Input
-                    id="budget_max"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={budgetMax}
-                    onChange={(e) => setBudgetMax(e.target.value)}
-                    placeholder="0"
-                  />
-                  {errors.budget_range_max && (
-                    <p className="text-sm text-error mt-1">{errors.budget_range_max}</p>
+                />
+              </div>
+
+              {/* Sharing Options */}
+              <div className="space-y-3">
+                <h3 className="font-heading text-lg flex items-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  Compartir
+                </h3>
+
+                <FormField
+                  control={form.control}
+                  name="share_accommodation"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Compartir alojamiento
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
                   )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="share_transport"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Compartir transporte
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="share_tours"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center space-x-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-sm font-normal cursor-pointer">
+                          Compartir tours / actividades
+                        </FormLabel>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Budget */}
+              <div className="space-y-4">
+                <h3 className="font-heading text-lg flex items-center gap-2">
+                  <DollarSign className="w-4 h-4" />
+                  Presupuesto
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="budget_range_min"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Presupuesto mínimo</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="budget_range_max"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Presupuesto máximo</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="0"
+                            {...field}
+                            value={field.value ?? ""}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
+
+                <FormField
+                  control={form.control}
+                  name="currency"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Moneda</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Selecciona moneda" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {CURRENCIES.map((c) => (
+                            <SelectItem key={c.value} value={c.value}>
+                              {c.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
 
-              <div>
-                <Label htmlFor="currency">Moneda</Label>
-                <Select value={currency} onValueChange={setCurrency}>
-                  <SelectTrigger id="currency">
-                    <SelectValue placeholder="Selecciona moneda" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CURRENCIES.map((c) => (
-                      <SelectItem key={c.value} value={c.value}>
-                        {c.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.currency && (
-                  <p className="text-sm text-error mt-1">{errors.currency}</p>
-                )}
-              </div>
-            </div>
+              {/* Submit Error */}
+              {submitError && (
+                <div
+                  className="p-3 border-2 border-error bg-error/10 rounded-[--radius]"
+                  role="alert"
+                  aria-live="polite"
+                >
+                  <p className="text-sm text-error">{submitError}</p>
+                </div>
+              )}
 
-            {/* Submit Error */}
-            {submitError && (
-              <div className="p-3 border-2 border-error bg-error/10 rounded-[--radius]">
-                <p className="text-sm text-error">{submitError}</p>
+              {/* Submit Button */}
+              <div className="flex justify-end pt-4 border-t-2 border-ink dark:border-neutral-gray">
+                <Button
+                  type="submit"
+                  disabled={form.formState.isSubmitting}
+                  variant="primary"
+                  className="px-8"
+                >
+                  {form.formState.isSubmitting ? "Creando plan..." : "Crear Plan"}
+                </Button>
               </div>
-            )}
-
-            {/* Submit Button */}
-            <div className="flex justify-end pt-4 border-t-2 border-neutral-black dark:border-neutral-gray">
-              <Button
-                type="submit"
-                disabled={loading}
-                variant="primary"
-                className="px-8"
-              >
-                {loading ? "Creando plan..." : "Crear Plan"}
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

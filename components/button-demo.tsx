@@ -1,13 +1,14 @@
 "use client";
 
 import { Button } from "./ui/button";
+import { Settings } from "lucide-react";
 
 export function ButtonDemo() {
   return (
     <div className="p-8 space-y-8">
       <div className="space-y-4">
         <h2 className="text-3xl font-heading text-primary dark:text-primary-light">Button Components</h2>
-        <p className="text-lg font-body text-neutral-gray dark:text-neutral-light">
+        <p className="text-lg font-body text-muted-foreground dark:text-neutral-light">
           Showcasing all button variants and states from your design system
         </p>
       </div>
@@ -44,8 +45,8 @@ export function ButtonDemo() {
           <Button variant="primary" size="lg">
             Large
           </Button>
-          <Button variant="primary" size="icon">
-            ⚙
+          <Button variant="primary" size="icon" aria-label="Settings">
+            <Settings />
           </Button>
         </div>
       </div>

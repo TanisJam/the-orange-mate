@@ -52,7 +52,7 @@ export function StarSelector({
                 iconSize,
                 filled
                   ? "fill-primary text-primary"
-                  : "text-neutral-gray/40 dark:text-neutral-gray/60",
+                  : "text-muted-foreground/40 dark:text-muted-foreground/60",
               )}
             />
           </button>

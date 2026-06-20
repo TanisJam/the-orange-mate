@@ -69,11 +69,11 @@ export default function NotificationItem({
           <span className="font-heading text-sm text-neutral-black dark:text-neutral-white truncate">
             {notification.title}
           </span>
-          <span className="text-[11px] text-neutral-gray dark:text-neutral-white/60 shrink-0">
+          <span className="text-[11px] text-muted-foreground dark:text-neutral-white/60 shrink-0">
             {formatRelativeDate(notification.created_at)}
           </span>
         </div>
-        <p className="text-xs text-neutral-gray dark:text-neutral-white/70 mt-0.5 line-clamp-2">
+        <p className="text-xs text-muted-foreground dark:text-neutral-white/70 mt-0.5 line-clamp-2">
           {notification.body}
         </p>
       </div>

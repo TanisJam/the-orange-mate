@@ -190,7 +190,7 @@ export function PlanDetail({
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-neutral-gray">
+              <p className="text-sm text-muted-foreground">
                 Creado por{" "}
                 <Link
                   href={`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`}
@@ -263,7 +263,7 @@ export function PlanDetail({
         </CardHeader>
         <CardContent className="space-y-4">
           {currentPlan.destinations.length === 0 ? (
-            <p className="text-neutral-gray">No se han definido destinos</p>
+            <p className="text-muted-foreground">No se han definido destinos</p>
           ) : (
             <div className="flex flex-wrap gap-2">
               {currentPlan.destinations.map((dest) => (
@@ -274,7 +274,7 @@ export function PlanDetail({
             </div>
           )}
           {currentPlan.start_date && (
-            <div className="flex items-center gap-4 text-sm text-neutral-gray">
+            <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 {formatDate(currentPlan.start_date)}
@@ -312,13 +312,13 @@ export function PlanDetail({
                   : ""}
               </p>
               {currencyInfo && (
-                <p className="text-sm text-neutral-gray">
+                <p className="text-sm text-muted-foreground">
                   Moneda: {currencyInfo.label}
                 </p>
               )}
             </div>
           ) : (
-            <p className="text-neutral-gray">Presupuesto no especificado</p>
+            <p className="text-muted-foreground">Presupuesto no especificado</p>
           )}
         </CardContent>
       </Card>
@@ -337,7 +337,7 @@ export function PlanDetail({
               <p className="whitespace-pre-wrap">{currentPlan.description}</p>
             </div>
           ) : (
-            <p className="text-neutral-gray">Sin descripción</p>
+            <p className="text-muted-foreground">Sin descripción</p>
           )}
         </CardContent>
       </Card>
@@ -427,7 +427,7 @@ export function PlanDetail({
                             </Badge>
                           )}
                         </p>
-                        <p className="text-xs text-neutral-gray">
+                        <p className="text-xs text-muted-foreground">
                           {getPermissionLabel(participant.permission_level)} ·{" "}
                           {formatDate(participant.joined_at)}
                         </p>
@@ -437,14 +437,14 @@ export function PlanDetail({
                 ))}
               </div>
             ) : (
-              <p className="text-neutral-gray text-center py-8">
+              <p className="text-muted-foreground text-center py-8">
                 No hay participantes todavía
               </p>
             )
           ) : (
             <div className="text-center py-8">
-              <Lock className="w-8 h-8 mx-auto text-neutral-gray mb-2" />
-              <p className="text-neutral-gray">
+              <Lock className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+              <p className="text-muted-foreground">
                 Únete al plan para ver los participantes
               </p>
             </div>
@@ -452,7 +452,7 @@ export function PlanDetail({
 
           {/* Join Request Flow */}
           {!isCreator && (
-            <div className="pt-4 border-t-2 border-neutral-black dark:border-neutral-gray">
+            <div className="pt-4 border-t-2 border-ink dark:border-neutral-gray">
               <JoinRequestFlow
                 planId={currentPlan.id}
                 userId={currentUserId}
@@ -468,7 +468,7 @@ export function PlanDetail({
 
           {/* Creator's pending requests */}
           {isCreator && (
-            <div className="pt-4 border-t-2 border-neutral-black dark:border-neutral-gray">
+            <div className="pt-4 border-t-2 border-ink dark:border-neutral-gray">
               <JoinRequestFlow
                 planId={currentPlan.id}
                 userId={currentUserId}

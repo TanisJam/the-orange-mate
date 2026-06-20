@@ -55,7 +55,7 @@ export default function FriendCard({
   };
 
   return (
-    <div className="flex items-center gap-3 p-3 rounded-[var(--radius)] border-2 border-neutral-black bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)]">
+    <div className="flex items-center gap-3 p-3 rounded-[var(--radius)] border-2 border-ink bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))]">
       {/* Avatar */}
       {avatarUrl ? (
         <img
@@ -83,7 +83,7 @@ export default function FriendCard({
             {displayName}
           </span>
         )}
-        <p className="text-xs text-neutral-gray mt-0.5">{statusLabel()}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{statusLabel()}</p>
       </div>
 
       {/* Actions */}
@@ -99,7 +99,7 @@ export default function FriendCard({
       )}
 
       {variant === "sent" && (
-        <span className="text-xs text-neutral-gray font-medium shrink-0 bg-neutral-light dark:bg-neutral-gray px-2 py-1 rounded-[var(--radius)]">
+        <span className="text-xs text-muted-foreground font-medium shrink-0 bg-neutral-light dark:bg-background px-2 py-1 rounded-[var(--radius)]">
           Pendiente
         </span>
       )}

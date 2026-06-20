@@ -120,7 +120,7 @@ export default function CommentItem({
             >
               {author?.full_name || author?.username || "Usuario"}
             </Link>
-            <span className="text-xs text-neutral-gray">
+            <span className="text-xs text-muted-foreground">
               {formatRelativeDate(comment.created_at)}
             </span>
           </div>
@@ -128,7 +128,7 @@ export default function CommentItem({
           {/* Content */}
           <p
             className={`text-sm mt-1 whitespace-pre-wrap ${
-              isReply ? "text-neutral-gray" : "text-neutral-black dark:text-neutral-white"
+              isReply ? "text-muted-foreground" : "text-neutral-black dark:text-neutral-white"
             }`}
           >
             {comment.content}
@@ -141,7 +141,7 @@ export default function CommentItem({
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-7 text-xs text-neutral-gray hover:text-primary"
+                className="h-7 text-xs text-muted-foreground hover:text-primary"
                 onClick={() => setShowReplyForm(!showReplyForm)}
               >
                 <CornerDownRight className="w-3.5 h-3.5 mr-1" />

@@ -62,7 +62,7 @@ interface ChatListProps {
 export default function ChatList({ chats, currentUserId }: ChatListProps) {
   if (chats.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-neutral-gray">
+      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
         <MessageCircle className="size-12 mb-4 opacity-50" />
         <p className="font-body text-lg">No tienes conversaciones</p>
         <p className="font-body text-sm mt-1">
@@ -96,7 +96,7 @@ export default function ChatList({ chats, currentUserId }: ChatListProps) {
           <Link
             key={chat.id}
             href={`/messages/${chat.id}`}
-            className="flex items-center gap-3 p-3 rounded-[var(--radius)] border-2 border-neutral-black bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] hover:bg-neutral-light dark:hover:bg-neutral-gray transition-colors cursor-pointer"
+            className="flex items-center gap-3 p-3 rounded-[var(--radius)] border-2 border-ink bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
           >
             {/* Avatar */}
             {other.avatar_url ? (
@@ -117,16 +117,16 @@ export default function ChatList({ chats, currentUserId }: ChatListProps) {
                 <span className="font-heading text-sm text-neutral-black dark:text-neutral-white truncate">
                   {other.full_name ?? "Usuario"}
                 </span>
-                <span className="text-xs text-neutral-gray shrink-0 ml-2">
+                <span className="text-xs text-muted-foreground shrink-0 ml-2">
                   {formatRelativeTime(chat.updated_at)}
                 </span>
               </div>
               {preview ? (
-                <p className="text-sm text-neutral-gray truncate mt-0.5">
+                <p className="text-sm text-muted-foreground truncate mt-0.5">
                   {preview}
                 </p>
               ) : (
-                <p className="text-sm text-neutral-gray italic mt-0.5">
+                <p className="text-sm text-muted-foreground italic mt-0.5">
                   Sin mensajes
                 </p>
               )}

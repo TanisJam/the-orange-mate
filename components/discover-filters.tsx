@@ -95,7 +95,7 @@ export function DiscoverFilters() {
   return (
     <form
       onSubmit={handleSearch}
-      className="border-2 border-neutral-black dark:border-neutral-gray rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light p-6 shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)]"
+      className="border-2 border-ink dark:border-neutral-gray rounded-[var(--radius)] bg-card p-6 shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))]"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Plan Type */}
@@ -126,7 +126,7 @@ export function DiscoverFilters() {
             placeholder="ej: Buenos Aires, Bariloche"
             defaultValue={currentValues.destinations}
           />
-          <p className="text-xs text-neutral-gray">Separados por coma</p>
+          <p className="text-xs text-muted-foreground">Separados por coma</p>
         </div>
 
         {/* Start Date */}

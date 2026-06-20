@@ -69,7 +69,7 @@ export default function NotificationList() {
 
   if (!authChecked) {
     return (
-      <div className="text-center py-12 text-neutral-gray">
+      <div className="text-center py-12 text-muted-foreground">
         Cargando...
       </div>
     );
@@ -78,7 +78,7 @@ export default function NotificationList() {
   if (!userId) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg font-heading text-neutral-gray dark:text-neutral-white/60">
+        <p className="text-lg font-heading text-muted-foreground dark:text-neutral-white/60">
           Debes iniciar sesión para ver tus notificaciones
         </p>
       </div>
@@ -89,7 +89,7 @@ export default function NotificationList() {
 
   if (isInitialLoad) {
     return (
-      <div className="text-center py-12 text-neutral-gray">
+      <div className="text-center py-12 text-muted-foreground">
         Cargando...
       </div>
     );
@@ -98,10 +98,10 @@ export default function NotificationList() {
   if (notifications.length === 0 && !loading) {
     return (
       <div className="text-center py-12">
-        <p className="text-lg font-heading text-neutral-gray dark:text-neutral-white/60">
+        <p className="text-lg font-heading text-muted-foreground dark:text-neutral-white/60">
           No tienes notificaciones aún
         </p>
-        <p className="text-sm text-neutral-gray dark:text-neutral-white/40 mt-1">
+        <p className="text-sm text-muted-foreground dark:text-neutral-white/40 mt-1">
           Cuando recibas notificaciones, aparecerán aquí.
         </p>
       </div>
@@ -111,7 +111,7 @@ export default function NotificationList() {
   return (
     <div className="flex flex-col gap-3">
       {/* Notification list */}
-      <div className={`divide-y divide-neutral-gray/20 border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] ${loading ? "opacity-50 pointer-events-none" : ""}`}>
+      <div className={`divide-y divide-neutral-gray/20 border-2 border-ink rounded-[var(--radius)] bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] ${loading ? "opacity-50 pointer-events-none" : ""}`}>
         {notifications.map((notif) => (
           <div
             key={notif.id}
@@ -140,7 +140,7 @@ export default function NotificationList() {
           >
             Anterior
           </Button>
-          <span className="text-sm text-neutral-gray dark:text-neutral-white/60 font-body">
+          <span className="text-sm text-muted-foreground dark:text-neutral-white/60 font-body">
             {page} / {totalPages}
           </span>
           <Button

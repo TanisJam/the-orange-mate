@@ -43,3 +43,7 @@ next-env.d.ts
 
 # SDD / agent tooling
 .atl/
+
+# Playwright artifacts
+/test-results/
+/tests/screenshots/

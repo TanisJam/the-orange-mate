@@ -140,7 +140,7 @@ export default function NotificationBell() {
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger className="relative flex items-center gap-1.5 text-sm font-body text-neutral-gray hover:text-neutral-black dark:hover:text-neutral-white transition-colors cursor-pointer">
+      <DropdownMenuTrigger className="relative flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-neutral-black dark:hover:text-neutral-white transition-colors cursor-pointer">
         <Bell className="size-4" />
         Notificaciones
         <UnreadBadge count={unreadCount} />

@@ -99,7 +99,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
           <Plane className="w-8 h-8 mx-auto mb-2 text-primary animate-pulse" />
-          <p className="text-neutral-gray">Cargando tu dashboard...</p>
+          <p className="text-muted-foreground">Cargando tu dashboard...</p>
         </div>
       </div>
     );
@@ -110,9 +110,9 @@ export function DashboardContent({ userId }: DashboardContentProps) {
       {/* Welcome Header */}
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
-          ¡Bienvenido a SoloTravelers!
+          ¡Bienvenido a The Orange Mate!
         </h1>
-        <p className="text-lg font-body text-neutral-gray dark:text-neutral-white max-w-2xl mx-auto">
+        <p className="text-lg font-body text-muted-foreground dark:text-neutral-white max-w-2xl mx-auto">
           Conecta con otros viajeros, descubre planes increíbles y haz que cada aventura sea memorable.
         </p>
       </div>
@@ -153,7 +153,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-neutral-gray">Mis Planes</p>
+                    <p className="text-sm font-medium text-muted-foreground">Mis Planes</p>
                     <p className="text-2xl font-bold text-primary">{myPlans.length}</p>
                   </div>
                   <PlusCircle className="w-8 h-8 text-primary" />
@@ -165,7 +165,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-neutral-gray">Participando</p>
+                    <p className="text-sm font-medium text-muted-foreground">Participando</p>
                     <p className="text-2xl font-bold text-secondary">{participatingPlans.length}</p>
                   </div>
                   <Users className="w-8 h-8 text-secondary" />
@@ -177,7 +177,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-neutral-gray">Sugerencias</p>
+                    <p className="text-sm font-medium text-muted-foreground">Sugerencias</p>
                     <p className="text-2xl font-bold text-accent">{suggestedPlans.length}</p>
                   </div>
                   <Heart className="w-8 h-8 text-accent" />
@@ -197,8 +197,8 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <CardContent className="space-y-3">
                 {myPlans.length === 0 ? (
                   <div className="text-center py-8">
-                    <PlusCircle className="w-12 h-12 mx-auto text-neutral-gray mb-4" />
-                    <p className="text-neutral-gray mb-4">No tienes planes de viaje aún</p>
+                    <PlusCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground mb-4">No tienes planes de viaje aún</p>
                   <Button asChild variant="primary">
                     <Link href="/plans/new">
                       Crear Tu Primer Plan
@@ -211,18 +211,18 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     const statusInfo = getPlanStatusInfo(plan.status);
                     
                     return (
-                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-neutral-gray transition-colors">
+                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h4 className="font-semibold">{plan.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-neutral-gray">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <span>{typeInfo.icon}</span>
                               <span>{typeInfo.label}</span>
                               <Badge className={statusInfo.color + " text-white text-xs"}>
                                 {statusInfo.label}
                               </Badge>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-neutral-gray mt-1">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 {plan.destinations.join(", ")}
@@ -252,19 +252,19 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <CardContent className="space-y-3">
                 {suggestedPlans.length === 0 ? (
                   <div className="text-center py-8">
-                    <Search className="w-12 h-12 mx-auto text-neutral-gray mb-4" />
-                    <p className="text-neutral-gray">No hay sugerencias disponibles</p>
+                    <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+                    <p className="text-muted-foreground">No hay sugerencias disponibles</p>
                   </div>
                 ) : (
                   suggestedPlans.slice(0, 3).map((plan) => {
                     const typeInfo = getPlanTypeInfo(plan.plan_type);
                     
                     return (
-                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-neutral-gray transition-colors cursor-pointer">
+                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer">
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h4 className="font-semibold">{plan.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-neutral-gray">
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
                               <span>{typeInfo.icon}</span>
                               <span>{typeInfo.label}</span>
                               <span>• por{' '}
@@ -276,7 +276,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                                 </Link>
                               </span>
                             </div>
-                            <div className="flex items-center gap-4 text-sm text-neutral-gray mt-1">
+                            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 {plan.destinations.join(", ")}
@@ -314,7 +314,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-2xl font-heading">Mis Planes de Viaje</h2>
-              <p className="text-neutral-gray">Gestiona tus planes y ve en cuáles participas</p>
+              <p className="text-muted-foreground">Gestiona tus planes y ve en cuáles participas</p>
             </div>
             <Button asChild variant="primary">
               <Link href="/plans/new">
@@ -332,9 +332,9 @@ export function DashboardContent({ userId }: DashboardContentProps) {
             <CardContent>
               {myPlans.length === 0 ? (
                 <div className="text-center py-12">
-                  <PlusCircle className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
+                  <PlusCircle className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
                   <h3 className="text-lg font-semibold mb-2">No tienes planes creados</h3>
-                  <p className="text-neutral-gray mb-6">Crea tu primer plan de viaje y conecta con otros viajeros</p>
+                  <p className="text-muted-foreground mb-6">Crea tu primer plan de viaje y conecta con otros viajeros</p>
                   <Button asChild variant="primary">
                     <Link href="/plans/new">
                       <PlusCircle className="w-4 h-4 mr-2" />
@@ -349,7 +349,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     const statusInfo = getPlanStatusInfo(plan.status);
                     
                     return (
-                      <div key={plan.id} className="p-4 border-2 border-neutral-black rounded-lg bg-neutral-white dark:border-neutral-gray dark:bg-neutral-light">
+                      <div key={plan.id} className="p-4 border-2 border-ink rounded-lg bg-card text-card-foreground">
                         <div className="flex justify-between items-start mb-3">
                           <div className="flex items-center gap-2">
                             <span className="text-lg">{typeInfo.icon}</span>
@@ -361,13 +361,13 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         </div>
                         
                         <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-1 text-neutral-gray">
+                          <div className="flex items-center gap-1 text-muted-foreground">
                             <MapPin className="w-4 h-4" />
                             <span>{plan.destinations.join(", ")}</span>
                           </div>
                           
                           {plan.start_date && (
-                            <div className="flex items-center gap-1 text-neutral-gray">
+                            <div className="flex items-center gap-1 text-muted-foreground">
                               <Calendar className="w-4 h-4" />
                               <span>
                                 {formatDate(plan.start_date)}
@@ -376,14 +376,14 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                             </div>
                           )}
                           
-                          <div className="flex items-center gap-1 text-neutral-gray">
+                          <div className="flex items-center gap-1 text-muted-foreground">
                             <Users className="w-4 h-4" />
                             <span>{plan.current_participants}/{plan.max_participants} participantes</span>
                           </div>
                         </div>
                         
                         {plan.description && (
-                          <p className="text-sm text-neutral-gray mt-3 line-clamp-2">
+                          <p className="text-sm text-muted-foreground mt-3 line-clamp-2">
                             {plan.description}
                           </p>
                         )}
@@ -427,7 +427,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                           <Badge variant="secondary">Participando</Badge>
                         </div>
                         
-                        <p className="text-sm text-neutral-gray mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           Creado por{' '}
                           <Link
                             href={`/profile/${plan.creator?.username || plan.creator_id}`}
@@ -438,13 +438,13 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         </p>
                         
                         <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-1 text-neutral-gray">
+                          <div className="flex items-center gap-1 text-muted-foreground">
                             <MapPin className="w-4 h-4" />
                             <span>{plan.destinations.join(", ")}</span>
                           </div>
                           
                           {plan.start_date && (
-                            <div className="flex items-center gap-1 text-neutral-gray">
+                            <div className="flex items-center gap-1 text-muted-foreground">
                               <Calendar className="w-4 h-4" />
                               <span>
                                 {formatDate(plan.start_date)}
@@ -487,8 +487,8 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="text-center">
-              <Search className="w-16 h-16 mx-auto text-neutral-gray mb-4" />
-              <p className="text-neutral-gray mb-6">
+              <Search className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground mb-6">
                 La nueva página de descubrimiento tiene filtros por tipo de plan,
                 destino, fechas, presupuesto y más.
               </p>

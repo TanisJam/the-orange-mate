@@ -85,7 +85,7 @@ export function PublicProfileDisplay({
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
             {/* Avatar */}
-            <div className="w-24 h-24 rounded-full border-2 border-neutral-black bg-secondary/20 flex items-center justify-center overflow-hidden shrink-0 dark:border-neutral-gray">
+            <div className="w-24 h-24 rounded-full border-2 border-ink bg-secondary/20 flex items-center justify-center overflow-hidden shrink-0 dark:border-neutral-gray">
               {profile.avatar_url ? (
                 <img
                   src={profile.avatar_url}
@@ -93,7 +93,7 @@ export function PublicProfileDisplay({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <User className="w-12 h-12 text-neutral-gray" />
+                <User className="w-12 h-12 text-muted-foreground" />
               )}
             </div>
 
@@ -104,7 +104,7 @@ export function PublicProfileDisplay({
                   {profile.full_name}
                 </h1>
               )}
-              <p className="text-lg text-neutral-gray">
+              <p className="text-lg text-muted-foreground">
                 @{profile.username ?? profile.id}
               </p>
               {profile.bio && (
@@ -143,7 +143,7 @@ export function PublicProfileDisplay({
       {(profile.age || profile.country || profile.city) && (
         <Card>
           <CardContent className="p-6">
-            <div className="flex flex-wrap items-center gap-4 text-sm text-neutral-gray">
+            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
               {profile.age && (
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4" />

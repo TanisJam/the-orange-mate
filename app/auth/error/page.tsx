@@ -8,7 +8,7 @@ export default async function Page({
   const params = await searchParams;
 
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-neutral-light dark:bg-neutral-gray">
+    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10 bg-neutral-light dark:bg-background">
       <div className="w-full max-w-sm">
         <div className="flex flex-col gap-6">
           <Card>
@@ -19,11 +19,11 @@ export default async function Page({
             </CardHeader>
             <CardContent>
               {params?.error ? (
-                <p className="text-sm font-body text-neutral-gray dark:text-neutral-white">
+                <p className="text-sm font-body text-muted-foreground dark:text-neutral-white">
                   Error: {params.error}
                 </p>
               ) : (
-                <p className="text-sm font-body text-neutral-gray dark:text-neutral-white">
+                <p className="text-sm font-body text-muted-foreground dark:text-neutral-white">
                   Ocurrió un error no especificado.
                 </p>
               )}
