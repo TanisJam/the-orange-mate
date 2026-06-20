@@ -1,7 +1,7 @@
 import { redirect, notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PlanDetail } from "@/components/plan-detail";
-import { getTravelPlan, getPlanJoinRequests } from "@/lib/database";
+import { getTravelPlan, getPlanJoinRequests, getPlanReviews } from "@/lib/database";
 import type { Metadata } from "next";
 
 type Props = {
@@ -38,11 +38,28 @@ export default async function PlanDetailPage({ params }: Props) {
     notFound();
   }
 
+  // Fetch reviews if plan is completed
+  let reviews: import("@/lib/types").UserReview[] = [];
+  let averageRating = { average: 0, count: 0 };
+
+  if (plan.status === "completado") {
+    reviews = await getPlanReviews(planId, true);
+    if (reviews.length > 0) {
+      const sum = reviews.reduce((acc, r) => acc + r.rating, 0);
+      averageRating = {
+        average: Math.round((sum / reviews.length) * 10) / 10,
+        count: reviews.length,
+      };
+    }
+  }
+
   return (
     <PlanDetail
       plan={plan}
       currentUserId={user.id}
       initialRequests={requests}
+      reviews={reviews}
+      averageRating={averageRating}
     />
   );
 }

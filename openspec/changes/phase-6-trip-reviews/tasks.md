@@ -46,19 +46,19 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4: UI Components
 
-- [ ] 4.1 `components/star-selector.tsx`: 1–5 clickable stars using lucide `Star`/`StarOff`. Props: `rating: number`, `onChange?: (r: number) => void`, `readonly?: boolean`. Filled/empty class: `text-warning`
-- [ ] 4.2 `components/review-form.tsx`: StarSelector + `<Textarea>` + submit `<Button>`. Props: `reviewedId`, `planId`, `onSubmit`, `initialRating?`, `initialComment?` (for edit pre-fill). Calls `submitReview`/`editReview` from database-client
-- [ ] 4.3 `components/review-card.tsx`: reviewer avatar, name (link to profile), stars (readonly), comment, `formatDate(created_at)`, "(editado)" badge if `edited_at`. Own review → edit button swaps to `ReviewForm` inline
-- [ ] 4.4 `components/reviews-section.tsx`: average stars + numeric (e.g., ★★★★☆ 4.2) + list of `ReviewCard`. Empty state: "No reviews yet". Props: `reviews: UserReview[]`, `averageRating`, `currentUserId`
+- [x] 4.1 `components/star-selector.tsx`: 1–5 clickable stars using lucide `Star`/`StarOff`. Props: `rating: number`, `onChange?: (r: number) => void`, `readonly?: boolean`. Filled/empty class: `text-warning`
+- [x] 4.2 `components/review-form.tsx`: StarSelector + `<Textarea>` + submit `<Button>`. Props: `reviewedId`, `planId`, `onSubmit`, `initialRating?`, `initialComment?` (for edit pre-fill). Calls `submitReview`/`editReview` from database-client
+- [x] 4.3 `components/review-card.tsx`: reviewer avatar, name (link to profile), stars (readonly), comment, `formatDate(created_at)`, "(editado)" badge if `edited_at`. Own review → edit button swaps to `ReviewForm` inline
+- [x] 4.4 `components/reviews-section.tsx`: average stars + numeric (e.g., ★★★★☆ 4.2) + list of `ReviewCard`. Empty state: "No reviews yet". Props: `reviews: UserReview[]`, `averageRating`, `currentUserId`
 
 ## Phase 5: Page Integration
 
-- [ ] 5.1 `components/plan-detail.tsx`: add `reviews`, `averageRating`, `onPlanUpdated` props. "Mark as Completed" button for creator when `status !== 'completado'` (uses `completeTrip` from database-client). Reviews section at position 7 (after participants), gated on `status === 'completado'` + `isAuthenticated`
-- [ ] 5.2 `components/public-profile-display.tsx`: add `reviews`, `averageRating` props. Reviews section after Plan Stats, gated on `currentUserId !== null`
-- [ ] 5.3 `app/plans/[id]/page.tsx`: server-side fetch `getPlanReviews(planId, true)`; pass `reviews`, `averageRating` to `PlanDetail`
-- [ ] 5.4 `app/profile/[username]/page.tsx`: server-side fetch `getUserReviews(profile.id, true)` + `getAverageRating(profile.id, true)`; pass to `PublicProfileDisplay`
+- [x] 5.1 `components/plan-detail.tsx`: add `reviews`, `averageRating`, `onPlanUpdated` props. "Mark as Completed" button for creator when `status !== 'completado'` (uses `completeTrip` from database-client). Reviews section at position 7 (after participants), gated on `status === 'completado'` + `isAuthenticated`
+- [x] 5.2 `components/public-profile-display.tsx`: add `reviews`, `averageRating` props. Reviews section after Plan Stats, gated on `currentUserId !== null`
+- [x] 5.3 `app/plans/[id]/page.tsx`: server-side fetch `getPlanReviews(planId, true)`; pass `reviews`, `averageRating` to `PlanDetail`
+- [x] 5.4 `app/profile/[username]/page.tsx`: server-side fetch `getUserReviews(profile.id, true)` + `getAverageRating(profile.id, true)`; pass to `PublicProfileDisplay`
 
 ## Phase 6: Verification
 
-- [ ] 6.1 Run `npm run build` — verify no TypeScript errors, no ESLint issues
+- [x] 6.1 Run `npm run build` — verify no TypeScript errors, no ESLint issues
 - [ ] 6.2 Manual: verify all spec scenarios — completion button visibility, review submit/edit, average display, auth gating, empty states, "(editado)" indicator
