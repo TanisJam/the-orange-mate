@@ -31,8 +31,8 @@ export default function NotificationItem({
 
   async function handleClick() {
     if (!notification.is_read) {
-      await markAsRead(notification.id);
-      onRead?.();
+      const ok = await markAsRead(notification.id, notification.user_id);
+      if (ok) onRead?.();
     }
     if (notification.link) {
       router.push(notification.link);
