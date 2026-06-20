@@ -759,11 +759,15 @@ export async function createPlanComment(
 
   // Notify parent comment author on reply
   if (data && commentData.parent_comment_id) {
-    const { data: parentComment } = await supabase
+    const { data: parentComment, error: parentQueryError } = await supabase
       .from('plan_comments')
       .select('author_id')
       .eq('id', commentData.parent_comment_id)
       .maybeSingle();
+
+    if (parentQueryError) {
+      console.error('Error fetching parent comment:', parentQueryError);
+    }
 
     if (parentComment && parentComment.author_id !== userId) {
       const actorName =
@@ -1148,14 +1152,13 @@ export async function submitReview(
       review.reviewer?.full_name ||
       review.reviewer?.username ||
       "Someone";
-    const reviewedUsername = review.reviewed?.username || review.reviewed_id;
     await createNotification({
       user_id: review.reviewed_id,
       actor_id: reviewerId,
       type: "review_received",
       title: `${reviewerName} te dejó una reseña`,
       body: `${review.rating} estrellas — ${review.comment?.slice(0, 80) ?? "Sin comentario"}`,
-      link: `/profile/${reviewedUsername}`,
+      link: `/plans/${review.plan_id}`,
     });
   }
 
