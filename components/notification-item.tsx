@@ -34,7 +34,10 @@ export default function NotificationItem({
       const ok = await markAsRead(notification.id, notification.user_id);
       if (ok) onRead?.();
     }
-    if (notification.link) {
+    if (
+      notification.link?.startsWith("/") &&
+      !notification.link.startsWith("//")
+    ) {
       router.push(notification.link);
     }
   }

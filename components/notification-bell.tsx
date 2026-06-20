@@ -67,61 +67,61 @@ export default function NotificationBell() {
     };
   }, []);
 
-  // Lazy realtime: subscribe on open, unsubscribe on close
-  const handleOpenChange = useCallback(
-    (isOpen: boolean) => {
-      setOpen(isOpen);
+  // Lazy realtime: subscribe when dropdown opens and userId is available
+  useEffect(() => {
+    if (!open || !userId) return;
 
-      if (isOpen && userId) {
-        // Fetch latest 5 notifications
-        getNotifications(userId, 1, 5).then(({ data }) => {
-          setNotifications(data);
-        });
+    // Fetch latest 5 notifications
+    getNotifications(userId, 1, 5).then(({ data }) => {
+      setNotifications(data);
+    });
 
-        // Create ONE client instance for both channel creation and removal
-        const supabase = createClient();
-        clientRef.current = supabase;
+    // Create ONE client instance for both channel creation and removal
+    const supabase = createClient();
+    clientRef.current = supabase;
 
-        const channel = supabase
-          .channel(`notifications-${userId}`)
-          .on(
-            "postgres_changes",
-            {
-              event: "INSERT",
-              schema: "public",
-              table: "notifications",
-              filter: `user_id=eq.${userId}`,
-            },
-            async (payload) => {
-              if (payload.new) {
-                // Re-fetch with actor join — realtime payload has no join data
-                const fullNotification = await getNotificationById(
-                  payload.new.id,
-                  userId,
-                );
-                if (fullNotification) {
-                  setNotifications((prev) =>
-                    [fullNotification, ...prev].slice(0, 5),
-                  );
-                }
-                setUnreadCount((prev) => prev + 1);
-              }
-            },
-          )
-          .subscribe();
+    const channel = supabase
+      .channel(`notifications-${userId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${userId}`,
+        },
+        async (payload) => {
+          if (payload.new) {
+            // Re-fetch with actor join — realtime payload has no join data
+            const fullNotification = await getNotificationById(
+              payload.new.id,
+              userId,
+            );
+            if (fullNotification) {
+              setNotifications((prev) =>
+                [fullNotification, ...prev].slice(0, 5),
+              );
+            }
+            setUnreadCount((prev) => prev + 1);
+          }
+        },
+      )
+      .subscribe();
 
-        channelRef.current = channel;
-      } else {
-        // Close: remove channel using the SAME client instance
-        if (channelRef.current && clientRef.current) {
-          clientRef.current.removeChannel(channelRef.current);
-          channelRef.current = null;
-          clientRef.current = null;
-        }
+    channelRef.current = channel;
+
+    return () => {
+      if (channelRef.current && clientRef.current) {
+        clientRef.current.removeChannel(channelRef.current);
+        channelRef.current = null;
+        clientRef.current = null;
       }
-    },
-    [userId],
-  );
+    };
+  }, [open, userId]);
+
+  const handleOpenChange = useCallback((isOpen: boolean) => {
+    setOpen(isOpen);
+  }, []);
 
   const handleMarkAllRead = useCallback(async () => {
     if (!userId) return;

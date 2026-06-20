@@ -122,7 +122,7 @@ export default function NotificationList() {
               disabled={notif.is_read}
               onCheckedChange={() => handleToggleRead(notif)}
               className="shrink-0"
-              aria-label={notif.is_read ? "Leído" : "Marcar como leída"}
+              aria-label={notif.is_read ? "Leída" : "Marcar como leída"}
             />
             <NotificationItem notification={notif} />
           </div>
