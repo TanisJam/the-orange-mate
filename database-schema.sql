@@ -303,14 +303,25 @@ create policy "Users can manage own photos" on public.user_photos
   for all using (auth.uid() = user_id);
 
 -- Travel plans policies
+
+-- SECURITY DEFINER function to break RLS recursion between travel_plans and plan_participants
+create or replace function public.is_plan_participant(plan_id uuid, user_id uuid)
+returns boolean
+language sql
+security definer
+stable
+as $$
+  select exists (
+    select 1 from public.plan_participants
+    where plan_id = $1 and user_id = $2
+  );
+$$;
+
 create policy "Users can view public plans" on public.travel_plans
   for select using (
     is_public = true
-    or creator_id = auth.uid() or 
-    exists (
-      select 1 from public.plan_participants pp
-      where pp.plan_id = travel_plans.id and pp.user_id = auth.uid()
-    )
+    or creator_id = auth.uid()
+    or (auth.uid() is not null and public.is_plan_participant(id, auth.uid()))
   );
 
 create policy "Users can create plans" on public.travel_plans
@@ -325,14 +336,11 @@ create policy "Creators can delete own plans" on public.travel_plans
 -- Plan participants policies
 create policy "Users can view plan participants" on public.plan_participants
   for select using (
-    exists (
+    auth.uid() = user_id
+    or exists (
       select 1 from public.travel_plans tp
       where tp.id = plan_participants.plan_id and (
-        tp.is_public = true or tp.creator_id = auth.uid() or
-        exists (
-          select 1 from public.plan_participants pp
-          where pp.plan_id = tp.id and pp.user_id = auth.uid()
-        )
+        tp.is_public = true or tp.creator_id = auth.uid()
       )
     )
   );

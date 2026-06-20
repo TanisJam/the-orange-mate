@@ -229,7 +229,7 @@ export async function getUserTravelPlans(userId: string, isServer = false): Prom
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .eq('creator_id', userId)
@@ -270,7 +270,7 @@ export async function getParticipatingPlans(userId: string, isServer = false): P
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .in('id', planIds)
@@ -302,7 +302,7 @@ export async function createTravelPlan(
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .maybeSingle();
@@ -353,7 +353,7 @@ export async function createTravelPlan(
         creator:user_profiles!creator_id(*),
         participants:plan_participants(
           *,
-          user:user_profiles(*)
+          user:user_profiles!user_id(*)
         )
       `)
       .eq('id', data.id)
@@ -381,7 +381,7 @@ export async function updateTravelPlan(
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .maybeSingle();
@@ -422,11 +422,7 @@ export async function searchTravelPlans(
     .from('travel_plans')
     .select(`
       *,
-      creator:user_profiles!creator_id(*),
-      participants:plan_participants(
-        *,
-        user:user_profiles(*)
-      )
+      creator:user_profiles!creator_id(*)
     `, { count: 'exact' })
     .eq('is_public', true);
 
@@ -503,7 +499,7 @@ export async function getTravelPlan(planId: string, isServer = false): Promise<T
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .eq('id', planId)
@@ -1083,7 +1079,7 @@ export async function completeTrip(planId: string, userId: string, isServer = fa
       creator:user_profiles!creator_id(*),
       participants:plan_participants(
         *,
-        user:user_profiles(*)
+        user:user_profiles!user_id(*)
       )
     `)
     .maybeSingle();

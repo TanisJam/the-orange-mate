@@ -33,16 +33,14 @@ export default async function PublicProfilePage({ params }: Props) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Fetch profile — try username first, then userId fallback
+  // Fetch profile — try username first, then userId fallback (only for UUID-like strings)
   const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(username);
   let profile = isUuid
     ? await getUserProfile(username, true)
     : await getUserProfileByUsername(username, true);
-  if (!profile) {
-    // Try the other lookup as fallback
-    profile = isUuid
-      ? await getUserProfileByUsername(username, true)
-      : await getUserProfile(username, true);
+  if (!profile && isUuid) {
+    // Only try the UUID fallback if the input is UUID-shaped
+    profile = await getUserProfileByUsername(username, true) || await getUserProfile(username, true);
   }
   if (!profile) {
     notFound();
