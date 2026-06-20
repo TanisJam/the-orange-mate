@@ -22,7 +22,9 @@ import type {
   UserReview,
   CreateReviewData,
   UpdateReviewData,
+  NotificationEventType,
 } from './types';
+import { createNotification } from '@/lib/notification-client';
 
 // User Profile Operations (Client-side)
 export async function getUserProfile(userId: string): Promise<UserProfile | null> {
@@ -567,7 +569,8 @@ export async function createJoinRequest(
 export async function updateJoinRequest(
   requestId: string,
   status: 'accepted' | 'rejected' | 'waiting_list',
-  permission_level: PermissionLevel = 'solo_ver'
+  permission_level: PermissionLevel = 'solo_ver',
+  callerId?: string
 ): Promise<PlanJoinRequest | null> {
   const supabase = createClient();
   
@@ -581,7 +584,7 @@ export async function updateJoinRequest(
     .select(`
       *,
       requester:user_profiles!requester_id(*),
-      plan:travel_plans(*)
+      plan:travel_plans(*, creator:user_profiles!creator_id(id, username, full_name))
     `)
     .maybeSingle();
 
@@ -621,6 +624,22 @@ export async function updateJoinRequest(
 
     if (updateError) {
       console.error('Error updating participant count:', updateError);
+    }
+
+    // Create notification for the requester
+    if (callerId) {
+      const creatorName =
+        data.plan?.creator?.full_name ||
+        data.plan?.creator?.username ||
+        "Someone";
+      await createNotification({
+        user_id: data.requester_id,
+        actor_id: callerId,
+        type: "join_accepted",
+        title: `${creatorName} aceptó tu solicitud`,
+        body: `Te has unido al plan ${data.plan?.title ?? ""}`,
+        link: `/plans/${data.plan_id}`,
+      });
     }
   }
 
