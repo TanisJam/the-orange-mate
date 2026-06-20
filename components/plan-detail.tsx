@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useState } from "react";
 import Link from "next/link";
+import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -167,6 +168,8 @@ export function PlanDetail({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <BackButton fallbackHref="/discover" />
+
       {/* Header */}
       <Card>
         <CardContent className="p-6">

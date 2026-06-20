@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -80,6 +81,8 @@ export function PublicProfileDisplay({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <BackButton fallbackHref="/discover" />
+
       {/* Header — Avatar + Name + Username */}
       <Card>
         <CardContent className="p-6">

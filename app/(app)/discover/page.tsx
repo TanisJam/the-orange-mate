@@ -3,6 +3,7 @@ import { searchTravelPlans } from "@/lib/database";
 import type { SearchFilters, PaginationParams } from "@/lib/types";
 import { DiscoverFilters } from "@/components/discover-filters";
 import { DiscoverResults } from "@/components/discover-results";
+import { BackButton } from "@/components/back-button";
 import { Search } from "lucide-react";
 import { Suspense } from "react";
 
@@ -83,7 +84,8 @@ export default async function DiscoverPage({
   const totalPages = Math.max(1, Math.ceil(totalCount / (pagination.limit || 10)));
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <BackButton fallbackHref="/dashboard" />
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-4xl font-heading text-primary dark:text-primary-light">

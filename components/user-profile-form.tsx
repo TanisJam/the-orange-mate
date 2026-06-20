@@ -370,8 +370,16 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
             </CardContent>
           </Card>
 
-          {/* Save Button */}
-          <div className="flex justify-end mt-6">
+          {/* Actions */}
+          <div className="flex justify-end gap-3 mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => form.reset()}
+              disabled={form.formState.isSubmitting || !form.formState.isDirty}
+            >
+              Cancelar
+            </Button>
             <Button
               type="submit"
               disabled={form.formState.isSubmitting}
