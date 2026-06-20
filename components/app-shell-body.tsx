@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeSwitcher } from "@/components/theme-switcher";
+import { INTERNAL_NAV_KEY } from "@/components/back-button";
 
 /**
  * Conditional content area for the (app) shell.
@@ -12,6 +14,22 @@ import { ThemeSwitcher } from "@/components/theme-switcher";
 export function AppShellBody({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isFullscreen = pathname?.startsWith("/messages") ?? false;
+
+  // Mark that an in-app client navigation has happened this session, so
+  // BackButton knows router.back() will land on an in-app page (not leave the
+  // app). The initial mount is skipped — only subsequent route changes count.
+  const isInitialMount = useRef(true);
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    try {
+      sessionStorage.setItem(INTERNAL_NAV_KEY, "1");
+    } catch {
+      // sessionStorage unavailable (privacy mode) — fall back to explicit href
+    }
+  }, [pathname]);
 
   if (isFullscreen) {
     return <div className="flex-1 flex flex-col min-h-0">{children}</div>;
