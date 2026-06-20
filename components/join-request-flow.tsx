@@ -87,7 +87,7 @@ export function JoinRequestFlow({
   const handleAccept = async (requestId: string) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));
     try {
-      await updateJoinRequest(requestId, "accepted", acceptPermission);
+      await updateJoinRequest(requestId, "accepted", acceptPermission, userId);
       setAcceptingId(null);
       setAcceptPermission("solo_ver");
       onRequestUpdate();
@@ -105,7 +105,7 @@ export function JoinRequestFlow({
   const handleReject = async (requestId: string) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));
     try {
-      await updateJoinRequest(requestId, "rejected");
+      await updateJoinRequest(requestId, "rejected", "solo_ver", userId);
       onRequestUpdate();
     } catch {
       setError("Error al rechazar la solicitud.");

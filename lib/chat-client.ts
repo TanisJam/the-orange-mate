@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/client";
 import type { Message, CreateMessageData } from "@/lib/types";
+import { createNotification } from "@/lib/notification-client";
 
 export async function getChatMessages(chatId: string): Promise<Message[]> {
   const supabase = createClient();
@@ -53,6 +54,37 @@ export async function sendMessage(
     .from("chats")
     .update({ updated_at: new Date().toISOString() })
     .eq("id", messageData.chat_id);
+
+  // Notify the other participant
+  if (data) {
+    const { data: chat } = await supabase
+      .from("chats")
+      .select("participant_1_id, participant_2_id")
+      .eq("id", messageData.chat_id)
+      .maybeSingle();
+
+    if (chat) {
+      const otherId =
+        chat.participant_1_id === userId
+          ? chat.participant_2_id
+          : chat.participant_1_id;
+
+      if (otherId) {
+        const senderName =
+          data.sender?.full_name ||
+          data.sender?.username ||
+          "Someone";
+        await createNotification({
+          user_id: otherId,
+          actor_id: userId,
+          type: "new_message",
+          title: `Nuevo mensaje de ${senderName}`,
+          body: messageData.content.slice(0, 100),
+          link: `/messages/${messageData.chat_id}`,
+        });
+      }
+    }
+  }
 
   return data;
 }

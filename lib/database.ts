@@ -586,6 +586,7 @@ export async function updateJoinRequest(
 
     if (upsertError) {
       console.error('Error upserting plan participant:', upsertError);
+      return null;
     }
 
     // Update participant count based on actual participants
