@@ -23,7 +23,7 @@ export default function MessageBubble({ message, isOwn }: MessageBubbleProps) {
     >
       {/* Sender name (only for other's messages) */}
       {!isOwn && message.sender?.full_name && (
-        <span className="text-xs font-body text-neutral-gray px-1">
+        <span className="text-xs font-body text-muted-foreground px-1">
           {message.sender.full_name}
         </span>
       )}
@@ -34,14 +34,14 @@ export default function MessageBubble({ message, isOwn }: MessageBubbleProps) {
           "px-3 py-2 rounded-2xl text-sm font-body",
           isOwn
             ? "bg-primary text-neutral-black rounded-br-md"
-            : "bg-neutral-white dark:bg-neutral-light text-neutral-black dark:text-neutral-black rounded-bl-md border border-neutral-gray",
+            : "bg-card text-card-foreground rounded-bl-md border border-neutral-gray",
         )}
       >
         {message.content}
       </div>
 
       {/* Timestamp */}
-      <span className="text-[10px] text-neutral-gray px-1">
+      <span className="text-[10px] text-muted-foreground px-1">
         {formatTime(message.created_at)}
       </span>
     </div>

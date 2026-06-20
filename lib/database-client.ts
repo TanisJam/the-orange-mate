@@ -904,7 +904,7 @@ export async function acceptFriendRequest(
       actor_id: userId,
       type: "friend_accepted",
       title: `${accepterName} aceptó tu solicitud de amistad`,
-      body: "Ahora son amigos en SoloTravelers",
+      body: "Ahora son amigos en The Orange Mate",
       link: `/profile/${accepterUsername}`,
     });
 
@@ -914,7 +914,7 @@ export async function acceptFriendRequest(
       actor_id: userId,
       type: "friend_accepted",
       title: `Aceptaste la solicitud de ${requesterName}`,
-      body: "Ahora son amigos en SoloTravelers",
+      body: "Ahora son amigos en The Orange Mate",
       link: `/profile/${requesterUsername}`,
     });
   }

@@ -141,14 +141,14 @@ export function JoinRequestFlow({
           )}
 
           {pending.length === 0 ? (
-            <p className="text-neutral-gray text-center py-4">
+            <p className="text-muted-foreground text-center py-4">
               No hay solicitudes pendientes
             </p>
           ) : (
             pending.map((request) => (
               <div
                 key={request.id}
-                className="p-4 border-2 border-neutral-black rounded-lg dark:border-neutral-gray"
+                className="p-4 border-2 border-ink rounded-lg dark:border-neutral-gray"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -158,12 +158,12 @@ export function JoinRequestFlow({
                         "Usuario"}
                     </p>
                     {request.message && (
-                      <div className="flex items-start gap-1 mt-1 text-sm text-neutral-gray">
+                      <div className="flex items-start gap-1 mt-1 text-sm text-muted-foreground">
                         <MessageSquare className="w-4 h-4 mt-0.5 shrink-0" />
                         <p className="break-words">{request.message}</p>
                       </div>
                     )}
-                    <p className="text-xs text-neutral-gray mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {new Date(request.created_at).toLocaleDateString(
                         "es-ES",
                         { dateStyle: "medium" }
@@ -251,7 +251,7 @@ export function JoinRequestFlow({
               Eres participante
             </Badge>
             {participantPermission && (
-              <span className="text-sm text-neutral-gray">
+              <span className="text-sm text-muted-foreground">
                 —
                 {PERMISSION_LEVELS.find(
                   (p) => p.value === participantPermission
@@ -291,7 +291,7 @@ export function JoinRequestFlow({
                 <Clock className="w-5 h-5 text-accent shrink-0" />
                 <div>
                   <p className="font-medium">Solicitud pendiente</p>
-                  <p className="text-sm text-neutral-gray">
+                  <p className="text-sm text-muted-foreground">
                     El creador revisará tu solicitud pronto
                   </p>
                 </div>
@@ -302,7 +302,7 @@ export function JoinRequestFlow({
                 <Clock className="w-5 h-5 text-accent shrink-0" />
                 <div>
                   <p className="font-medium">En lista de espera</p>
-                  <p className="text-sm text-neutral-gray">
+                  <p className="text-sm text-muted-foreground">
                     El plan está completo. Recibirás una notificación si hay un
                     lugar disponible.
                   </p>
@@ -315,7 +315,7 @@ export function JoinRequestFlow({
                   <X className="w-5 h-5 text-error shrink-0" />
                   <div>
                     <p className="font-medium">Solicitud rechazada</p>
-                    <p className="text-sm text-neutral-gray">
+                    <p className="text-sm text-muted-foreground">
                       Puedes volver a solicitarlo
                     </p>
                   </div>

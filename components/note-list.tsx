@@ -78,7 +78,7 @@ export default function NoteList({ planId, currentUserId }: NoteListProps) {
           disabled={posting}
         />
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-neutral-gray cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer select-none">
             <Checkbox
               checked={isPrivate}
               onCheckedChange={(checked) => setIsPrivate(checked === true)}
@@ -103,12 +103,12 @@ export default function NoteList({ planId, currentUserId }: NoteListProps) {
       {/* Notes list */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <Plane className="w-6 h-6 animate-pulse text-neutral-gray" />
+          <Plane className="w-6 h-6 animate-pulse text-muted-foreground" />
         </div>
       ) : visibleNotes.length === 0 ? (
         <div className="text-center py-8">
-          <StickyNote className="w-10 h-10 mx-auto text-neutral-gray mb-2" />
-          <p className="text-neutral-gray">No hay notas. ¡Agrega una!</p>
+          <StickyNote className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+          <p className="text-muted-foreground">No hay notas. ¡Agrega una!</p>
         </div>
       ) : (
         <div className="space-y-3">

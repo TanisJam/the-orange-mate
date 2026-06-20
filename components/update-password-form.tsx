@@ -10,34 +10,50 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const updatePasswordSchema = z.object({
+  password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+});
+
+type UpdatePasswordValues = z.infer<typeof updatePasswordSchema>;
 
 export function UpdatePasswordForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const form = useForm<UpdatePasswordValues>({
+    resolver: zodResolver(updatePasswordSchema),
+    mode: "onTouched",
+    defaultValues: { password: "" },
+  });
+
+  const onSubmit = async (values: UpdatePasswordValues) => {
     const supabase = createClient();
-    setIsLoading(true);
     setError(null);
 
     try {
-      const { error } = await supabase.auth.updateUser({ password });
+      const { error } = await supabase.auth.updateUser({ password: values.password });
       if (error) throw error;
       router.push("/dashboard");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Ocurrió un error");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -48,30 +64,52 @@ export function UpdatePasswordForm({
           <CardTitle className="text-2xl font-heading text-primary dark:text-primary-light">
             Nueva Contraseña
           </CardTitle>
-          <CardDescription className="font-body text-neutral-gray dark:text-neutral-white">
+          <CardDescription className="font-body text-muted-foreground dark:text-neutral-white">
             Ingresa tu nueva contraseña a continuación
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleUpdatePassword}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="password">Nueva contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Nueva contraseña"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Nueva contraseña</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          placeholder="Nueva contraseña"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
+                {error && (
+                  <p
+                    className="text-sm font-body text-error"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {error}
+                  </p>
+                )}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                  variant="primary"
+                >
+                  {form.formState.isSubmitting ? "Guardando..." : "Guardar nueva contraseña"}
+                </Button>
               </div>
-              {error && <p className="text-sm font-body text-error">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading} variant="primary">
-                {isLoading ? "Guardando..." : "Guardar nueva contraseña"}
-              </Button>
-            </div>
-          </form>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

@@ -23,7 +23,7 @@ export default function NotificationDropdown({
   if (notifications.length === 0) {
     return (
       <>
-        <div className="px-3 py-4 text-center text-sm text-neutral-gray dark:text-neutral-white/60">
+        <div className="px-3 py-4 text-center text-sm text-muted-foreground dark:text-neutral-white/60">
           No tienes notificaciones
         </div>
         <DropdownMenuSeparator />

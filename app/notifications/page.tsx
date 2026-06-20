@@ -3,7 +3,7 @@ import NotificationList from "@/components/notification-list";
 
 export const metadata: Metadata = {
   title: "Notificaciones | The Orange Mate",
-  description: "Tus notificaciones en SoloTravelers",
+  description: "Tus notificaciones en The Orange Mate",
 };
 
 export default function NotificationsPage() {

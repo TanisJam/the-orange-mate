@@ -57,7 +57,7 @@ export default function NoteItem({ note, currentUserId }: NoteItemProps) {
           </p>
 
           {/* Timestamp */}
-          <p className="text-xs text-neutral-gray mt-2">
+          <p className="text-xs text-muted-foreground mt-2">
             {formatDate(note.created_at)}
           </p>
         </div>

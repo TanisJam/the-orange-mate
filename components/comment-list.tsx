@@ -118,12 +118,12 @@ export default function CommentList({
       {/* Comments thread */}
       {loading ? (
         <div className="flex items-center justify-center py-8">
-          <Plane className="w-6 h-6 animate-pulse text-neutral-gray" />
+          <Plane className="w-6 h-6 animate-pulse text-muted-foreground" />
         </div>
       ) : tree.length === 0 ? (
         <div className="text-center py-8">
-          <MessageSquare className="w-10 h-10 mx-auto text-neutral-gray mb-2" />
-          <p className="text-neutral-gray">
+          <MessageSquare className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
+          <p className="text-muted-foreground">
             No hay comentarios aún. ¡Sé el primero!
           </p>
         </div>

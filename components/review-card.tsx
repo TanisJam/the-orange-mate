@@ -39,7 +39,7 @@ export function ReviewCard({
 
   if (editing) {
     return (
-      <div className="p-4 rounded-[var(--radius)] border-2 border-neutral-black bg-neutral-white dark:bg-neutral-light">
+      <div className="p-4 rounded-[var(--radius)] border-2 border-ink bg-card">
         <ReviewForm
           planId={review.plan_id}
           reviewedId={review.reviewed_id}
@@ -55,10 +55,10 @@ export function ReviewCard({
   }
 
   return (
-    <div className="flex gap-4 p-4 rounded-[var(--radius)] border-2 border-neutral-black bg-neutral-white dark:bg-neutral-light shadow-[2px_2px_0px_0px_rgba(25,25,25,1)]">
+    <div className="flex gap-4 p-4 rounded-[var(--radius)] border-2 border-ink bg-card shadow-[2px_2px_0px_0px_hsl(var(--ink))]">
       {/* Avatar */}
       <div className="shrink-0">
-        <div className="w-10 h-10 rounded-full border-2 border-neutral-black bg-secondary/20 flex items-center justify-center overflow-hidden">
+        <div className="w-10 h-10 rounded-full border-2 border-ink bg-secondary/20 flex items-center justify-center overflow-hidden">
           {review.reviewer?.avatar_url ? (
             <img
               src={review.reviewer.avatar_url}
@@ -100,15 +100,15 @@ export function ReviewCard({
         </div>
 
         {review.comment && (
-          <p className="text-sm text-neutral-gray dark:text-neutral-white whitespace-pre-wrap">
+          <p className="text-sm text-muted-foreground dark:text-neutral-white whitespace-pre-wrap">
             {review.comment}
           </p>
         )}
 
-        <div className="flex items-center gap-2 text-xs text-neutral-gray">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>{formatDate(review.created_at)}</span>
           {review.edited_at && (
-            <span className="italic text-neutral-gray/70">
+            <span className="italic text-muted-foreground/70">
               (editado)
             </span>
           )}

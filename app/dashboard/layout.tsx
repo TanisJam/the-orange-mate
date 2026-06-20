@@ -10,12 +10,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className="min-h-screen flex flex-col bg-neutral-light dark:bg-neutral-gray">
+    <main className="min-h-screen flex flex-col bg-neutral-light dark:bg-background">
       <nav className="w-full flex justify-center border-b border-neutral-gray dark:border-neutral-gray h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
             <Link href={"/"} className="font-heading text-xl text-primary dark:text-primary-light">
-              SoloTravelers
+              The Orange Mate
             </Link>
             <ChatNavLink />
             <NotificationBell />
@@ -34,7 +34,7 @@ export default function DashboardLayout({
       </div>
 
       <footer className="w-full flex items-center justify-center border-t border-neutral-gray dark:border-neutral-gray mx-auto text-center text-xs gap-8 py-8">
-        <p className="font-body text-neutral-gray dark:text-neutral-white">
+        <p className="font-body text-muted-foreground dark:text-neutral-white">
           Built with{" "}
           <a
             href="https://supabase.com"

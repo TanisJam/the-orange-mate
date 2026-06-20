@@ -121,9 +121,9 @@ export default function ChatWindow({
   }, []);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)] border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-8rem)] border-2 border-ink rounded-[var(--radius)] bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] overflow-hidden">
       {/* Header */}
-      <div className="flex items-center gap-3 p-3 border-b border-neutral-gray bg-neutral-light dark:bg-neutral-gray">
+      <div className="flex items-center gap-3 p-3 border-b border-neutral-gray bg-neutral-light dark:bg-background">
         <Link
           href={`/profile/${otherParticipant.id}`}
           className="shrink-0"
@@ -156,7 +156,7 @@ export default function ChatWindow({
         className="flex-1 overflow-y-auto p-4 space-y-3"
       >
         {messages.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-neutral-gray">
+          <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
             <MessageCircle className="size-10 mb-2 opacity-50" />
             <p className="font-body text-sm">
               No hay mensajes aún. ¡Di hola!

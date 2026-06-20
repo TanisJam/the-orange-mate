@@ -66,7 +66,7 @@ export default function FriendsPageClient({
 
         <TabsContent value="amigos">
           {friends.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-neutral-gray">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Users className="size-12 mb-4 opacity-50" />
               <p className="font-body text-lg">
                 No tenés amigos todavía.
@@ -96,7 +96,7 @@ export default function FriendsPageClient({
 
         <TabsContent value="pendientes">
           {pending.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-neutral-gray">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Users className="size-12 mb-4 opacity-50" />
               <p className="font-body text-lg">
                 No hay solicitudes pendientes
@@ -120,7 +120,7 @@ export default function FriendsPageClient({
 
         <TabsContent value="enviadas">
           {sent.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-16 text-neutral-gray">
+            <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <Users className="size-12 mb-4 opacity-50" />
               <p className="font-body text-lg">
                 No has enviado solicitudes

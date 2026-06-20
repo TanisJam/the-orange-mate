@@ -101,8 +101,8 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
       {/* Avatar Preview */}
       <div className="flex items-center gap-4">
         <div
-          className="w-20 h-20 rounded-full border-2 border-neutral-black dark:border-neutral-gray overflow-hidden bg-neutral-light flex items-center justify-center shrink-0
-            shadow-[2px_2px_0px_0px_rgba(25,25,25,1)] dark:shadow-[2px_2px_0px_0px_rgba(200,200,200,1)]"
+          className="w-20 h-20 rounded-full border-2 border-ink dark:border-neutral-gray overflow-hidden bg-neutral-light flex items-center justify-center shrink-0
+            shadow-[2px_2px_0px_0px_hsl(var(--ink))] dark:shadow-[2px_2px_0px_0px_rgba(200,200,200,1)]"
         >
           {avatarSrc ? (
             <img
@@ -111,7 +111,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
               className="w-full h-full object-cover"
             />
           ) : (
-            <User className="w-10 h-10 text-neutral-gray" />
+            <User className="w-10 h-10 text-muted-foreground" />
           )}
         </div>
 
@@ -152,18 +152,18 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="p-1 rounded-full hover:bg-neutral-light dark:hover:bg-neutral-gray transition-colors"
+                  className="p-1 rounded-full hover:bg-neutral-light dark:hover:bg-muted transition-colors"
                   title="Cancelar selección"
                   aria-label="Cancelar selección"
                 >
-                  <X className="w-4 h-4 text-neutral-gray" />
+                  <X className="w-4 h-4 text-muted-foreground" />
                 </button>
               </>
             )}
           </div>
 
           {selectedFile && (
-            <p className="text-xs text-neutral-gray">
+            <p className="text-xs text-muted-foreground">
               {selectedFile.name} ({(selectedFile.size / 1024).toFixed(0)} KB)
             </p>
           )}

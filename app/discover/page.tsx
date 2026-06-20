@@ -89,7 +89,7 @@ export default async function DiscoverPage({
         <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
           Descubrí Planes
         </h1>
-        <p className="text-lg font-body text-neutral-gray dark:text-neutral-white max-w-2xl mx-auto">
+        <p className="text-lg font-body text-muted-foreground dark:text-neutral-white max-w-2xl mx-auto">
           Encontrá compañeros de viaje y unite a aventuras increíbles. Todos los planes
           públicos están a un click.
         </p>
@@ -98,13 +98,13 @@ export default async function DiscoverPage({
       {/* Filter Panel — wrapped in Suspense for useSearchParams */}
       <Suspense
         fallback={
-          <div className="border-2 border-neutral-black dark:border-neutral-gray rounded-[var(--radius)] p-6 bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)]">
+          <div className="border-2 border-ink dark:border-neutral-gray rounded-[var(--radius)] p-6 bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))]">
             <div className="animate-pulse space-y-4">
-              <div className="h-10 bg-neutral-light dark:bg-neutral-gray rounded" />
+              <div className="h-10 bg-neutral-light dark:bg-background rounded" />
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="h-10 bg-neutral-light dark:bg-neutral-gray rounded" />
-                <div className="h-10 bg-neutral-light dark:bg-neutral-gray rounded" />
-                <div className="h-10 bg-neutral-light dark:bg-neutral-gray rounded" />
+                <div className="h-10 bg-neutral-light dark:bg-background rounded" />
+                <div className="h-10 bg-neutral-light dark:bg-background rounded" />
+                <div className="h-10 bg-neutral-light dark:bg-background rounded" />
               </div>
             </div>
           </div>
@@ -116,11 +116,11 @@ export default async function DiscoverPage({
       {/* Introductory message when no filters */}
       {!hasActiveFilters && (
         <div className="text-center py-4">
-          <Search className="w-12 h-12 mx-auto text-neutral-gray mb-4" />
-          <p className="text-neutral-gray text-lg">
+          <Search className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground text-lg">
             Mostrando todos los planes públicos disponibles.
           </p>
-          <p className="text-neutral-gray text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Usá los filtros para encontrar el plan ideal.
           </p>
         </div>

@@ -96,7 +96,7 @@ export default function ChatNavLink() {
   return (
     <Link
       href="/messages"
-      className="relative flex items-center gap-1.5 text-sm font-body text-neutral-gray hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
+      className="relative flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
     >
       <MessagesSquare className="size-4" />
       Mensajes

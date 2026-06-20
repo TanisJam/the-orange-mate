@@ -10,39 +10,56 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
+const signUpSchema = z
+  .object({
+    email: z.string().email("Ingresa un email válido"),
+    password: z.string().min(8, "La contraseña debe tener al menos 8 caracteres"),
+    repeatPassword: z.string().min(1, "Repite tu contraseña"),
+  })
+  .refine((data) => data.password === data.repeatPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["repeatPassword"],
+  });
+
+type SignUpValues = z.infer<typeof signUpSchema>;
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const supabase = createClient();
-    setIsLoading(true);
-    setError(null);
+  const form = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onTouched",
+    defaultValues: { email: "", password: "", repeatPassword: "" },
+  });
 
-    if (password !== repeatPassword) {
-      setError("Las contraseñas no coinciden");
-      setIsLoading(false);
-      return;
-    }
+  const onSubmit = async (values: SignUpValues) => {
+    const supabase = createClient();
+    setError(null);
 
     try {
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: values.email,
+        password: values.password,
         options: {
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
@@ -51,8 +68,6 @@ export function SignUpForm({
       router.push("/auth/sign-up-success");
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : "Ocurrió un error");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -63,61 +78,97 @@ export function SignUpForm({
           <CardTitle className="text-2xl font-heading text-primary dark:text-primary-light">
             Crear Cuenta
           </CardTitle>
-          <CardDescription className="font-body text-neutral-gray dark:text-neutral-white">
+          <CardDescription className="font-body text-muted-foreground dark:text-neutral-white">
             Crea una nueva cuenta para empezar a viajar
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSignUp}>
-            <div className="flex flex-col gap-6">
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="tu@email.com"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className="flex flex-col gap-6">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Email</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="tu@email.com"
+                          autoComplete="email"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="password">Contraseña</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Contraseña</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="repeat-password">Repetir Contraseña</Label>
-                <Input
-                  id="repeat-password"
-                  type="password"
-                  required
-                  value={repeatPassword}
-                  onChange={(e) => setRepeatPassword(e.target.value)}
+                <FormField
+                  control={form.control}
+                  name="repeatPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Repetir Contraseña</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="password"
+                          autoComplete="new-password"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </div>
-              {error && <p className="text-sm font-body text-error">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading} variant="primary">
-                {isLoading ? "Creando cuenta..." : "Crear Cuenta"}
-              </Button>
-            </div>
-            <div className="mt-4 text-center text-sm">
-              <span className="font-body text-neutral-gray dark:text-neutral-white">
-                ¿Ya tienes cuenta?{" "}
-                <Link
-                  href="/auth/login"
-                  className="font-body text-primary dark:text-primary-light underline underline-offset-4 hover:text-primary-dark dark:hover:text-primary"
+                {error && (
+                  <p
+                    className="text-sm font-body text-error"
+                    role="alert"
+                    aria-live="polite"
+                  >
+                    {error}
+                  </p>
+                )}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                  variant="primary"
                 >
-                  Inicia sesión
-                </Link>
-              </span>
-            </div>
-          </form>
+                  {form.formState.isSubmitting ? "Creando cuenta..." : "Crear Cuenta"}
+                </Button>
+              </div>
+              <div className="mt-4 text-center text-sm">
+                <span className="font-body text-muted-foreground dark:text-neutral-white">
+                  ¿Ya tienes cuenta?{" "}
+                  <Link
+                    href="/auth/login"
+                    className="font-body text-primary dark:text-primary-light underline underline-offset-4 hover:text-primary-dark dark:hover:text-primary"
+                  >
+                    Inicia sesión
+                  </Link>
+                </span>
+              </div>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

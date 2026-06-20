@@ -1,13 +1,30 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from "@/components/ui/form";
 import { StarSelector } from "@/components/star-selector";
 import { submitReview, editReview } from "@/lib/database-client";
 import type { UserReview } from "@/lib/types";
 import { Loader2 } from "lucide-react";
+
+const reviewSchema = z.object({
+  rating: z.number().min(1, "Selecciona una calificación de al menos 1 estrella"),
+  comment: z.string().optional(),
+});
+
+type ReviewValues = z.infer<typeof reviewSchema>;
 
 interface ReviewFormProps {
   planId: string;
@@ -25,27 +42,25 @@ export function ReviewForm({
   existingReview,
 }: ReviewFormProps) {
   const isEditing = !!existingReview;
-  const [rating, setRating] = useState<number>(
-    existingReview?.rating ?? 0,
-  );
-  const [comment, setComment] = useState<string>(
-    existingReview?.comment ?? "",
-  );
-  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async () => {
-    if (rating === 0) {
-      toast.error("Por favor seleccioná una puntuación de al menos 1 estrella");
-      return;
-    }
+  const form = useForm<ReviewValues>({
+    resolver: zodResolver(reviewSchema),
+    mode: "onTouched",
+    defaultValues: {
+      rating: existingReview?.rating ?? 0,
+      comment: existingReview?.comment ?? "",
+    },
+  });
 
-    setLoading(true);
+  const onSubmit = async (values: ReviewValues) => {
+    setError(null);
     try {
       if (isEditing) {
         const updated = await editReview(
           existingReview.id,
           currentUserId,
-          { rating, comment: comment || undefined },
+          { rating: values.rating, comment: values.comment || undefined },
         );
         if (updated) {
           toast.success("Review actualizada");
@@ -57,8 +72,8 @@ export function ReviewForm({
         const created = await submitReview(currentUserId, {
           plan_id: planId,
           reviewed_id: reviewedId,
-          rating,
-          comment: comment || undefined,
+          rating: values.rating,
+          comment: values.comment || undefined,
         });
         if (created) {
           toast.success("Review enviada");
@@ -69,53 +84,87 @@ export function ReviewForm({
       }
     } catch {
       toast.error("Error al procesar la review");
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4 p-4 border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light">
-      <div className="flex items-center gap-3">
-        <span className="text-sm font-semibold text-neutral-black dark:text-neutral-white">
-          Tu puntuación:
-        </span>
-        <StarSelector
-          value={rating}
-          onChange={setRating}
-          readonly={loading}
-        />
-      </div>
+    <div className="space-y-4 p-4 border-2 border-ink rounded-[var(--radius)] bg-card">
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="rating"
+            render={({ field }) => (
+              <FormItem>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-semibold text-neutral-black dark:text-neutral-white">
+                    Tu puntuación:
+                  </span>
+                  <FormControl>
+                    <StarSelector
+                      value={field.value}
+                      onChange={field.onChange}
+                      readonly={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <Textarea
-        placeholder="Comentario (opcional)"
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-        disabled={loading}
-        rows={3}
-      />
+          <FormField
+            control={form.control}
+            name="comment"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Textarea
+                    placeholder="Comentario (opcional)"
+                    disabled={form.formState.isSubmitting}
+                    rows={3}
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className="flex items-center gap-3">
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={handleSubmit}
-          disabled={loading}
-        >
-          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-          {isEditing ? "Actualizar review" : "Enviar review"}
-        </Button>
-        {isEditing && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onSubmitted}
-            disabled={loading}
-          >
-            Cancelar
-          </Button>
-        )}
-      </div>
+          {error && (
+            <p
+              className="text-sm font-body text-error"
+              role="alert"
+              aria-live="polite"
+            >
+              {error}
+            </p>
+          )}
+
+          <div className="flex items-center gap-3">
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              disabled={form.formState.isSubmitting}
+            >
+              {form.formState.isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+              {isEditing ? "Actualizar review" : "Enviar review"}
+            </Button>
+            {isEditing && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={onSubmitted}
+                disabled={form.formState.isSubmitting}
+              >
+                Cancelar
+              </Button>
+            )}
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }
