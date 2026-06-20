@@ -38,8 +38,8 @@ Chain strategy: feature-branch-chain
 
 ## Phase 3: Avatar Upload + Profile Linking (PR 3)
 
-- [ ] 3.1 Create `components/avatar-upload.tsx` — `'use client'`: accept `userId`+`onUploadComplete` props, `<input type="file" accept="image/*">`, validate type (jpeg/png/webp) and size (≤2MB) client-side with Spanish error messages, FileReader preview, upload button calling `uploadAvatar()` from `database-client`
-- [ ] 3.2 Integrate `<AvatarUpload>` into `components/user-profile-form.tsx` — import and render before "Información Personal" card, pass `userId`, set `onUploadComplete` to update local `avatar_url` state
-- [ ] 3.3 Add "Mi Perfil" link to `components/auth-button.tsx` — import `getUserProfile` from `lib/database`, fetch profile after `auth.getUser()`, render `<Link href={/profile/${profile.username}}>` when username exists, hide when null
-- [ ] 3.4 Wrap creator name in `components/plan-detail.tsx` line 168 with `<Link href={/profile/${plan.creator?.username || plan.creator_id}}>` — import `Link` from `next/link`
-- [ ] 3.5 Wrap creator names in `components/dashboard-content.tsx` at lines 270 (suggested), 424 (participating), 507 (discover) with profile `<Link>` using `username || creator_id` fallback — `Link` already imported
+- [x] 3.1 Create `components/avatar-upload.tsx` — `'use client'`: accept `userId`+`onUploadComplete` props, `<input type="file" accept="image/*">`, validate type (jpeg/png/webp) and size (≤2MB) client-side with Spanish error messages, FileReader preview, upload button calling `uploadAvatar()` from `database-client`
+- [x] 3.2 Integrate `<AvatarUpload>` into `components/user-profile-form.tsx` — import and render before "Información Personal" card, pass `userId`, set `onUploadComplete` to update local `avatar_url` state
+- [x] 3.3 Add "Mi Perfil" link to `components/auth-button.tsx` — import `getUserProfile` from `lib/database`, fetch profile after `auth.getUser()`, render `<Link href={/profile/${profile.username}}>` when username exists, hide when null
+- [x] 3.4 Wrap creator name in `components/plan-detail.tsx` line 168 with `<Link href={/profile/${plan.creator?.username || plan.creator_id}}>` — import `Link` from `next/link`
+- [x] 3.5 Wrap creator names in `components/dashboard-content.tsx` at lines 270 (suggested), 424 (participating), 507 (discover) with profile `<Link>` using `username || creator_id` fallback — `Link` already imported
