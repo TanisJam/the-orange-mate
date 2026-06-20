@@ -54,6 +54,17 @@ export default function NotificationBell() {
     return () => window.removeEventListener("focus", handleFocus);
   }, [refreshUnread]);
 
+  // Safety net: cleanup channel on unmount (even if dropdown is open)
+  useEffect(() => {
+    return () => {
+      if (channelRef.current) {
+        const supabase = createClient();
+        supabase.removeChannel(channelRef.current);
+        channelRef.current = null;
+      }
+    };
+  }, []);
+
   // Lazy realtime: subscribe on open, unsubscribe on close
   const handleOpenChange = useCallback(
     (isOpen: boolean) => {
