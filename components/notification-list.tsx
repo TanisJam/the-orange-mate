@@ -10,6 +10,7 @@ import type { Notification } from "@/lib/types";
 
 export default function NotificationList() {
   const [userId, setUserId] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
@@ -40,6 +41,7 @@ export default function NotificationList() {
       if (user) {
         setUserId(user.id);
       }
+      setAuthChecked(true);
     }
     init();
   }, []);
@@ -55,7 +57,7 @@ export default function NotificationList() {
     // markAsRead is one-way (only sets is_read=true). Don't toggle
     // visually in the opposite direction — that causes UI/DB mismatch.
     if (notif.is_read) return;
-    const ok = await markAsRead(notif.id);
+    const ok = await markAsRead(notif.id, notif.user_id);
     if (ok) {
       setNotifications((prev) =>
         prev.map((n) =>
@@ -65,15 +67,27 @@ export default function NotificationList() {
     }
   }
 
+  if (!authChecked) {
+    return (
+      <div className="text-center py-12 text-neutral-gray">
+        Cargando...
+      </div>
+    );
+  }
+
   if (!userId) {
     return (
-      <div className="text-center py-12 text-neutral-gray">
-        Cargando...
+      <div className="text-center py-12">
+        <p className="text-lg font-heading text-neutral-gray dark:text-neutral-white/60">
+          Debes iniciar sesión para ver tus notificaciones
+        </p>
       </div>
     );
   }
 
-  if (loading) {
+  const isInitialLoad = notifications.length === 0 && loading;
+
+  if (isInitialLoad) {
     return (
       <div className="text-center py-12 text-neutral-gray">
         Cargando...
@@ -81,7 +95,7 @@ export default function NotificationList() {
     );
   }
 
-  if (notifications.length === 0) {
+  if (notifications.length === 0 && !loading) {
     return (
       <div className="text-center py-12">
         <p className="text-lg font-heading text-neutral-gray dark:text-neutral-white/60">
@@ -97,19 +111,18 @@ export default function NotificationList() {
   return (
     <div className="flex flex-col gap-3">
       {/* Notification list */}
-      <div className="divide-y divide-neutral-gray/20 border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)]">
+      <div className={`divide-y divide-neutral-gray/20 border-2 border-neutral-black rounded-[var(--radius)] bg-neutral-white dark:bg-neutral-light shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_rgba(25,25,25,1)] ${loading ? "opacity-50 pointer-events-none" : ""}`}>
         {notifications.map((notif) => (
           <div
             key={notif.id}
-            className={`flex items-center gap-3 p-3 ${
-              notif.is_read ? "opacity-50" : ""
-            }`}
+            className="flex items-center gap-3 p-3"
           >
             <Checkbox
               checked={notif.is_read}
+              disabled={notif.is_read}
               onCheckedChange={() => handleToggleRead(notif)}
               className="shrink-0"
-              aria-label={notif.is_read ? "Marcar como no leída" : "Marcar como leída"}
+              aria-label={notif.is_read ? "Leído" : "Marcar como leída"}
             />
             <NotificationItem notification={notif} />
           </div>
