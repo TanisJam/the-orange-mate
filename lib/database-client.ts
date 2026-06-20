@@ -22,7 +22,6 @@ import type {
   UserReview,
   CreateReviewData,
   UpdateReviewData,
-  NotificationEventType,
 } from './types';
 import { createNotification } from '@/lib/notification-client';
 
