@@ -1125,6 +1125,16 @@ export async function submitReview(
 
   if (!participant) return null;
 
+  // Verify reviewed user is also a participant of this plan
+  const { data: reviewedParticipant } = await supabase
+    .from('plan_participants')
+    .select('id')
+    .eq('plan_id', data.plan_id)
+    .eq('user_id', data.reviewed_id)
+    .maybeSingle();
+
+  if (!reviewedParticipant) return null;
+
   // Insert review
   const { data: review, error } = await supabase
     .from('user_reviews')
@@ -1157,6 +1167,9 @@ export async function editReview(
   isServer = false
 ): Promise<UserReview | null> {
   const supabase = isServer ? await getServerClient() : createClient();
+
+  // Validate rating range
+  if (data.rating !== undefined && (data.rating < 1 || data.rating > 5)) return null;
 
   const updateData: Record<string, unknown> = { edited_at: new Date().toISOString() };
   if (data.rating !== undefined) updateData.rating = data.rating;

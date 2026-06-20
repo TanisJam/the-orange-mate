@@ -407,7 +407,25 @@ create policy "Users can view all reviews" on public.user_reviews
   for select using (auth.uid() IS NOT NULL);
 
 create policy "Users can create reviews" on public.user_reviews
-  for insert with check (auth.uid() = reviewer_id);
+  for insert with check (
+    auth.uid() = reviewer_id
+    and exists (
+      select 1 from public.travel_plans
+      where id = plan_id and status = 'completado'
+    )
+    and exists (
+      select 1 from public.plan_participants
+      where plan_id = user_reviews.plan_id and user_id = reviewer_id
+    )
+    and exists (
+      select 1 from public.plan_participants
+      where plan_id = user_reviews.plan_id and user_id = reviewed_id
+    )
+  );
+
+create policy "Users can update own reviews" on public.user_reviews
+  for update using (auth.uid() = reviewer_id)
+  with check (auth.uid() = reviewer_id);
 
 -- Functions for automatic profile creation
 create or replace function public.handle_new_user()

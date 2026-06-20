@@ -7,7 +7,7 @@ import { ReviewCard } from "@/components/review-card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Star } from "lucide-react";
 import type { UserReview } from "@/lib/types";
-import { getPlanReviews } from "@/lib/database-client";
+import { getPlanReviews, getUserReviews } from "@/lib/database-client";
 
 interface ReviewableParticipant {
   id: string;
@@ -51,8 +51,20 @@ export function ReviewsSection({
       } else {
         setCurrentAverage({ average: 0, count: 0 });
       }
+    } else if (reviewedId) {
+      const updated = await getUserReviews(reviewedId);
+      setReviews(updated);
+      if (updated.length > 0) {
+        const sum = updated.reduce((acc, r) => acc + r.rating, 0);
+        setCurrentAverage({
+          average: Math.round((sum / updated.length) * 10) / 10,
+          count: updated.length,
+        });
+      } else {
+        setCurrentAverage({ average: 0, count: 0 });
+      }
     }
-  }, [planId]);
+  }, [planId, reviewedId]);
 
   const effectiveReviewedId = reviewedId || selectedReviewTarget;
   const showReviewForm = canReview && planId && effectiveReviewedId;
@@ -67,7 +79,7 @@ export function ReviewsSection({
           Reviews
         </h3>
         <div className="flex items-center gap-2">
-          <StarSelector value={Math.round(currentAverage.average)} readonly size="sm" />
+          <StarSelector value={Math.min(5, Math.max(0, Math.floor(currentAverage.average)))} readonly size="sm" />
           <span className="text-sm font-semibold text-neutral-black dark:text-neutral-white">
             {currentAverage.average}
           </span>

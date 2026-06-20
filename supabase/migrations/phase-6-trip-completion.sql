@@ -18,3 +18,28 @@ DROP POLICY IF EXISTS "Users can view all reviews" ON public.user_reviews;
 
 CREATE POLICY "Users can view all reviews" ON public.user_reviews
     FOR SELECT USING (auth.uid() IS NOT NULL);
+
+-- 5. Tighten INSERT policy: only allow reviews on completed plans by participants
+DROP POLICY IF EXISTS "Users can create reviews" ON public.user_reviews;
+
+CREATE POLICY "Users can create reviews" ON public.user_reviews
+    FOR INSERT WITH CHECK (
+        auth.uid() = reviewer_id
+        AND EXISTS (
+            SELECT 1 FROM public.travel_plans
+            WHERE id = plan_id AND status = 'completado'
+        )
+        AND EXISTS (
+            SELECT 1 FROM public.plan_participants
+            WHERE plan_id = user_reviews.plan_id AND user_id = reviewer_id
+        )
+        AND EXISTS (
+            SELECT 1 FROM public.plan_participants
+            WHERE plan_id = user_reviews.plan_id AND user_id = reviewed_id
+        )
+    );
+
+-- 6. Add UPDATE policy for editReview
+CREATE POLICY "Users can update own reviews" ON public.user_reviews
+    FOR UPDATE USING (auth.uid() = reviewer_id)
+    WITH CHECK (auth.uid() = reviewer_id);
