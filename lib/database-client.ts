@@ -839,13 +839,54 @@ export async function acceptFriendRequest(
     .eq('friend_id', userId)
     .select(`
       *,
-      friend:user_profiles!friend_id(id, username, full_name, avatar_url)
+      friend:user_profiles!friend_id(id, username, full_name, avatar_url),
+      requester:user_profiles!user_id(id, username, full_name, avatar_url)
     `)
     .maybeSingle();
 
   if (error) {
     console.error('Error accepting friend request:', error);
     return null;
+  }
+
+  // Create notifications after successful accept
+  if (data) {
+    const requesterData = data as unknown as {
+      user_id: string;
+      friend?: UserProfile;
+      requester?: Pick<UserProfile, 'id' | 'username' | 'full_name' | 'avatar_url'>;
+    };
+
+    const accepterName =
+      requesterData.friend?.full_name ||
+      requesterData.friend?.username ||
+      "Someone";
+    const requesterName =
+      requesterData.requester?.full_name ||
+      requesterData.requester?.username ||
+      "Someone";
+    const accepterUsername = requesterData.friend?.username ?? "";
+    const requesterUsername = requesterData.requester?.username ?? "";
+
+    // Notify original requester
+    await createNotification({
+      user_id: requesterData.user_id,
+      actor_id: userId,
+      type: "friend_accepted",
+      title: `${accepterName} aceptó tu solicitud de amistad`,
+      body: "Ahora son amigos en SoloTravelers",
+      link: `/profile/${accepterUsername}`,
+    });
+
+    // Self-notification for accepter
+    await createNotification({
+      user_id: userId,
+      actor_id: userId,
+      type: "friend_accepted",
+      title: `Aceptaste la solicitud de ${requesterName}`,
+      body: "Ahora son amigos en SoloTravelers",
+      link: `/profile/${requesterUsername}`,
+    });
   }
 
   return data;
