@@ -4,7 +4,7 @@ import ChatNavLink from "@/components/chat-nav-link";
 import NotificationBell from "@/components/notification-bell";
 import Link from "next/link";
 
-export default function DashboardLayout({
+export default function AppLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,7 +14,7 @@ export default function DashboardLayout({
       <nav className="w-full flex justify-center border-b border-neutral-gray dark:border-neutral-gray h-16">
         <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
           <div className="flex gap-5 items-center font-semibold">
-            <Link href={"/"} className="font-heading text-xl text-primary dark:text-primary-light">
+            <Link href={"/dashboard"} className="font-heading text-xl text-primary dark:text-primary-light">
               The Orange Mate
             </Link>
             <ChatNavLink />
