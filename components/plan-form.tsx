@@ -168,7 +168,7 @@ export function PlanForm({ userId, initialValues }: PlanFormProps) {
           comments_enabled: true,
         });
         toast.success("Demo mode: plan created!");
-        router.push(`/demo/plans/${plan.id}`);
+        router.replace(`/demo/plans/${plan.id}`);
       } catch {
         setSubmitError("Error al simular la creación del plan.");
       }
@@ -204,7 +204,7 @@ export function PlanForm({ userId, initialValues }: PlanFormProps) {
       });
 
       if (plan) {
-        router.push(`/plans/${plan.id}`);
+        router.replace(`/plans/${plan.id}`);
       } else {
         setSubmitError("Error al crear el plan. Inténtalo de nuevo.");
       }
