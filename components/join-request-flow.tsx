@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { toast } from "sonner";
+import { useDemo } from "@/components/demo-provider";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -45,6 +47,7 @@ export function JoinRequestFlow({
   pendingRequests,
   onRequestUpdate,
 }: JoinRequestFlowProps) {
+  const { isDemo, submitJoinRequest } = useDemo();
   const [showJoinForm, setShowJoinForm] = useState(false);
   const [message, setMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -59,6 +62,22 @@ export function JoinRequestFlow({
     setSubmitting(true);
     setError(null);
     setSuccess(null);
+
+    if (isDemo) {
+      const result = submitJoinRequest(planId);
+      if (result) {
+        toast.success("Demo mode: join request sent!");
+        setSuccess("Solicitud enviada. El creador del plan la revisará pronto.");
+        setShowJoinForm(false);
+        setMessage("");
+        onRequestUpdate();
+      } else {
+        setError("Error al enviar la solicitud. Inténtalo de nuevo.");
+      }
+      setSubmitting(false);
+      return;
+    }
+
     try {
       const result = await createJoinRequest(userId, {
         plan_id: planId,
@@ -86,6 +105,20 @@ export function JoinRequestFlow({
 
   const handleAccept = async (requestId: string) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));
+
+    if (isDemo) {
+      toast.success("Demo mode: request accepted!");
+      setAcceptingId(null);
+      setAcceptPermission("solo_ver");
+      onRequestUpdate();
+      setProcessingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(requestId);
+        return next;
+      });
+      return;
+    }
+
     try {
       await updateJoinRequest(requestId, "accepted", acceptPermission, userId);
       setAcceptingId(null);
@@ -104,6 +137,18 @@ export function JoinRequestFlow({
 
   const handleReject = async (requestId: string) => {
     setProcessingIds((prev) => new Set(prev).add(requestId));
+
+    if (isDemo) {
+      toast.success("Demo mode: request rejected!");
+      onRequestUpdate();
+      setProcessingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(requestId);
+        return next;
+      });
+      return;
+    }
+
     try {
       await updateJoinRequest(requestId, "rejected", "solo_ver", userId);
       onRequestUpdate();

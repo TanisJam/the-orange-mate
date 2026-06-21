@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useDemo } from "@/components/demo-provider";
 import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,11 +63,17 @@ export function PlanDetail({
   averageRating = { average: 0, count: 0 },
 }: PlanDetailProps) {
   const router = useRouter();
+  const { isDemo } = useDemo();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
   const [joinRequests, setJoinRequests] =
     useState<PlanJoinRequest[]>(initialRequests);
   const [publishing, setPublishing] = useState(false);
   const [completing, setCompleting] = useState(false);
+
+  /** Prefix internal links with `/demo` when in demo mode. */
+  const href = useMemo(() => {
+    return (path: string) => (isDemo ? `/demo${path}` : path);
+  }, [isDemo]);
 
   const isCreator = currentUserId === currentPlan.creator_id;
   const isParticipant =
@@ -82,6 +89,10 @@ export function PlanDetail({
   const canViewFullContent = isParticipant || isCreator || currentPlan.is_public;
 
   const handleMessageCreator = async () => {
+    if (isDemo) {
+      toast.success("Demo mode: messaging simulated!");
+      return;
+    }
     try {
       const chatId = await createOrGetChat(
         currentUserId,
@@ -98,6 +109,10 @@ export function PlanDetail({
   };
 
   const refreshRequests = async () => {
+    if (isDemo) {
+      // In demo mode,  JoinRequestFlow handles state;  nothing to refresh
+      return;
+    }
     try {
       const data = await getPlanJoinRequests(currentPlan.id);
       setJoinRequests(data);
@@ -107,6 +122,11 @@ export function PlanDetail({
   };
 
   const handlePublish = async () => {
+    if (isDemo) {
+      setCurrentPlan((p) => ({ ...p, is_public: true }));
+      toast.success("Demo mode: plan published!");
+      return;
+    }
     setPublishing(true);
     try {
       const updated = await updateTravelPlan(currentPlan.id, {
@@ -123,6 +143,11 @@ export function PlanDetail({
   };
 
   const handleComplete = async () => {
+    if (isDemo) {
+      setCurrentPlan((p) => ({ ...p, status: "completado" as const }));
+      toast.success("Demo mode: trip marked as completed!");
+      return;
+    }
     setCompleting(true);
     try {
       const updated = await completeTrip(currentPlan.id, currentUserId);
@@ -196,7 +221,7 @@ export function PlanDetail({
               <p className="text-sm text-muted-foreground">
                 Creado por{" "}
                 <Link
-                  href={`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`}
+                  href={href(`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`)}
                   className="hover:underline"
                 >
                   {currentPlan.creator?.full_name ||
