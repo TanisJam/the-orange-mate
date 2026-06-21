@@ -18,8 +18,8 @@ export async function AuthButton() {
   }
 
   return user ? (
-    <div className="flex items-center gap-4">
-      <span className="font-body text-muted-foreground dark:text-neutral-white">
+    <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 sm:gap-4">
+      <span className="max-w-full break-all font-body text-sm text-muted-foreground dark:text-neutral-white">
         ¡Hola, {user.email?.split('@')[0]}!
       </span>
       {profileUsername && (
@@ -30,7 +30,7 @@ export async function AuthButton() {
       <LogoutButton />
     </div>
   ) : (
-    <div className="flex gap-2">
+    <div className="flex flex-wrap justify-end gap-2">
       <Button asChild size="sm" variant="outline">
         <Link href="/auth/login">Iniciar Sesión</Link>
       </Button>

@@ -33,13 +33,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={{ colorScheme: 'light dark' }}>
+      <head>
+        <meta name="color-scheme" content="light dark" />
+      </head>
       <body className={`${bebasNeue.variable} ${oxanium.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
-          disableTransitionOnChange
         >
           {children}
           <Toaster />

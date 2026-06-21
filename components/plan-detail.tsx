@@ -237,7 +237,7 @@ export function PlanDetail({
                 </Button>
               )}
             {currentPlan.status === "completado" && (
-              <Badge className="bg-success text-white">
+              <Badge className="bg-success text-white dark:text-neutral-black">
                 <CheckCircle className="w-3 h-3 mr-1" />
                 Viaje completado
               </Badge>

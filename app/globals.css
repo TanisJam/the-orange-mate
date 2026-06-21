@@ -4,55 +4,146 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ==========================================================================
+   0. ANIMATABLE COLOR PROPERTIES — registered so browsers can interpolate
+   ==========================================================================
+   CSS custom properties inside hsl() don't transition without @property
+   registration. We register dedicated <color> tokens for the body surface
+   and text so the theme toggle dissolves smoothly.                     */
+
+@property --body-bg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #FFFBF9;
+}
+
+@property --body-fg {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #191919;
+}
+
+/* ==========================================================================
+   1. BRAND COLOR TOKENS — themed per color-scheme
+   ==========================================================================
+   Light mode: saturated, works on light background.
+   Dark mode:  art-directed from the user's reference image — comic-noir,
+   black line art, terminal green, electric teal, warm orange/coral, and cream
+   text. These themed tokens feed the @theme block below via var(), so every
+   bg-primary / text-accent / etc. resolves correctly per theme.
+   ========================================================================== */
+
+:root {
+  /* Primary — brand orange */
+  --brand-primary-light: #FFAE66;
+  --brand-primary:       #FA8432;
+  --brand-primary-dark:  #D25400;
+
+  /* Accent — deep teal (CTA emphasis) */
+  --brand-accent-light:  #14B8C9;
+  --brand-accent:        #0086A4;
+  --brand-accent-dark:   #006177;
+
+  /* Secondary — cyan (supporting) */
+  --brand-secondary-light: #2CD3EC;
+  --brand-secondary:       #009FB7;
+  --brand-secondary-dark:  #0086A4;
+
+  /* Semantic */
+  --brand-error:   #D9534F;
+  --brand-success: #5CB85C;
+
+  /* Neutrals */
+  --neutral-white: #FDFEFE;
+  --neutral-light: #FFFBF9;
+  --neutral-gray:  #625F63;
+  --neutral-black: #191919;
+}
+
+.dark {
+  /* Poster/noir palette inspired by the provided reference image:
+     black line art, warm orange/coral objects, neon terminal green,
+     electric teal/cyan, cobalt atmosphere, and cream text. */
+
+  /* Primary — pencil/orange warmth */
+  --brand-primary-light: #FFB15E;
+  --brand-primary:       #FF8C42;
+  --brand-primary-dark:  #F26B2D;
+
+  /* Accent — terminal green line work */
+  --brand-accent-light:  #8CFF73;
+  --brand-accent:        #64F263;
+  --brand-accent-dark:   #38D85E;
+
+  /* Secondary — electric desk-cable teal */
+  --brand-secondary-light: #44F2D7;
+  --brand-secondary:       #25D0BE;
+  --brand-secondary-dark:  #109E96;
+
+  /* Semantic — softer comic-poster feedback colors */
+  --brand-error:   #FF7A85;
+  --brand-success: #64F263;
+
+  /* Neutrals — cream instead of white, black instead of gray outlines.
+     Components using dark:text-neutral-white now read as warm paper/monitor
+     cream. Components using dark:border-neutral-gray become neon green line
+     accents, matching the screen in the reference image. */
+  --neutral-white: #F4EFC9;
+  --neutral-light: #D9D39B;
+  --neutral-gray:  #64F263;
+  --neutral-black: #030303;
+}
+
+/* ==========================================================================
+   2. TAILWIND v4 @theme — registers all utilities
+   ==========================================================================
+   Every utility class (bg-primary, text-accent-light, etc.) resolves through
+   a CSS custom-property chain to the themed --brand-* tokens above.
+   ========================================================================== */
+
 @theme {
-  /* Design System Colors */
-  --color-primary-light: #FFAE66;
-  --color-primary: #FA8432;
-  --color-primary-dark: #D25400;
+  /* Brand colors → themed via var() chain */
+  --color-primary-light: var(--brand-primary-light);
+  --color-primary:       var(--brand-primary);
+  --color-primary-dark:  var(--brand-primary-dark);
 
-  /* Accent = deep teal (CTA emphasis). Replaces the former muddy brown so the
-     brand reads as a cohesive orange + teal system. */
-  --color-accent-light: #14B8C9;
-  --color-accent: #0086A4;
-  --color-accent-dark: #006177;
+  --color-accent-light:  var(--brand-accent-light);
+  --color-accent:        var(--brand-accent);
+  --color-accent-dark:   var(--brand-accent-dark);
 
-  --color-secondary-light: #2CD3EC;
-  --color-secondary: #009FB7;
-  --color-secondary-dark: #0086A4;
+  --color-secondary-light: var(--brand-secondary-light);
+  --color-secondary:       var(--brand-secondary);
+  --color-secondary-dark:  var(--brand-secondary-dark);
 
-  --color-neutral-white: #FDFEFE;
-  --color-neutral-light: #FFFBF9;
-  --color-neutral-gray: #625F63;
-  --color-neutral-black: #191919;
+  --color-error:   var(--brand-error);
+  --color-success: var(--brand-success);
 
-  /* Theme-aware structural ink for brutalist borders + offset shadows.
-     Near-black in light, near-white in dark — so the brutalist outlines and
-     shadows stay visible in BOTH themes (they used to be black-on-black in dark). */
+  /* Neutral swatches → themed via var() chain */
+  --color-neutral-white: var(--neutral-white);
+  --color-neutral-light: var(--neutral-light);
+  --color-neutral-gray:  var(--neutral-gray);
+  --color-neutral-black: var(--neutral-black);
+
+  /* Theme-aware structural ink — near-black in light, true-black in the
+     poster-inspired dark theme. This preserves the comic line-art language
+     from the reference image instead of turning outlines white/gray. */
   --color-ink: hsl(var(--ink));
 
-  --color-error: #D9534F;
-  --color-success: #5CB85C;
-
-  /* Shadcn/ui compatibility colors */
+  /* Shadcn/ui compatibility colors — resolve to HSL custom properties
+     defined in the :root / .dark blocks below */
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
-
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
-
   --color-popover: hsl(var(--popover));
   --color-popover-foreground: hsl(var(--popover-foreground));
-
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
-
   --color-border: hsl(var(--border));
   --color-input: hsl(var(--input));
   --color-ring: hsl(var(--ring));
-
   --color-chart-1: hsl(var(--chart-1));
   --color-chart-2: hsl(var(--chart-2));
   --color-chart-3: hsl(var(--chart-3));
@@ -61,32 +152,133 @@
 
   /* Typography */
   --font-heading: var(--font-bebas-neue), sans-serif;
-  --font-body: var(--font-oxanium), sans-serif;
+  --font-body:    var(--font-oxanium), sans-serif;
 
-  /* Radius */
+  /* Radius — brutalist-friendly, sharp but not zero */
   --radius-lg: 6px;
   --radius-md: 4px;
   --radius-sm: 2px;
-  --radius: 6px;
+  --radius:    6px;
 
-  /* Stroke */
+  /* Stroke width for brutalist offset shadows */
   --stroke-width: 2px;
 }
 
 @theme inline {
-  /* Font family mappings for Tailwind CSS v4 */
   --font-heading: var(--font-bebas-neue), sans-serif;
-  --font-body: var(--font-oxanium), sans-serif;
+  --font-body:    var(--font-oxanium), sans-serif;
 }
 
-/*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
-  so we've added these compatibility styles to make sure everything still
-  looks the same as it did with Tailwind CSS v3.
+/* ==========================================================================
+   3. SHADCN SEMANTIC TOKENS — per-theme HSL channels
+   ==========================================================================
+   Light mode: dark text on warm-off-white bg — classic readable palette.
+   Dark mode:  Material-style elevation system — higher surfaces are LIGHTER.
+   ========================================================================== */
 
-  If we ever want to remove these styles, we need to add an explicit border
-  color utility to any element that depends on these defaults.
-*/
+@layer base {
+  :root {
+    /* Browser-native dark-mode awareness for form controls, scrollbars, etc.
+       Tells the browser we support both themes; it picks the right UA sheet. */
+    color-scheme: light dark;
+
+    /* Registered @property tokens — used by body for smooth theme dissolve */
+    --body-bg: #FFFBF9;
+    --body-fg: #191919;
+
+    /* ----- Light mode surface hierarchy (dark-on-light) ----- */
+    --background: 20 100% 99%;      /* warm off-white #FFFBF9 */
+    --foreground: 0 0% 10%;         /* #191919 — near-black text */
+    --ink: 0 0% 10%;                /* structural ink — brutalist borders/shadows */
+
+    --card: 0 0% 100%;              /* pure white card */
+    --card-foreground: 0 0% 3.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 0 0% 9%;
+
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+
+    --destructive: 2 64% 58%;       /* brand error #D9534F */
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 89.8%;           /* subtle light gray */
+    --input: 0 0% 89.8%;
+    --ring: 25 95% 59%;             /* brand orange focus ring */
+
+    --chart-1: 25 95% 59%;
+    --chart-2: 189 100% 36%;
+    --chart-3: 192 100% 32%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 16 87% 64%;
+
+    --radius: 0.375rem;
+  }
+
+  .dark {
+    /* ----- Poster-inspired dark mode -----
+       Direction from the reference image: not "gray app dark mode".
+       This is comic-noir + retro terminal: cobalt atmosphere, black line art,
+       dark monitor panels, cream text, neon green/cyan UI lines, and warm
+       orange/coral objects. */
+
+    --background: 219 59% 24%;      /* deep cobalt blue — image atmosphere */
+    --foreground: 53 62% 87%;       /* warm cream — readable, not white */
+
+    --body-bg: #1A2F5A;             /* same cobalt, registered @property */
+    --body-fg: #F4EFC9;             /* same cream, registered @property */
+
+    --ink: 0 0% 2%;                 /* true comic line art: black, never white */
+
+    --card: 60 8% 10%;              /* dark monitor-panel surface */
+    --card-foreground: 53 62% 87%;
+
+    --popover: 60 8% 12%;           /* slightly lifted monitor surface */
+    --popover-foreground: 53 62% 87%;
+
+    --primary: 53 62% 87%;
+    --primary-foreground: 0 0% 2%;
+
+    --secondary: 174 55% 16%;       /* deep teal support surface */
+    --secondary-foreground: 174 90% 78%;
+
+    --muted: 60 8% 15%;             /* dark olive/monitor muted surface */
+    --muted-foreground: 53 34% 73%; /* softer cream */
+
+    --accent: 117 62% 17%;          /* terminal-green hover/background */
+    --accent-foreground: 114 100% 73%;
+
+    --destructive: 355 100% 74%;    /* coral-pink from the mug/UI accents */
+    --destructive-foreground: 0 0% 2%;
+
+    --border: 117 84% 57%;          /* neon terminal line, not gray/white */
+    --input: 117 84% 57%;
+    --ring: 117 100% 72%;           /* focus = terminal glow */
+
+    --chart-1: 25 100% 63%;         /* orange */
+    --chart-2: 117 84% 57%;         /* terminal green */
+    --chart-3: 174 82% 48%;         /* electric teal */
+    --chart-4: 50 100% 59%;         /* sticky-note yellow */
+    --chart-5: 355 100% 74%;        /* coral pink */
+
+    --radius: 0.375rem;
+  }
+}
+
+/* ==========================================================================
+   4. TAILWIND v4 BORDER COMPAT
+   ========================================================================== */
+
 @layer base {
   *,
   ::after,
@@ -97,74 +289,54 @@
   }
 }
 
-@layer base {
-  :root {
-    /* shadcn semantic tokens aligned to the brand (single source of truth) */
-    --background: 20 100% 99%; /* warm off-white #FFFBF9 (brand neutral-light) */
-    --foreground: 0 0% 10%; /* #191919 (brand neutral-black) */
-    --ink: 0 0% 10%; /* structural ink — near-black in light mode */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 2 64% 58%; /* brand error #D9534F */
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 25 95% 59%; /* brand primary orange #FA8432 — matches button focus rings */
-    --chart-1: 25 95% 59%; /* orange */
-    --chart-2: 189 100% 36%; /* teal */
-    --chart-3: 192 100% 32%; /* deep teal */
-    --chart-4: 43 74% 66%;
-    --chart-5: 16 87% 64%;
-    --radius: 0.375rem; /* 6px — matches the @theme brutalist radius */
-  }
-  .dark {
-    --background: 0 0% 10%; /* #191919 (brand neutral-black) */
-    --foreground: 0 0% 99%; /* #FDFEFE (brand neutral-white) */
-    --ink: 0 0% 99%; /* structural ink — near-white in dark so brutalist borders/shadows stay visible */
-    --card: 20 6% 14%; /* warm dark surface, lighter than bg so cards elevate */
-    --card-foreground: 0 0% 98%;
-    --popover: 20 6% 14%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 20 5% 18%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 20 5% 18%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 2 64% 48%; /* brand error, slightly brighter for dark surfaces */
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 26%; /* visible separators on dark surfaces */
-    --input: 0 0% 26%;
-    --ring: 25 95% 59%; /* brand primary orange */
-    --chart-1: 25 95% 62%; /* orange */
-    --chart-2: 187 84% 55%; /* bright teal */
-    --chart-3: 189 100% 36%; /* teal */
-    --chart-4: 43 74% 66%;
-    --chart-5: 16 87% 64%;
-  }
-}
+/* ==========================================================================
+   5. BASE STYLES
+   ========================================================================== */
 
 @layer base {
   * {
     @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground font-body;
+
+    /* Smooth theme transitions on all elements.
+       Backgrounds transition slowly so the dark cobalt -> light surface
+       change is not abrupt. Text and borders transition faster. */
+    transition:
+      background-color 2s ease,
+      color 0.5s ease,
+      border-color 0.5s ease;
   }
 
-  /* Respect users who request reduced motion (WCAG 2.3.3 / prefers-reduced-motion) */
+  body {
+    @apply font-body;
+
+    /* Use registered @property tokens so the browser can interpolate
+       colors smoothly. Overrides the Tailwind bg-background/text-foreground
+       for the body element only. */
+    background-color: var(--body-bg);
+    color: var(--body-fg);
+
+    /* Body background dissolves at 2s. Text and borders stay responsive. */
+    transition:
+      background-color 2s ease,
+      color 0.5s ease,
+      border-color 0.5s ease;
+  }
+
+  /* ── Image re-colorization for dark mode ───────────────────────────
+     Research (web.dev / Thomas Steiner): full-brightness photos on dark
+     backgrounds can cause visual discomfort. For this app's new poster-like
+     direction we keep images vivid, but slightly controlled.
+     Vector icons (SVG) get different treatment — they should be inverted
+     or use currentColor, handled at the component/<img> level. ───── */
+
+  /* Theme is controlled by next-themes via the .dark class. Do not rely on
+     prefers-color-scheme here, otherwise a user-forced light theme would still
+     inherit dark image filters when the OS is dark. */
+  .dark img:not([src*='.svg']) {
+    filter: brightness(0.92) contrast(1.08) saturate(1.12);
+  }
+
+  /* ── Accessibility: respect reduced motion (WCAG 2.3.3) ──────────── */
   @media (prefers-reduced-motion: reduce) {
     *,
     ::before,
