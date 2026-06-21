@@ -106,9 +106,10 @@ type PlanValues = z.infer<typeof planSchema>;
 
 interface PlanFormProps {
   userId: string;
+  initialValues?: Partial<PlanValues>;
 }
 
-export function PlanForm({ userId }: PlanFormProps) {
+export function PlanForm({ userId, initialValues }: PlanFormProps) {
   const router = useRouter();
   const { isDemo, createPlan } = useDemo();
   const goBack = useBackNavigation(isDemo ? "/demo/dashboard" : "/dashboard");
@@ -118,20 +119,20 @@ export function PlanForm({ userId }: PlanFormProps) {
     resolver: zodResolver(planSchema),
     mode: "onTouched",
     defaultValues: {
-      title: "",
-      plan_type: "viaje_completo" as PlanType,
-      destinations: "",
-      start_date: "",
-      end_date: "",
-      flexible_dates: false,
-      description: "",
-      max_participants: "1",
-      share_accommodation: false,
-      share_transport: false,
-      share_tours: false,
-      budget_range_min: "",
-      budget_range_max: "",
-      currency: "USD",
+      title: initialValues?.title ?? "",
+      plan_type: (initialValues?.plan_type as PlanType) ?? ("viaje_completo" as PlanType),
+      destinations: initialValues?.destinations ?? "",
+      start_date: initialValues?.start_date ?? "",
+      end_date: initialValues?.end_date ?? "",
+      flexible_dates: initialValues?.flexible_dates ?? false,
+      description: initialValues?.description ?? "",
+      max_participants: initialValues?.max_participants ?? "1",
+      share_accommodation: initialValues?.share_accommodation ?? false,
+      share_transport: initialValues?.share_transport ?? false,
+      share_tours: initialValues?.share_tours ?? false,
+      budget_range_min: initialValues?.budget_range_min ?? "",
+      budget_range_max: initialValues?.budget_range_max ?? "",
+      currency: initialValues?.currency ?? "USD",
     },
   });
 
