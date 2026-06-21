@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Trash2, CornerDownRight, Loader2 } from "lucide-react";
 import { createPlanComment, deletePlanComment } from "@/lib/database-client";
 import { useDemo } from "@/components/demo-provider";
+import { toast } from "sonner";
 import type { PlanComment } from "@/lib/types";
 
 function formatRelativeDate(dateStr: string): string {
@@ -62,6 +63,11 @@ export default function CommentItem({
     : `/profile/${author?.username || comment.author_id}`;
 
   const handleDelete = async () => {
+    if (isDemo) {
+      setIsDeleted(true);
+      onCommentChanged();
+      return;
+    }
     const confirmed = window.confirm(
       "¿Eliminar este comentario? Esta acción también eliminará sus respuestas.",
     );
@@ -83,6 +89,14 @@ export default function CommentItem({
   const handleReplySubmit = async () => {
     const trimmed = replyContent.trim();
     if (!trimmed) return;
+
+    if (isDemo) {
+      setReplyContent("");
+      setShowReplyForm(false);
+      onCommentChanged();
+      toast.success("Demo mode: reply posted");
+      return;
+    }
 
     setPosting(true);
     try {
