@@ -21,7 +21,7 @@ export function DemoLayoutClient({ children }: { children: React.ReactNode }) {
           <div className="w-full max-w-5xl flex flex-col gap-3 p-3 px-5 text-sm sm:flex-row sm:items-center sm:justify-between">
             <div className="flex min-w-0 flex-wrap gap-x-5 gap-y-2 items-center font-semibold">
               <Link
-                href="/demo"
+                href="/"
                 className="font-heading text-xl text-primary dark:text-primary-light"
               >
                 The Orange Mate
