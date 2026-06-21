@@ -310,7 +310,7 @@ function AuthenticatedCard({
       {/* CTA */}
       <div className="mt-auto pt-3 border-t border-neutral-gray/30">
         <Button asChild variant="primary" size="sm" className="w-full">
-          <Link href={`/plans/${plan.id}`}>
+          <Link href={isDemo ? `/demo/plans/${plan.id}` : `/plans/${plan.id}`}>
             Ver plan
             <ArrowRight className="w-4 h-4" />
           </Link>

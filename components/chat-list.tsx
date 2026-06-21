@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { MessageCircle } from "lucide-react";
+import { useDemo } from "@/components/demo-provider";
 import type { Chat } from "@/lib/types";
 
 function getOtherParticipant(
@@ -60,6 +61,9 @@ interface ChatListProps {
 }
 
 export default function ChatList({ chats, currentUserId }: ChatListProps) {
+  const { isDemo } = useDemo();
+  const chatPath = (chatId: string) =>
+    isDemo ? `/demo/messages/${chatId}` : `/messages/${chatId}`;
   if (chats.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
@@ -95,7 +99,7 @@ export default function ChatList({ chats, currentUserId }: ChatListProps) {
         return (
           <Link
             key={chat.id}
-            href={`/messages/${chat.id}`}
+            href={chatPath(chat.id)}
             className="flex items-center gap-3 p-3 rounded-[var(--radius)] border-2 border-ink bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
           >
             {/* Avatar */}
