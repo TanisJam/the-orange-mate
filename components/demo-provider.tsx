@@ -32,6 +32,7 @@ export interface DemoContextValue {
   reviews: UserReview[];
   /** Simulated mutations — each shows toast "Demo mode: …" on success */
   createPlan: (data: CreateTravelPlanData) => TravelPlan;
+  deletePlan: (planId: string) => boolean;
   sendMessage: (data: CreateMessageData) => Message | null;
   sendFriendRequest: (friendId: string) => EnrichedFriend | null;
   acceptFriendRequest: (requestId: string) => EnrichedFriend | null;
@@ -54,6 +55,7 @@ const stub: DemoContextValue = {
   createPlan: () => {
     throw new Error("useDemo: createPlan called outside demo mode");
   },
+  deletePlan: () => false,
   sendMessage: () => null,
   sendFriendRequest: () => null,
   acceptFriendRequest: () => null,
@@ -85,6 +87,7 @@ export function DemoProvider({ children }: { children: ReactNode }) {
     friends: demoStore.friends,
     reviews: demoStore.reviews,
     createPlan: (data) => demoStore.createPlan(data),
+    deletePlan: (id) => demoStore.deletePlan(id),
     sendMessage: (data) => demoStore.sendMessage(data),
     sendFriendRequest: (id) => demoStore.sendFriendRequest(id),
     acceptFriendRequest: (id) => demoStore.acceptFriendRequest(id),

@@ -20,6 +20,7 @@ import {
   updateTravelPlan,
   getPlanJoinRequests,
   completeTrip,
+  deleteTravelPlan,
 } from "@/lib/database-client";
 import { createOrGetChat } from "@/lib/chat-client";
 import type { TravelPlan, PlanJoinRequest, UserReview } from "@/lib/types";
@@ -45,6 +46,7 @@ import {
   StickyNote,
   CheckCircle,
   Loader2,
+  Trash2,
 } from "lucide-react";
 
 interface PlanDetailProps {
@@ -63,7 +65,7 @@ export function PlanDetail({
   averageRating = { average: 0, count: 0 },
 }: PlanDetailProps) {
   const router = useRouter();
-  const { isDemo } = useDemo();
+  const { isDemo, deletePlan: demoDeletePlan } = useDemo();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
   const [joinRequests, setJoinRequests] =
     useState<PlanJoinRequest[]>(initialRequests);
@@ -165,6 +167,33 @@ export function PlanDetail({
     }
   };
 
+  const handleDeletePlan = async () => {
+    if (!isCreator) return;
+    const confirmed = window.confirm(
+      "¿Eliminar este plan? Esta acción no se puede deshacer.",
+    );
+    if (!confirmed) return;
+
+    if (isDemo) {
+      demoDeletePlan(currentPlan.id);
+      toast.success("Demo mode: plan deleted");
+      router.push(isDemo ? "/demo/dashboard" : "/dashboard");
+      return;
+    }
+
+    try {
+      const ok = await deleteTravelPlan(currentPlan.id);
+      if (ok) {
+        toast.success("Plan eliminado");
+        router.push("/dashboard");
+      } else {
+        toast.error("No se pudo eliminar el plan");
+      }
+    } catch {
+      toast.error("Error al eliminar el plan");
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
       year: "numeric",
@@ -261,6 +290,17 @@ export function PlanDetail({
                     : "Marcar viaje como completado"}
                 </Button>
               )}
+            {isCreator && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDeletePlan}
+                className="border-error text-error hover:bg-error/10"
+              >
+                <Trash2 className="w-4 h-4" />
+                Eliminar plan
+              </Button>
+            )}
             {currentPlan.status === "completado" && (
               <Badge className="bg-success text-white dark:text-neutral-black">
                 <CheckCircle className="w-3 h-3 mr-1" />

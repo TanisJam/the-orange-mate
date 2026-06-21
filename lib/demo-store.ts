@@ -94,6 +94,13 @@ class DemoStore {
     return plan;
   }
 
+  deletePlan(planId: string): boolean {
+    const idx = this.plans.findIndex((p) => p.id === planId);
+    if (idx === -1) return false;
+    this.plans.splice(idx, 1);
+    return true;
+  }
+
   // ── Messages ────────────────────────────────────────────────────────────
 
   sendMessage(data: CreateMessageData): Message | null {
