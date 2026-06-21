@@ -164,7 +164,7 @@ export async function getSentRequests(userId: string): Promise<EnrichedFriend[]>
 
 // ── Chats ───────────────────────────────────────────────────────────────────
 
-export async function getUserChats(userId: string, _isServer = false): Promise<Chat[]> {
+export async function getUserChats(userId: string): Promise<Chat[]> {
   return demoDataSet.chats
     .filter(
       (c) => c.participant_1_id === userId || c.participant_2_id === userId,
@@ -172,7 +172,7 @@ export async function getUserChats(userId: string, _isServer = false): Promise<C
     .sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
 }
 
-export async function getChatMessages(chatId: string, _isServer = false): Promise<Message[]> {
+export async function getChatMessages(chatId: string): Promise<Message[]> {
   return demoStore.messages
     .filter((m) => m.chat_id === chatId)
     .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
