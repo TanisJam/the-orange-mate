@@ -442,7 +442,7 @@ export function PlanDetail({
                           "U")[0]}
                       </div>
                       <div>
-                        <p className="font-semibold text-sm">
+                        <div className="font-semibold text-sm">
                           {participant.user?.full_name ||
                             participant.user?.username ||
                             "Usuario"}
@@ -454,7 +454,7 @@ export function PlanDetail({
                               Creador
                             </Badge>
                           )}
-                        </p>
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {getPermissionLabel(participant.permission_level)} ·{" "}
                           {formatDate(participant.joined_at)}

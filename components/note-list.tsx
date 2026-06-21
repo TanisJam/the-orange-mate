@@ -6,22 +6,37 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { StickyNote, Loader2, Plane } from "lucide-react";
 import { getPlanNotes, createPlanNote } from "@/lib/database-client";
+import { getPlanNotes as getPlanNotesDemo } from "@/lib/demo-database";
+import { useDemo } from "@/components/demo-provider";
+import { toast } from "sonner";
 import NoteItem from "@/components/note-item";
 import type { PlanNote } from "@/lib/types";
 
 interface NoteListProps {
   planId: string;
   currentUserId: string;
+  initialNotes?: PlanNote[];
 }
 
-export default function NoteList({ planId, currentUserId }: NoteListProps) {
-  const [notes, setNotes] = useState<PlanNote[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function NoteList({ planId, currentUserId, initialNotes }: NoteListProps) {
+  const { isDemo, demoUser } = useDemo();
+  const [notes, setNotes] = useState<PlanNote[]>(initialNotes || []);
+  const [loading, setLoading] = useState(!initialNotes);
   const [newContent, setNewContent] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [posting, setPosting] = useState(false);
 
   const loadNotes = useCallback(async () => {
+    if (isDemo) {
+      if (initialNotes) {
+        setNotes(initialNotes);
+      } else {
+        const data = await getPlanNotesDemo(planId);
+        setNotes(data);
+      }
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const data = await getPlanNotes(planId);
@@ -31,7 +46,7 @@ export default function NoteList({ planId, currentUserId }: NoteListProps) {
     } finally {
       setLoading(false);
     }
-  }, [planId]);
+  }, [planId, isDemo, initialNotes]);
 
   useEffect(() => {
     loadNotes();
@@ -42,6 +57,26 @@ export default function NoteList({ planId, currentUserId }: NoteListProps) {
     if (!trimmed) return;
 
     setPosting(true);
+
+    if (isDemo) {
+      const newNote: PlanNote = {
+        id: `note-${Date.now()}`,
+        plan_id: planId,
+        author_id: currentUserId,
+        content: trimmed,
+        is_private: isPrivate,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        author: demoUser,
+      };
+      setNotes((prev) => [newNote, ...prev]);
+      setNewContent("");
+      setIsPrivate(false);
+      setPosting(false);
+      toast.success("Demo mode: note added");
+      return;
+    }
+
     try {
       const created = await createPlanNote(currentUserId, {
         plan_id: planId,
