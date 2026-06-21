@@ -177,7 +177,7 @@ export function PlanDetail({
     if (isDemo) {
       demoDeletePlan(currentPlan.id);
       toast.success("Demo mode: plan deleted");
-      router.push(isDemo ? "/demo/dashboard" : "/dashboard");
+      router.replace(isDemo ? "/demo/dashboard" : "/dashboard");
       return;
     }
 
@@ -185,7 +185,7 @@ export function PlanDetail({
       const ok = await deleteTravelPlan(currentPlan.id);
       if (ok) {
         toast.success("Plan eliminado");
-        router.push("/dashboard");
+        router.replace("/dashboard");
       } else {
         toast.error("No se pudo eliminar el plan");
       }
