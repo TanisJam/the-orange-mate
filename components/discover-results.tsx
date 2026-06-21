@@ -70,6 +70,8 @@ function PaginationControls({
 }) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isDemo } = useDemo();
+  const basePath = isDemo ? "/demo/discover" : "/discover";
 
   const buildPageUrl = useCallback(
     (targetPage: number) => {
@@ -129,8 +131,6 @@ export function DiscoverResults({
   currentUserId,
   pagination,
 }: DiscoverResultsProps) {
-  const { isDemo } = useDemo();
-  const basePath = isDemo ? "/demo/discover" : "/discover";
   if (plans.length === 0) {
     return (
       <div className="text-center py-16">
