@@ -2,7 +2,7 @@
 
 **Connect, Travel, Share.** The Orange Mate (TOM) is a social platform for solo travelers. Find travel companions, share accommodation and transport costs, and experience incredible adventures alongside people who share your passion for exploring the world.
 
-Built with Next.js 15, Tailwind CSS 4, and Supabase, featuring a brutalist design system with an orange + teal palette.
+Built with Next.js 15, Tailwind CSS 4, and Supabase, featuring a brutalist design system with an orange + teal light palette art-directed into a comic-noir dark theme (warm orange/coral, terminal green, electric teal on near-black).
 
 ## ✨ Features
 
@@ -15,7 +15,7 @@ Built with Next.js 15, Tailwind CSS 4, and Supabase, featuring a brutalist desig
 - **Discovery with filters** — browse public plans by type, destination, dates, budget, and more
 - **Public profiles** — each user has a public profile with bio, interests, and reviews
 - **Reviews system** — rate and review your experiences with other travelers
-- **Brutalist design system** — orange + teal palette, bold borders, offset shadows, light and dark themes
+- **Brutalist design system** — orange + teal light palette art-directed into a comic-noir dark poster theme (warm orange/coral, terminal green, electric teal on near-black), bold borders, offset shadows, light and dark themes
 - **Dual typography** — Bebas Neue for headings, Oxanium for body
 - **Responsive** — optimized for mobile, tablet, and desktop with Tailwind CSS 4
 - **TypeScript** — end-to-end type safety
@@ -90,7 +90,8 @@ Open [http://localhost:3000](http://localhost:3000).
 │   │   ├── forgot-password/
 │   │   ├── update-password/
 │   │   └── error/
-│   ├── demo/                    # Design system demo
+│   ├── (demo)/                  # Route group for full demo mode (no URL prefix)
+│   │   └── demo/                # Unauthenticated demo of the full app with mock data
 │   ├── api/                     # API routes
 │   ├── globals.css              # Design system + CSS tokens
 │   ├── layout.tsx               # Root layout (fonts, theme provider)
@@ -146,6 +147,8 @@ Open [http://localhost:3000](http://localhost:3000).
 
 TOM uses a brutalist design system with its own identity:
 
+### Light theme
+
 | Token | Color |
 |-------|-------|
 | Primary | `#FA8432` (orange) |
@@ -156,6 +159,22 @@ TOM uses a brutalist design system with its own identity:
 | Accent Dark | `#006177` |
 | Neutral White | `#FDFEFE` |
 | Neutral Black | `#191919` |
+
+### Dark theme (comic-noir poster)
+
+Art-directed from a black line-art poster reference — warm orange/coral objects, neon terminal-green line work, electric teal/cyan, and cream text on near-black.
+
+| Token | Color |
+|-------|-------|
+| Primary | `#FF8C42` (warm orange/coral) |
+| Primary Light | `#FFB15E` |
+| Primary Dark | `#F26B2D` |
+| Accent | `#64F263` (terminal green — line work) |
+| Accent Light | `#8CFF73` |
+| Accent Dark | `#38D85E` |
+| Secondary | `#25D0BE` (electric teal) |
+| Neutral White | `#F4EFC9` (cream text) |
+| Neutral Black | `#030303` |
 
 - **Bold borders** with `border-ink` (black in light mode, white in dark mode)
 - **Brutalist offset shadows** (`shadow-[2px_2px_0px_0px]`)
