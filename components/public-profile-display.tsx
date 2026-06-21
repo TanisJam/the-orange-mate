@@ -88,7 +88,7 @@ export function PublicProfileDisplay({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <BackButton fallbackHref="/discover" />
+      <BackButton fallbackHref={isDemo ? "/demo/discover" : "/discover"} />
 
       {/* Header — Avatar + Name + Username */}
       <Card>

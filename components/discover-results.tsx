@@ -79,7 +79,7 @@ function PaginationControls({
       } else {
         params.set("page", String(targetPage));
       }
-      return `/discover?${params.toString()}`;
+      return `${basePath}?${params.toString()}`;
     },
     [searchParams]
   );
@@ -129,6 +129,8 @@ export function DiscoverResults({
   currentUserId,
   pagination,
 }: DiscoverResultsProps) {
+  const { isDemo } = useDemo();
+  const basePath = isDemo ? "/demo/discover" : "/discover";
   if (plans.length === 0) {
     return (
       <div className="text-center py-16">
