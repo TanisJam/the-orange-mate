@@ -2,8 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
+import { useDemo } from "@/components/demo-provider";
 import { BackButton } from "@/components/back-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +20,9 @@ import {
   updateTravelPlan,
   getPlanJoinRequests,
   completeTrip,
+  deleteTravelPlan,
 } from "@/lib/database-client";
+import { getPlanJoinRequests as getPlanJoinRequestsDemo } from "@/lib/demo-database";
 import { createOrGetChat } from "@/lib/chat-client";
 import type { TravelPlan, PlanJoinRequest, UserReview } from "@/lib/types";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -44,6 +47,7 @@ import {
   StickyNote,
   CheckCircle,
   Loader2,
+  Trash2,
 } from "lucide-react";
 
 interface PlanDetailProps {
@@ -62,11 +66,17 @@ export function PlanDetail({
   averageRating = { average: 0, count: 0 },
 }: PlanDetailProps) {
   const router = useRouter();
+  const { isDemo, deletePlan: demoDeletePlan } = useDemo();
   const [currentPlan, setCurrentPlan] = useState<TravelPlan>(plan);
   const [joinRequests, setJoinRequests] =
     useState<PlanJoinRequest[]>(initialRequests);
   const [publishing, setPublishing] = useState(false);
   const [completing, setCompleting] = useState(false);
+
+  /** Prefix internal links with `/demo` when in demo mode. */
+  const href = useMemo(() => {
+    return (path: string) => (isDemo ? `/demo${path}` : path);
+  }, [isDemo]);
 
   const isCreator = currentUserId === currentPlan.creator_id;
   const isParticipant =
@@ -82,6 +92,10 @@ export function PlanDetail({
   const canViewFullContent = isParticipant || isCreator || currentPlan.is_public;
 
   const handleMessageCreator = async () => {
+    if (isDemo) {
+      toast.success("Demo mode: messaging simulated!");
+      return;
+    }
     try {
       const chatId = await createOrGetChat(
         currentUserId,
@@ -98,6 +112,11 @@ export function PlanDetail({
   };
 
   const refreshRequests = async () => {
+    if (isDemo) {
+      const data = await getPlanJoinRequestsDemo(currentPlan.id);
+      setJoinRequests(data);
+      return;
+    }
     try {
       const data = await getPlanJoinRequests(currentPlan.id);
       setJoinRequests(data);
@@ -107,6 +126,11 @@ export function PlanDetail({
   };
 
   const handlePublish = async () => {
+    if (isDemo) {
+      setCurrentPlan((p) => ({ ...p, is_public: true }));
+      toast.success("Demo mode: plan published!");
+      return;
+    }
     setPublishing(true);
     try {
       const updated = await updateTravelPlan(currentPlan.id, {
@@ -123,6 +147,11 @@ export function PlanDetail({
   };
 
   const handleComplete = async () => {
+    if (isDemo) {
+      setCurrentPlan((p) => ({ ...p, status: "completado" as const }));
+      toast.success("Demo mode: trip marked as completed!");
+      return;
+    }
     setCompleting(true);
     try {
       const updated = await completeTrip(currentPlan.id, currentUserId);
@@ -137,6 +166,33 @@ export function PlanDetail({
       toast.error("Error al completar el viaje");
     } finally {
       setCompleting(false);
+    }
+  };
+
+  const handleDeletePlan = async () => {
+    if (!isCreator) return;
+    const confirmed = window.confirm(
+      "¿Eliminar este plan? Esta acción no se puede deshacer.",
+    );
+    if (!confirmed) return;
+
+    if (isDemo) {
+      demoDeletePlan(currentPlan.id);
+      toast.success("Demo mode: plan deleted");
+      router.replace(isDemo ? "/demo/dashboard" : "/dashboard");
+      return;
+    }
+
+    try {
+      const ok = await deleteTravelPlan(currentPlan.id);
+      if (ok) {
+        toast.success("Plan eliminado");
+        router.replace("/dashboard");
+      } else {
+        toast.error("No se pudo eliminar el plan");
+      }
+    } catch {
+      toast.error("Error al eliminar el plan");
     }
   };
 
@@ -168,7 +224,7 @@ export function PlanDetail({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <BackButton fallbackHref="/discover" />
+      <BackButton fallbackHref={isDemo ? "/demo/discover" : "/discover"} />
 
       {/* Header */}
       <Card>
@@ -196,7 +252,7 @@ export function PlanDetail({
               <p className="text-sm text-muted-foreground">
                 Creado por{" "}
                 <Link
-                  href={`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`}
+                  href={href(`/profile/${currentPlan.creator?.username || currentPlan.creator_id}`)}
                   className="hover:underline"
                 >
                   {currentPlan.creator?.full_name ||
@@ -236,6 +292,17 @@ export function PlanDetail({
                     : "Marcar viaje como completado"}
                 </Button>
               )}
+            {isCreator && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleDeletePlan}
+                className="border-error text-error hover:bg-error/10"
+              >
+                <Trash2 className="w-4 h-4" />
+                Eliminar plan
+              </Button>
+            )}
             {currentPlan.status === "completado" && (
               <Badge className="bg-success text-white dark:text-neutral-black">
                 <CheckCircle className="w-3 h-3 mr-1" />
@@ -417,7 +484,7 @@ export function PlanDetail({
                           "U")[0]}
                       </div>
                       <div>
-                        <p className="font-semibold text-sm">
+                        <div className="font-semibold text-sm">
                           {participant.user?.full_name ||
                             participant.user?.username ||
                             "Usuario"}
@@ -429,7 +496,7 @@ export function PlanDetail({
                               Creador
                             </Badge>
                           )}
-                        </p>
+                        </div>
                         <p className="text-xs text-muted-foreground">
                           {getPermissionLabel(participant.permission_level)} ·{" "}
                           {formatDate(participant.joined_at)}

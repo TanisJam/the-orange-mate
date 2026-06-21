@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { useDemo } from "@/components/demo-provider";
 import type { EnrichedFriend } from "@/lib/types";
 
 interface FriendCardProps {
@@ -37,11 +38,15 @@ export default function FriendCard({
   onAccept,
   onReject,
 }: FriendCardProps) {
+  const { isDemo } = useDemo();
   const friendProfile = friendship.friend;
   const displayName =
     friendProfile?.full_name || friendProfile?.username || "Usuario";
   const avatarUrl = friendProfile?.avatar_url;
   const profileId = friendProfile?.id;
+  const profilePath = isDemo
+    ? `/demo/profile/${friendProfile?.username || profileId}`
+    : `/profile/${friendProfile?.username || profileId}`;
 
   const statusLabel = () => {
     switch (variant) {
@@ -73,7 +78,7 @@ export default function FriendCard({
       <div className="flex-1 min-w-0">
         {profileId ? (
           <Link
-            href={`/profile/${friendProfile?.username || profileId}`}
+            href={profilePath}
             className="font-heading text-sm text-neutral-black dark:text-neutral-white hover:underline truncate block"
           >
             {displayName}

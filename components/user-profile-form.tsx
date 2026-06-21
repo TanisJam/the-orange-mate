@@ -42,6 +42,10 @@ import {
   addUserInterest,
   removeUserInterest,
 } from "@/lib/database-client";
+import { getUserProfile as getDemoUserProfile, getUserInterests as getDemoUserInterests } from "@/lib/demo-database";
+import { demoInterests } from "@/lib/demo-data";
+import { useDemo } from "@/components/demo-provider";
+import { toast } from "sonner";
 import type { UserProfile, Interest, UserInterest } from "@/lib/types";
 import { COUNTRIES } from "@/lib/types";
 
@@ -63,6 +67,7 @@ interface UserProfileFormProps {
 }
 
 export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormProps) {
+  const { isDemo } = useDemo();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [interests, setInterests] = useState<Interest[]>([]);
   const [userInterests, setUserInterests] = useState<UserInterest[]>([]);
@@ -89,6 +94,33 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
     const loadProfileData = async () => {
       setLoading(true);
       try {
+        if (isDemo) {
+          const [profileData] = await Promise.all([
+            getDemoUserProfile(userId),
+          ]);
+          const profileInterests = await getDemoUserInterests(userId);
+          const allInterests = demoInterests;
+
+          setProfile(profileData);
+          setInterests(allInterests);
+          setUserInterests(profileInterests);
+
+          if (profileData) {
+            form.reset({
+              username: profileData.username || "",
+              full_name: profileData.full_name || "",
+              bio: profileData.bio || "",
+              age: profileData.age?.toString() || "",
+              country: profileData.country || "",
+              city: profileData.city || "",
+              phone: profileData.phone || "",
+            });
+            setAvatarUrl(profileData.avatar_url);
+          }
+          setLoading(false);
+          return;
+        }
+
         const [profileData, allInterests, profileInterests] = await Promise.all([
           getUserProfile(userId),
           getAllInterests(),
@@ -123,6 +155,17 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
 
   const onSubmit = async (values: ProfileValues) => {
     setError(null);
+
+    if (isDemo) {
+      if (!profile) {
+        toast.error("Demo mode: profile not loaded");
+        return;
+      }
+      toast.success("Demo mode: profile saved");
+      onProfileUpdated?.(profile);
+      return;
+    }
+
     try {
       const profileData = {
         username: values.username || undefined,
@@ -152,6 +195,14 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
   };
 
   const handleAddInterest = async (interestId: string) => {
+    if (isDemo) {
+      const interest = demoInterests.find((i) => i.id === interestId);
+      if (interest) {
+        const newId = `ui-${Date.now()}`;
+        setUserInterests([...userInterests, { id: newId, user_id: userId, interest_id: interestId, is_custom: false, created_at: new Date().toISOString(), interest }]);
+      }
+      return;
+    }
     try {
       const result = await addUserInterest(userId, interestId);
       if (result) {
@@ -164,6 +215,15 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
 
   const handleAddCustomInterest = async () => {
     if (!newCustomInterest.trim()) return;
+
+    if (isDemo) {
+      const newId = `ui-${Date.now()}`;
+      const customInterest: Interest = { id: `int-custom-${Date.now()}`, name: newCustomInterest.trim(), is_predefined: false, created_at: new Date().toISOString() };
+      setInterests([...interests, customInterest]);
+      setUserInterests([...userInterests, { id: newId, user_id: userId, interest_id: customInterest.id, is_custom: true, custom_name: newCustomInterest.trim(), created_at: new Date().toISOString(), interest: customInterest }]);
+      setNewCustomInterest("");
+      return;
+    }
 
     try {
       const supabase = createClient();
@@ -189,6 +249,10 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
   };
 
   const handleRemoveInterest = async (userInterestId: string) => {
+    if (isDemo) {
+      setUserInterests(userInterests.filter(ui => ui.id !== userInterestId));
+      return;
+    }
     try {
       const success = await removeUserInterest(userInterestId);
       if (success) {

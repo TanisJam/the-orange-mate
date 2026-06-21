@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import Link from "next/link";
+import { useDemo } from "@/components/demo-provider";
 import type { UserProfile, UserInterest, FriendStatus, UserReview } from "@/lib/types";
 import { createOrGetChat } from "@/lib/chat-client";
 import FriendRequestButton from "@/components/friend-request-button";
@@ -54,6 +55,7 @@ export function PublicProfileDisplay({
   averageRating = { average: 0, count: 0 },
 }: PublicProfileDisplayProps) {
   const router = useRouter();
+  const { isDemo } = useDemo();
 
   const interestLabel = (ui: UserInterest): string => {
     if (ui.is_custom && ui.custom_name) return ui.custom_name;
@@ -67,6 +69,11 @@ export function PublicProfileDisplay({
 
   const handleSendMessage = async () => {
     if (!currentUserId) return;
+    if (isDemo) {
+      toast.success("Demo mode: opening messages");
+      router.push("/demo/messages");
+      return;
+    }
     try {
       const chatId = await createOrGetChat(currentUserId, profile.id);
       if (chatId) {
@@ -81,7 +88,7 @@ export function PublicProfileDisplay({
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <BackButton fallbackHref="/discover" />
+      <BackButton fallbackHref={isDemo ? "/demo/discover" : "/discover"} />
 
       {/* Header — Avatar + Name + Username */}
       <Card>

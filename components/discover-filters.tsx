@@ -14,11 +14,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PLAN_TYPES } from "@/lib/types";
+import { useDemo } from "@/components/demo-provider";
 import { Search, X } from "lucide-react";
 
 export function DiscoverFilters() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isDemo } = useDemo();
+  const basePath = isDemo ? "/demo/discover" : "/discover";
 
   // Read current values from URL
   const currentValues = useMemo(() => {
@@ -83,14 +86,14 @@ export function DiscoverFilters() {
       if (formData.get("share_transport") === "on") params.set("share_transport", "true");
       if (formData.get("share_tours") === "on") params.set("share_tours", "true");
 
-      router.push(`/discover?${params.toString()}`);
+      router.push(`${basePath}?${params.toString()}`);
     },
-    [router]
+    [router, basePath]
   );
 
   const handleClear = useCallback(() => {
-    router.push("/discover");
-  }, [router]);
+    router.push(basePath);
+  }, [router, basePath]);
 
   return (
     <form

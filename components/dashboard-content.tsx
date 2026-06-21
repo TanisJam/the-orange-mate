@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useDemo } from "@/components/demo-provider";
 import { UserProfileForm } from "@/components/user-profile-form";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,40 +40,97 @@ import { PLAN_TYPES, PLAN_STATUSES } from "@/lib/types";
 
 interface DashboardContentProps {
   userId: string;
+  /** Demo mode: pre-loaded profile to skip Supabase fetch. */
+  initialUserProfile?: UserProfile | null;
+  /** Demo mode: pre-loaded user plans to skip Supabase fetch. */
+  initialUserPlans?: TravelPlan[];
+  /** Demo mode: pre-loaded participating plans to skip Supabase fetch. */
+  initialParticipatingPlans?: TravelPlan[];
+  /** Demo mode: pre-loaded discover/suggested plans to skip Supabase fetch. */
+  initialDiscoverPlans?: TravelPlan[];
 }
 
-export function DashboardContent({ userId }: DashboardContentProps) {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [myPlans, setMyPlans] = useState<TravelPlan[]>([]);
-  const [participatingPlans, setParticipatingPlans] = useState<TravelPlan[]>([]);
-  const [suggestedPlans, setSuggestedPlans] = useState<TravelPlan[]>([]);
-  const [loading, setLoading] = useState(true);
+export function DashboardContent({
+  userId,
+  initialUserProfile,
+  initialUserPlans,
+  initialParticipatingPlans,
+  initialDiscoverPlans,
+}: DashboardContentProps) {
+  const { isDemo } = useDemo();
+  const hasDemoData =
+    initialUserProfile !== undefined &&
+    initialUserPlans !== undefined &&
+    initialParticipatingPlans !== undefined &&
+    initialDiscoverPlans !== undefined;
+
+  const [profile, setProfile] = useState<UserProfile | null>(
+    initialUserProfile ?? null,
+  );
+  const [myPlans, setMyPlans] = useState<TravelPlan[]>(
+    initialUserPlans ?? [],
+  );
+  const [participatingPlans, setParticipatingPlans] = useState<TravelPlan[]>(
+    initialParticipatingPlans ?? [],
+  );
+  const [suggestedPlans, setSuggestedPlans] = useState<TravelPlan[]>(
+    initialDiscoverPlans ?? [],
+  );
+  const [loading, setLoading] = useState(!hasDemoData);
   const [activeTab, setActiveTab] = useState("overview");
 
+  /** Prefix internal links with `/demo` when in demo mode. */
+  const href = useMemo(() => {
+    return (path: string) => (isDemo ? `/demo${path}` : path);
+  }, [isDemo]);
+
   useEffect(() => {
-    loadDashboardData();
-  }, [userId]);
-
-  const loadDashboardData = async () => {
-    setLoading(true);
-    try {
-      const [profileData, userPlans, participatingData, suggestedData] = await Promise.all([
-        getUserProfile(userId),
-        getUserTravelPlans(userId),
-        getParticipatingPlans(userId),
-        searchTravelPlans({}, { page: 1, limit: 6 }),
-      ]);
-
-      setProfile(profileData);
-      setMyPlans(userPlans);
-      setParticipatingPlans(participatingData);
-      setSuggestedPlans(suggestedData.data);
-    } catch (error) {
-      console.error("Error loading dashboard data:", error);
-    } finally {
+    if (hasDemoData) {
+      setProfile(initialUserProfile ?? null);
+      setMyPlans(initialUserPlans ?? []);
+      setParticipatingPlans(initialParticipatingPlans ?? []);
+      setSuggestedPlans(initialDiscoverPlans ?? []);
       setLoading(false);
+      return;
     }
-  };
+
+    if (isDemo) {
+      setLoading(false);
+      return;
+    }
+
+    async function loadDashboardData() {
+      setLoading(true);
+      try {
+        const [profileData, userPlans, participatingData, suggestedData] =
+          await Promise.all([
+            getUserProfile(userId),
+            getUserTravelPlans(userId),
+            getParticipatingPlans(userId),
+            searchTravelPlans({}, { page: 1, limit: 6 }),
+          ]);
+
+        setProfile(profileData);
+        setMyPlans(userPlans);
+        setParticipatingPlans(participatingData);
+        setSuggestedPlans(suggestedData.data);
+      } catch (error) {
+        console.error("Error loading dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, [
+    userId,
+    hasDemoData,
+    isDemo,
+    initialUserProfile,
+    initialUserPlans,
+    initialParticipatingPlans,
+    initialDiscoverPlans,
+  ]);
 
   const handleProfileUpdate = (updatedProfile: UserProfile) => {
     setProfile(updatedProfile);
@@ -200,7 +258,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     <PlusCircle className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
                     <p className="text-muted-foreground mb-4">No tienes planes de viaje aún</p>
                   <Button asChild variant="primary">
-                    <Link href="/plans/new">
+                    <Link href={href("/plans/new")}>
                       Crear Tu Primer Plan
                     </Link>
                   </Button>
@@ -213,7 +271,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     return (
                       <Link
                         key={plan.id}
-                        href={`/plans/${plan.id}`}
+                        href={href(`/plans/${plan.id}`)}
                         className="block p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
                       >
                         <div className="flex items-start justify-between">
@@ -266,7 +324,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     return (
                       <Link
                         key={plan.id}
-                        href={`/plans/${plan.id}`}
+                        href={href(`/plans/${plan.id}`)}
                         className="block p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
                       >
                         <div className="flex items-start justify-between">
@@ -315,7 +373,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
               <p className="text-muted-foreground">Gestiona tus planes y ve en cuáles participas</p>
             </div>
             <Button asChild variant="primary">
-              <Link href="/plans/new">
+              <Link href={href("/plans/new")}>
                 <PlusCircle className="w-4 h-4 mr-2" />
                 Crear Nuevo Plan
               </Link>
@@ -334,7 +392,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                   <h3 className="text-lg font-semibold mb-2">No tienes planes creados</h3>
                   <p className="text-muted-foreground mb-6">Crea tu primer plan de viaje y conecta con otros viajeros</p>
                   <Button asChild variant="primary">
-                    <Link href="/plans/new">
+                    <Link href={href("/plans/new")}>
                       <PlusCircle className="w-4 h-4 mr-2" />
                       Crear Mi Primer Plan
                     </Link>
@@ -388,7 +446,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         
                         <div className="flex gap-2 mt-4">
                           <Button asChild size="sm" variant="outline" className="flex-1">
-                            <Link href={`/plans/${plan.id}`}>
+                            <Link href={href(`/plans/${plan.id}`)}>
                               Ver Detalles
                             </Link>
                           </Button>
@@ -428,7 +486,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         <p className="text-sm text-muted-foreground mb-2">
                           Creado por{' '}
                           <Link
-                            href={`/profile/${plan.creator?.username || plan.creator_id}`}
+                            href={href(`/profile/${plan.creator?.username || plan.creator_id}`)}
                             className="hover:underline"
                           >
                             {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
@@ -454,7 +512,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                         
                         <div className="flex gap-2 mt-4">
                           <Button asChild size="sm" variant="secondary" className="flex-1">
-                            <Link href={`/plans/${plan.id}`}>
+                            <Link href={href(`/plans/${plan.id}`)}>
                               Ver Detalles
                             </Link>
                           </Button>
@@ -491,7 +549,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                 destino, fechas, presupuesto y más.
               </p>
               <Button asChild variant="primary" size="lg">
-                <Link href="/discover">
+                <Link href={href("/discover")}>
                   <Search className="w-4 h-4" />
                   Explorar Planes
                 </Link>

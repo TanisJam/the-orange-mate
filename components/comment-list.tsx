@@ -5,6 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageSquare, Loader2, Plane } from "lucide-react";
 import { getPlanComments, createPlanComment } from "@/lib/database-client";
+import { getPlanComments as getPlanCommentsDemo } from "@/lib/demo-database";
+import { useDemo } from "@/components/demo-provider";
+import { toast } from "sonner";
 import CommentItem from "@/components/comment-item";
 import type { PlanComment } from "@/lib/types";
 
@@ -35,19 +38,32 @@ interface CommentListProps {
   planId: string;
   currentUserId: string;
   canComment: boolean;
+  initialComments?: PlanComment[];
 }
 
 export default function CommentList({
   planId,
   currentUserId,
   canComment,
+  initialComments,
 }: CommentListProps) {
-  const [comments, setComments] = useState<PlanComment[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { isDemo, demoUser } = useDemo();
+  const [comments, setComments] = useState<PlanComment[]>(initialComments || []);
+  const [loading, setLoading] = useState(!initialComments);
   const [newContent, setNewContent] = useState("");
   const [posting, setPosting] = useState(false);
 
   const loadComments = useCallback(async () => {
+    if (isDemo) {
+      if (initialComments) {
+        setComments(initialComments);
+      } else {
+        const data = await getPlanCommentsDemo(planId);
+        setComments(data);
+      }
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const data = await getPlanComments(planId);
@@ -57,7 +73,7 @@ export default function CommentList({
     } finally {
       setLoading(false);
     }
-  }, [planId]);
+  }, [planId, isDemo, initialComments]);
 
   useEffect(() => {
     loadComments();
@@ -68,6 +84,25 @@ export default function CommentList({
     if (!trimmed) return;
 
     setPosting(true);
+
+    if (isDemo) {
+      const newComment: PlanComment = {
+        id: `comment-${Date.now()}`,
+        plan_id: planId,
+        author_id: currentUserId,
+        content: trimmed,
+        parent_comment_id: undefined,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        author: demoUser,
+      };
+      setComments((prev) => [newComment, ...prev]);
+      setNewContent("");
+      setPosting(false);
+      toast.success("Demo mode: comment posted");
+      return;
+    }
+
     try {
       const created = await createPlanComment(currentUserId, {
         plan_id: planId,

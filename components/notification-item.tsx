@@ -4,6 +4,7 @@ import type { Notification } from "@/lib/types";
 import { markAsRead } from "@/lib/notification-client";
 import { formatRelativeDate } from "@/lib/format-date";
 import { useRouter } from "next/navigation";
+import { useDemo } from "@/components/demo-provider";
 
 function getInitials(name?: string): string {
   if (!name) return "?";
@@ -24,13 +25,14 @@ export default function NotificationItem({
   onRead,
 }: NotificationItemProps) {
   const router = useRouter();
+  const { isDemo } = useDemo();
   const actorName =
     notification.actor?.full_name ||
     notification.actor?.username ||
     "Usuario";
 
   async function handleClick() {
-    if (!notification.is_read) {
+    if (!notification.is_read && !isDemo) {
       const ok = await markAsRead(notification.id, notification.user_id);
       if (ok) onRead?.();
     }
@@ -38,7 +40,7 @@ export default function NotificationItem({
       notification.link?.startsWith("/") &&
       !notification.link.startsWith("//")
     ) {
-      router.push(notification.link);
+      router.push(isDemo ? `/demo${notification.link}` : notification.link);
     }
   }
 

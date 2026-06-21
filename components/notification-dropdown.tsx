@@ -7,6 +7,7 @@ import {
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import NotificationItem from "@/components/notification-item";
+import { useDemo } from "@/components/demo-provider";
 import type { Notification } from "@/lib/types";
 
 interface NotificationDropdownProps {
@@ -20,6 +21,8 @@ export default function NotificationDropdown({
   onMarkAllRead,
   onRead,
 }: NotificationDropdownProps) {
+  const { isDemo } = useDemo();
+  const notifPath = isDemo ? "/demo/notifications" : "/notifications";
   if (notifications.length === 0) {
     return (
       <>
@@ -28,7 +31,7 @@ export default function NotificationDropdown({
         </div>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link href="/notifications" className="cursor-pointer">
+          <Link href={notifPath} className="cursor-pointer">
             Ver todas
           </Link>
         </DropdownMenuItem>
@@ -52,7 +55,7 @@ export default function NotificationDropdown({
 
       <DropdownMenuSeparator />
       <DropdownMenuItem asChild>
-        <Link href="/notifications" className="cursor-pointer">
+        <Link href={notifPath} className="cursor-pointer">
           Ver todas
         </Link>
       </DropdownMenuItem>

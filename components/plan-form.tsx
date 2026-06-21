@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { toast } from "sonner";
+import { useDemo } from "@/components/demo-provider";
 import { Button } from "@/components/ui/button";
 import { useBackNavigation } from "@/components/back-button";
 import { Input } from "@/components/ui/input";
@@ -104,36 +106,76 @@ type PlanValues = z.infer<typeof planSchema>;
 
 interface PlanFormProps {
   userId: string;
+  initialValues?: Partial<PlanValues>;
 }
 
-export function PlanForm({ userId }: PlanFormProps) {
+export function PlanForm({ userId, initialValues }: PlanFormProps) {
   const router = useRouter();
-  const goBack = useBackNavigation("/dashboard");
+  const { isDemo, createPlan } = useDemo();
+  const goBack = useBackNavigation(isDemo ? "/demo/dashboard" : "/dashboard");
   const [submitError, setSubmitError] = useState<string | null>(null);
 
   const form = useForm<PlanValues>({
     resolver: zodResolver(planSchema),
     mode: "onTouched",
     defaultValues: {
-      title: "",
-      plan_type: "viaje_completo" as PlanType,
-      destinations: "",
-      start_date: "",
-      end_date: "",
-      flexible_dates: false,
-      description: "",
-      max_participants: "1",
-      share_accommodation: false,
-      share_transport: false,
-      share_tours: false,
-      budget_range_min: "",
-      budget_range_max: "",
-      currency: "USD",
+      title: initialValues?.title ?? "",
+      plan_type: (initialValues?.plan_type as PlanType) ?? ("viaje_completo" as PlanType),
+      destinations: initialValues?.destinations ?? "",
+      start_date: initialValues?.start_date ?? "",
+      end_date: initialValues?.end_date ?? "",
+      flexible_dates: initialValues?.flexible_dates ?? false,
+      description: initialValues?.description ?? "",
+      max_participants: initialValues?.max_participants ?? "1",
+      share_accommodation: initialValues?.share_accommodation ?? false,
+      share_transport: initialValues?.share_transport ?? false,
+      share_tours: initialValues?.share_tours ?? false,
+      budget_range_min: initialValues?.budget_range_min ?? "",
+      budget_range_max: initialValues?.budget_range_max ?? "",
+      currency: initialValues?.currency ?? "USD",
     },
   });
 
   const onSubmit = async (values: PlanValues) => {
     setSubmitError(null);
+
+    // ── Demo mode: simulate plan creation via in-memory store ────────
+    if (isDemo) {
+      try {
+        const plan = createPlan({
+          title: values.title.trim(),
+          plan_type: values.plan_type,
+          destinations: values.destinations
+            .split(",")
+            .map((d) => d.trim())
+            .filter(Boolean),
+          start_date: values.start_date || undefined,
+          end_date: values.end_date || undefined,
+          flexible_dates: values.flexible_dates,
+          description: values.description?.trim() || undefined,
+          max_participants: Number(values.max_participants),
+          share_accommodation: values.share_accommodation,
+          share_transport: values.share_transport,
+          share_tours: values.share_tours,
+          budget_range_min: values.budget_range_min
+            ? Number(values.budget_range_min)
+            : undefined,
+          budget_range_max: values.budget_range_max
+            ? Number(values.budget_range_max)
+            : undefined,
+          currency: values.currency.trim() || "USD",
+          is_public: false,
+          comments_enabled: true,
+        });
+        toast.success("Demo mode: plan created!");
+        router.replace(`/demo/plans/${plan.id}`);
+      } catch {
+        setSubmitError("Error al simular la creación del plan.");
+      }
+      return;
+    }
+
+    // ── Real mode: call Supabase ─────────────────────────────────────
     try {
       const plan = await createTravelPlan(userId, {
         title: values.title.trim(),
@@ -162,7 +204,7 @@ export function PlanForm({ userId }: PlanFormProps) {
       });
 
       if (plan) {
-        router.push(`/plans/${plan.id}`);
+        router.replace(`/plans/${plan.id}`);
       } else {
         setSubmitError("Error al crear el plan. Inténtalo de nuevo.");
       }

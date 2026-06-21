@@ -5,6 +5,7 @@ import Link from "next/link";
 import { StarSelector } from "@/components/star-selector";
 import { ReviewForm } from "@/components/review-form";
 import { Button } from "@/components/ui/button";
+import { useDemo } from "@/components/demo-provider";
 import type { UserReview } from "@/lib/types";
 import { Pencil } from "lucide-react";
 
@@ -19,8 +20,19 @@ export function ReviewCard({
   currentUserId,
   onEdited,
 }: ReviewCardProps) {
+  const { isDemo } = useDemo();
   const [editing, setEditing] = useState(false);
   const isOwnReview = review.reviewer_id === currentUserId;
+
+  const reviewerName =
+    review.reviewer?.full_name ||
+    review.reviewer?.username ||
+    "Usuario";
+  const reviewerUsername =
+    review.reviewer?.username || review.reviewer_id;
+  const profilePath = isDemo
+    ? `/demo/profile/${reviewerUsername}`
+    : `/profile/${reviewerUsername}`;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
@@ -29,13 +41,6 @@ export function ReviewCard({
       day: "numeric",
     });
   };
-
-  const reviewerName =
-    review.reviewer?.full_name ||
-    review.reviewer?.username ||
-    "Usuario";
-  const reviewerUsername =
-    review.reviewer?.username || review.reviewer_id;
 
   if (editing) {
     return (
@@ -78,7 +83,7 @@ export function ReviewCard({
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <Link
-              href={`/profile/${reviewerUsername}`}
+              href={profilePath}
               className="font-semibold text-sm text-neutral-black dark:text-neutral-white hover:underline truncate"
             >
               {reviewerName}

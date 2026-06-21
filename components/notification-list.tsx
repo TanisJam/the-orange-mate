@@ -3,12 +3,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { getNotifications, markAsRead } from "@/lib/notification-client";
+import { getNotifications as getDemoNotifications } from "@/lib/demo-database";
+import { demoStore } from "@/lib/demo-store";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import NotificationItem from "@/components/notification-item";
 import type { Notification } from "@/lib/types";
 
-export default function NotificationList() {
+interface NotificationListProps {
+  /** When provided, the component operates in demo mode:
+   *  - Skips Supabase auth check
+   *  - Uses demo-database for data fetching
+   *  - Uses demoStore for mark-as-read operations */
+  demoUserId?: string;
+}
+
+export default function NotificationList({ demoUserId }: NotificationListProps) {
+  const isDemo = !!demoUserId;
   const [userId, setUserId] = useState<string | null>(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -21,19 +32,32 @@ export default function NotificationList() {
 
   const fetchPage = useCallback(
     async (pageNum: number) => {
-      if (!userId) return;
+      const uid = isDemo ? demoUserId! : userId;
+      if (!uid) return;
       setLoading(true);
-      const { data, count } = await getNotifications(userId, pageNum, limit);
-      setNotifications(data);
-      setTotalCount(count);
+
+      if (isDemo) {
+        const { data, count } = await getDemoNotifications(uid, pageNum, limit);
+        setNotifications(data);
+        setTotalCount(count);
+      } else {
+        const { data, count } = await getNotifications(uid, pageNum, limit);
+        setNotifications(data);
+        setTotalCount(count);
+      }
       setLoading(false);
     },
-    [userId, limit]
+    [userId, demoUserId, isDemo, limit]
   );
 
-  // Get userId on mount
+  // Get userId on mount (or use demoUserId directly)
   useEffect(() => {
     async function init() {
+      if (isDemo) {
+        setUserId(demoUserId);
+        setAuthChecked(true);
+        return;
+      }
       const supabase = createClient();
       const {
         data: { user },
@@ -44,27 +68,33 @@ export default function NotificationList() {
       setAuthChecked(true);
     }
     init();
-  }, []);
+  }, [isDemo, demoUserId]);
 
   // Fetch when userId or page changes
   useEffect(() => {
-    if (userId) {
+    const uid = isDemo ? demoUserId : userId;
+    if (uid) {
       fetchPage(page);
     }
-  }, [userId, page, fetchPage]);
+  }, [userId, demoUserId, isDemo, page, fetchPage]);
 
   async function handleToggleRead(notif: Notification) {
     // markAsRead is one-way (only sets is_read=true). Don't toggle
     // visually in the opposite direction — that causes UI/DB mismatch.
     if (notif.is_read) return;
-    const ok = await markAsRead(notif.id, notif.user_id);
-    if (ok) {
-      setNotifications((prev) =>
-        prev.map((n) =>
-          n.id === notif.id ? { ...n, is_read: true } : n
-        )
-      );
+
+    if (isDemo) {
+      demoStore.markNotificationRead(notif.id);
+    } else {
+      const ok = await markAsRead(notif.id, notif.user_id);
+      if (!ok) return;
     }
+
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.id === notif.id ? { ...n, is_read: true } : n
+      )
+    );
   }
 
   if (!authChecked) {
