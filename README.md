@@ -1,238 +1,219 @@
 # The Orange Mate
 
-The Orange Mate (TOM) is a modern web application starter kit designed to connect solo travelers, helping them share experiences, split costs on accommodation and transport, and find like-minded companions for their adventures. Built with the powerful combination of Next.js 15, Tailwind CSS 4, and Supabase, TOM provides a solid foundation to make solo travel more accessible, affordable, and enjoyable.
+**Conecta, Viaja, Comparte.** The Orange Mate (TOM) es una plataforma social para viajeros solitarios. Descubrí compañeros de viaje, compartí gastos de alojamiento y transporte, y viví experiencias increíbles junto a personas que comparten tu pasión por explorar el mundo.
+
+Construida con Next.js 15, Tailwind CSS 4 y Supabase, con un design system brutalista en paleta naranja + teal.
 
 ## ✨ Features
 
-- **Robust Authentication**: Secure user login and registration powered by Supabase with email/password authentication
-- **Modern UI Components**: Beautiful and accessible components built with Radix UI and styled with Tailwind CSS
-- **Design System**: Comprehensive design system with custom color palette optimized for travel applications
-- **Dark Mode Toggle**: User-friendly option to switch between light and dark themes using next-themes
-- **Responsive Design**: Optimized for seamless experience across various devices using Tailwind CSS 4
-- **Protected Routes**: Secure dashboard areas accessible only to authenticated users
-- **TypeScript Support**: Full TypeScript support for better development experience and type safety
-- **Modern Next.js**: Built with Next.js 15 App Router for optimal performance and developer experience
+- **Autenticación completa** — registro, login, confirmación de email, recuperación y cambio de contraseña con Supabase Auth
+- **Dashboard personalizado** — resumen, perfil, planes propios y descubrimiento en tabs con stats en tiempo real
+- **Planes de viaje** — creá, editá y compartí planes con tipo (alojamiento, actividad, viaje completo, transporte, salida local), fechas, presupuesto y participación abierta
+- **Sistema de amigos** — enviá y recibí solicitudes de amistad, gestioná tu red de viajeros
+- **Chat en tiempo real** — mensajería 1-a-1 integrada para coordinar con tus compañeros de viaje
+- **Notificaciones** — campana con badge de no leídos, dropdown de notificaciones en tiempo real
+- **Descubrimiento con filtros** — buscá planes públicos por tipo, destino, fechas, presupuesto y más
+- **Perfiles públicos** — cada usuario tiene un perfil público con bio, intereses y reviews
+- **Sistema de reviews** — calificá y comentá sobre tus experiencias con otros viajeros
+- **Design system brutalista** — paleta naranja + teal, bordes marcados, sombras offset, temas claro y oscuro
+- **Tipografía dual** — Bebas Neue para headings, Oxanium para cuerpo
+- **Responsive** — optimizado para mobile, tablet y desktop con Tailwind CSS 4
+- **TypeScript** — type safety de punta a punta
+- **Tests E2E** — smoke tests con Playwright
 
 ## 🚀 Getting Started
 
-Follow these steps to set up and run The Orange Mate locally on your machine.
+### Prerrequisitos
 
-### Prerequisites
+- **Node.js** 18+
+- **pnpm** (recomendado)
+- Una cuenta en [Supabase](https://supabase.com)
 
-Ensure you have the following installed:
-
-- **Node.js** (version 18 or higher)
-- **pnpm** (recommended package manager)
-
-### 1. Clone the Repository
+### 1. Clonar el repo
 
 ```bash
-git clone <YOUR_PROJECT_REPOSITORY_URL>
+git clone https://github.com/TanisJam/the-orange-mate.git
 cd the-orange-mate
 ```
 
-### 2. Install Dependencies
+### 2. Instalar dependencias
 
 ```bash
 pnpm install
 ```
 
-### 3. Supabase Setup
+### 3. Configurar Supabase
 
-#### Create a Supabase Project:
+Creá un proyecto en Supabase y ejecutá el schema:
 
-1. Go to [Supabase](https://supabase.com) and sign up or log in
-2. Create a new project
-3. Once your project is created, navigate to **Project Settings > API**
-
-#### Environment Variables:
-
-1. Create a `.env.local` file in the root of your project
-2. Copy the following variables and paste your Supabase project's values:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_PROJECT_URL
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
+```bash
+# Copiá el contenido de database-schema.sql en el SQL Editor de Supabase
 ```
 
-Where:
-- `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL (e.g., `https://abcdefghijk.supabase.co`)
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your project's "public anon key"
+Configurá las variables de entorno:
 
-#### Database Schema & Policies:
+```env
+# .env.local
+NEXT_PUBLIC_SUPABASE_URL=https://tu-proyecto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
+```
 
-For the app to function correctly, you will need to set up your Supabase database schema and Row Level Security (RLS) policies.
-
-**Recommended Tables** (for future development):
-
-- `profiles`: `id` (UUID, primary key, references auth.users), `username`, `avatar_url`, `bio`, `age`, `country`, `interests` (JSONB or array of text)
-- `travel_plans`: `id` (UUID, primary key), `user_id` (UUID, references profiles.id), `title`, `type`, `destination`, `dates`, `status`, `description`, `share_accommodation`, `share_transport`, `share_tours`
-- `plan_notes`: `id`, `plan_id`, `user_id`, `content`, `is_private`
-- `comments`: `id`, `plan_id`, `user_id`, `content`
-- `chats`: `id`, `user1_id`, `user2_id`
-- `messages`: `id`, `chat_id`, `sender_id`, `content`, `created_at`
-
-**RLS**: Ensure you have appropriate RLS policies enabled for each table to secure user data (e.g., users can only view/edit their own profile, but can view public plans).
-
-### 4. Run the Application
+### 4. Ejecutar en desarrollo
 
 ```bash
 pnpm dev
 ```
 
-This will start the application in development mode. Open [http://localhost:3000](http://localhost:3000) in your browser to see The Orange Mate in action.
+Abrí [http://localhost:3000](http://localhost:3000).
 
-## 📁 Project Structure
+## 📁 Estructura del proyecto
 
 ```
 .
-├── app/                    # Next.js App Router (routes, layouts, pages)
-│   ├── auth/              # Authentication pages (login, sign-up, etc.)
-│   │   ├── login/         # Login page
-│   │   ├── sign-up/       # Registration page
-│   │   ├── confirm/       # Email confirmation
-│   │   └── ...           # Other auth-related pages
-│   ├── protected/         # Protected dashboard pages
-│   ├── globals.css        # Global styles and design system variables
-│   ├── layout.tsx         # Root layout with theme provider
-│   └── page.tsx           # Homepage
-├── components/            # Reusable React components
-│   ├── ui/               # Base UI components (Button, Input, etc.)
-│   ├── auth-button.tsx   # Authentication button component
-│   ├── login-form.tsx    # Login form component
-│   ├── sign-up-form.tsx  # Registration form component
-│   └── ...               # Other reusable components
-├── lib/                  # Utility functions and configurations
-│   ├── supabase/         # Supabase client configurations
-│   │   ├── client.ts     # Browser client
-│   │   ├── server.ts     # Server client
-│   │   └── middleware.ts # Middleware client
-│   └── utils.ts          # Utility functions
-├── .env.local            # Local environment variables (DO NOT COMMIT)
-├── components.json       # shadcn/ui configuration
-├── middleware.ts         # Next.js middleware for auth
-├── next.config.ts        # Next.js configuration
-├── package.json          # Dependencies and scripts
-├── postcss.config.mjs    # PostCSS configuration
-├── tailwind.config.js    # Tailwind CSS configuration (auto-generated)
-└── tsconfig.json         # TypeScript configuration
+├── app/                          # Next.js App Router
+│   ├── (app)/                   # Rutas autenticadas (route group)
+│   │   ├── dashboard/           # Dashboard con tabs
+│   │   ├── discover/            # Página de descubrimiento con filtros
+│   │   ├── friends/             # Sistema de amigos
+│   │   ├── messages/            # Chat en tiempo real
+│   │   ├── notifications/       # Centro de notificaciones
+│   │   ├── plans/               # Planes (detalle, creación)
+│   │   │   ├── [id]/            # Detalle de plan
+│   │   │   └── new/             # Crear plan
+│   │   ├── profile/             # Perfil público
+│   │   └── layout.tsx           # Shell autenticado (nav + footer)
+│   ├── auth/                    # Flujo de autenticación
+│   │   ├── login/
+│   │   ├── sign-up/
+│   │   ├── sign-up-success/
+│   │   ├── confirm/
+│   │   ├── forgot-password/
+│   │   ├── update-password/
+│   │   └── error/
+│   ├── demo/                    # Demo del design system
+│   ├── api/                     # API routes
+│   ├── globals.css              # Design system + tokens CSS
+│   ├── layout.tsx               # Root layout (fuentes, theme provider)
+│   └── page.tsx                 # Landing page
+├── components/
+│   ├── ui/                      # Primitivas shadcn/ui (Button, Card, Badge, Tabs, etc.)
+│   ├── auth-button.tsx          # Botón de auth universal
+│   ├── login-form.tsx
+│   ├── sign-up-form.tsx
+│   ├── dashboard-content.tsx    # Dashboard con tabs y stats
+│   ├── plan-form.tsx            # Formulario de creación/edición de plan
+│   ├── plan-detail.tsx          # Vista detallada de plan
+│   ├── discover-filters.tsx     # Filtros de descubrimiento
+│   ├── discover-results.tsx     # Resultados de búsqueda
+│   ├── chat-list.tsx            # Lista de chats
+│   ├── chat-window.tsx          # Ventana de chat
+│   ├── message-bubble.tsx       # Burbuja de mensaje
+│   ├── message-input.tsx        # Input de mensaje
+│   ├── notification-bell.tsx    # Campana con badge
+│   ├── notification-dropdown.tsx # Dropdown de notificaciones
+│   ├── notification-item.tsx    # Item de notificación
+│   ├── friend-card.tsx          # Tarjeta de amigo
+│   ├── friend-request-button.tsx # Botón de solicitud de amistad
+│   ├── friends-page-client.tsx  # Página de amigos (client)
+│   ├── user-profile-form.tsx    # Formulario de perfil
+│   ├── public-profile-display.tsx # Perfil público
+│   ├── review-card.tsx          # Tarjeta de review
+│   ├── review-form.tsx          # Formulario de review
+│   ├── star-selector.tsx        # Selector de estrellas
+│   ├── avatar-upload.tsx        # Upload de avatar
+│   ├── theme-switcher.tsx       # Toggle claro/oscuro
+│   ├── back-button.tsx          # Botón de navegación hacia atrás
+│   ├── page-header.tsx          # Header de página reutilizable
+│   ├── app-nav.tsx              # Navegación principal autenticada
+│   └── app-shell-body.tsx       # Cuerpo del shell autenticado
+├── lib/
+│   ├── database.ts              # Queries server-side a Supabase
+│   ├── database-client.ts       # Queries client-side
+│   ├── chat-client.ts           # Cliente de chat
+│   ├── notification-client.ts   # Cliente de notificaciones
+│   ├── format-date.ts           # Formateo de fechas
+│   ├── types.ts                 # Tipos compartidos (TravelPlan, UserProfile, etc.)
+│   ├── utils.ts                 # Utilidades generales
+│   └── supabase/               # Clientes de Supabase (client, server, middleware)
+├── supabase/migrations/         # Migraciones de base de datos
+├── tests/                       # Tests E2E con Playwright
+├── database-schema.sql          # Schema completo de la base de datos
+├── middleware.ts                # Middleware de autenticación
+└── package.json
 ```
 
-## 💡 Usage & Key Concepts
+## 🎨 Design System
 
-### Supabase Integration
+TOM usa un design system brutalista con identidad propia:
 
-The Supabase client is configured with multiple instances for different environments:
+| Token | Color |
+|-------|-------|
+| Primary | `#FA8432` (naranja) |
+| Primary Light | `#FFAE66` |
+| Primary Dark | `#D25400` |
+| Accent | `#0086A4` (teal) |
+| Accent Light | `#14B8C9` |
+| Accent Dark | `#006177` |
+| Neutral White | `#FDFEFE` |
+| Neutral Black | `#191919` |
 
-#### Server Components/API Routes:
+- **Bordes marcados** con `border-ink` (negro en light, blanco en dark)
+- **Sombras offset** tipo brutalist (`shadow-[2px_2px_0px_0px]`)
+- **Tipografía**: Bebas Neue (headings) + Oxanium (cuerpo)
+- **Radio**: 6px consistente en toda la UI
+- **Temas**: claro y oscuro con `next-themes`
 
-```typescript
-import { createClient } from '@/lib/supabase/server';
+## 🧪 Tests
 
-export default async function Page() {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  return (
-    <div>
-      {user ? `Welcome, ${user.email}!` : 'Please log in'}
-    </div>
-  );
-}
+```bash
+# E2E smoke tests con Playwright
+npx playwright test
 ```
 
-#### Client Components:
+Configuración en `playwright.config.ts`.
 
-```typescript
-'use client';
-import { createClient } from '@/lib/supabase/client';
+## 🗄️ Base de datos
 
-function MyComponent() {
-  const [user, setUser] = useState(null);
-  const supabase = createClient();
+El schema completo está en `database-schema.sql`. Tablas principales:
 
-  useEffect(() => {
-    async function getUser() {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
-    }
-    getUser();
-  }, []);
+- `profiles` — perfiles de usuario con bio, intereses, país
+- `travel_plans` — planes de viaje con tipo, estado, fechas, sharing options
+- `plan_participants` — participantes y pendientes en cada plan
+- `reviews` — sistema de reviews entre viajeros
+- `friendships` — solicitudes y relaciones de amistad
+- `notifications` — sistema de notificaciones
+- `messages` — mensajes del chat
+- `plan_notes` — notas colaborativas en planes
 
-  return <div>{user ? user.email : 'Loading...'}</div>;
-}
-```
+Todas las tablas tienen Row Level Security (RLS) configurado.
 
-### Tailwind CSS Styling
+## 🧰 Scripts
 
-The project uses Tailwind CSS 4 with a custom design system. The color palette is optimized for travel applications:
+| Comando | Descripción |
+|---------|-------------|
+| `pnpm dev` | Servidor de desarrollo con Turbopack |
+| `pnpm build` | Build de producción |
+| `pnpm start` | Servidor de producción |
+| `pnpm lint` | ESLint |
 
-```jsx
-<button className="bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-[--radius] transition-colors">
-  Create New Plan
-</button>
-```
+## 🏗️ Stack
 
-Custom design system colors available:
-- **Primary**: `primary-light`, `primary`, `primary-dark` (Orange tones)
-- **Secondary**: `secondary-light`, `secondary`, `secondary-dark` (Blue tones)
-- **Accent**: `accent-light`, `accent`, `accent-dark` (Brown tones)
-- **Neutral**: `neutral-white`, `neutral-light`, `neutral-gray`, `neutral-black`
-- **Status**: `error`, `success`
+- [Next.js 15](https://nextjs.org) — App Router, Server Components, Streaming
+- [Supabase](https://supabase.com) — Auth, base de datos PostgreSQL, RLS
+- [Tailwind CSS 4](https://tailwindcss.com) — Utility-first + CSS-first con `@theme`
+- [Radix UI](https://radix-ui.com) — Primitivas accesibles (Checkbox, Select, Tabs, Dropdown, Label, Slot)
+- [shadcn/ui](https://ui.shadcn.com) — Componentes construidos sobre Radix + Tailwind
+- [TypeScript](https://typescriptlang.org) — Type safety
+- [Lucide React](https://lucide.dev) — Iconos
+- [next-themes](https://github.com/pacocoursey/next-themes) — Tema claro/oscuro
+- [React Hook Form](https://react-hook-form.com) + [Zod](https://zod.dev) — Formularios con validación
+- [Sonner](https://sonner.emilkowal.ski) — Toasts
+- [Playwright](https://playwright.dev) — Tests E2E
 
-### Authentication Flow
+## 👤 Autor
 
-The application includes a complete authentication system with:
+**TanisJam** — [github.com/TanisJam](https://github.com/TanisJam)
 
-- **Login/Registration** forms with validation
-- **Email confirmation** workflow
-- **Password reset** functionality
-- **Protected routes** with automatic redirects
-- **Session management** across the entire app
+## 📄 Licencia
 
-### Theme System
-
-Dark mode is implemented using `next-themes`:
-
-```jsx
-import { ThemeSwitcher } from '@/components/theme-switcher';
-
-// Use the theme switcher component
-<ThemeSwitcher />
-```
-
-## 🧪 Available Scripts
-
-- `pnpm dev` - Start development server with Turbopack
-- `pnpm build` - Build the application for production
-- `pnpm start` - Start production server
-- `pnpm lint` - Run ESLint for code quality
-
-## 🤝 Contributing
-
-Contributions are highly encouraged! If you find a bug, have a feature request, or want to improve the codebase, please open an issue or submit a pull request.
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/your-feature-name`)
-3. Make your changes and commit them (`git commit -m 'feat: adds new feature'`)
-4. Push to the branch (`git push origin feature/your-feature-name`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License. See the LICENSE file for more details.
-
-## 🔗 Built With
-
-- [Next.js 15](https://nextjs.org) - React framework with App Router
-- [Supabase](https://supabase.com) - Backend as a Service with authentication
-- [Tailwind CSS 4](https://tailwindcss.com) - Utility-first CSS framework
-- [Radix UI](https://radix-ui.com) - Accessible component primitives
-- [TypeScript](https://typescriptlang.org) - Type-safe JavaScript
-- [next-themes](https://github.com/pacocoursey/next-themes) - Theme management
-
----
-
-**Happy Coding with The Orange Mate!** 🍊
-
-(README created by Claude)
+MIT
