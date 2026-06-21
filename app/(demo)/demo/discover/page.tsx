@@ -17,9 +17,8 @@ import { Search } from "lucide-react";
  * mock plans from the demo-database adapter and passes them as props to
  * the same `DiscoverResults` component used by the real route.
  *
- * Note: `DiscoverFilters` uses URL search params which point to
- * `/discover?...` in production.  On the demo page the filter redirects
- * still go to `/discover` — full demo filter support is a follow-up.
+ * `DiscoverFilters` uses `useDemo()` to keep query params and pagination within
+ * `/demo/discover` while in demo mode (and `/discover` in the real app).
  */
 function DemoDiscoverInner() {
   const { isDemo, demoUser } = useDemo();

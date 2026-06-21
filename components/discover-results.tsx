@@ -83,7 +83,7 @@ function PaginationControls({
       }
       return `${basePath}?${params.toString()}`;
     },
-    [searchParams]
+    [searchParams, basePath]
   );
 
   const goToPage = useCallback(

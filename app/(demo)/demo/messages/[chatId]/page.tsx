@@ -70,16 +70,19 @@ export default function DemoChatPage({
   const isP1 = chat.participant_1_id === demoUser.id;
   const otherParticipant: {
     id: string;
+    username?: string;
     full_name?: string;
     avatar_url?: string;
   } = isP1
     ? {
         id: chat.participant_2_id,
+        username: (chat.participant_2 as UserProfile)?.username,
         full_name: (chat.participant_2 as UserProfile)?.full_name,
         avatar_url: (chat.participant_2 as UserProfile)?.avatar_url,
       }
     : {
         id: chat.participant_1_id,
+        username: (chat.participant_1 as UserProfile)?.username,
         full_name: (chat.participant_1 as UserProfile)?.full_name,
         avatar_url: (chat.participant_1 as UserProfile)?.avatar_url,
       };

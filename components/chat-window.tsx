@@ -16,6 +16,7 @@ interface ChatWindowProps {
   currentUserId: string;
   otherParticipant: {
     id: string;
+    username?: string;
     full_name?: string;
     avatar_url?: string;
   };
@@ -42,7 +43,7 @@ export default function ChatWindow({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const profilePath = isDemo
-    ? `/demo/profile/${otherParticipant.id}`
+    ? `/demo/profile/${otherParticipant.username || otherParticipant.id}`
     : `/profile/${otherParticipant.id}`;
 
   const scrollToBottom = useCallback(() => {
@@ -61,11 +62,13 @@ export default function ChatWindow({
 
   // Mark messages as read on chat open
   useEffect(() => {
+    if (isDemo) return;
     markMessagesAsRead(chatId, currentUserId);
-  }, [chatId, currentUserId]);
+  }, [chatId, currentUserId, isDemo]);
 
   // Mark as read when user returns to this tab
   useEffect(() => {
+    if (isDemo) return;
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         markMessagesAsRead(chatId, currentUserId);
@@ -75,10 +78,11 @@ export default function ChatWindow({
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () =>
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-  }, [chatId, currentUserId]);
+  }, [chatId, currentUserId, isDemo]);
 
   // Realtime subscription — replaces polling
   useEffect(() => {
+    if (isDemo) return;
     const supabase = createClient();
 
     const channel = supabase

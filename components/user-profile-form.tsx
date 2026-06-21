@@ -157,8 +157,12 @@ export function UserProfileForm({ userId, onProfileUpdated }: UserProfileFormPro
     setError(null);
 
     if (isDemo) {
+      if (!profile) {
+        toast.error("Demo mode: profile not loaded");
+        return;
+      }
       toast.success("Demo mode: profile saved");
-      onProfileUpdated?.(profile!);
+      onProfileUpdated?.(profile);
       return;
     }
 

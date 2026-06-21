@@ -22,6 +22,7 @@ import {
   completeTrip,
   deleteTravelPlan,
 } from "@/lib/database-client";
+import { getPlanJoinRequests as getPlanJoinRequestsDemo } from "@/lib/demo-database";
 import { createOrGetChat } from "@/lib/chat-client";
 import type { TravelPlan, PlanJoinRequest, UserReview } from "@/lib/types";
 import { ReviewsSection } from "@/components/reviews-section";
@@ -112,7 +113,8 @@ export function PlanDetail({
 
   const refreshRequests = async () => {
     if (isDemo) {
-      // In demo mode,  JoinRequestFlow handles state;  nothing to refresh
+      const data = await getPlanJoinRequestsDemo(currentPlan.id);
+      setJoinRequests(data);
       return;
     }
     try {
