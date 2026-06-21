@@ -5,6 +5,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { markMessagesAsRead } from "@/lib/chat-client";
+import { useDemo } from "@/components/demo-provider";
 import MessageBubble from "@/components/message-bubble";
 import MessageInput from "@/components/message-input";
 import type { Message } from "@/lib/types";
@@ -36,9 +37,13 @@ export default function ChatWindow({
   currentUserId,
   otherParticipant,
 }: ChatWindowProps) {
+  const { isDemo } = useDemo();
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const profilePath = isDemo
+    ? `/demo/profile/${otherParticipant.id}`
+    : `/profile/${otherParticipant.id}`;
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -125,7 +130,7 @@ export default function ChatWindow({
       {/* Header */}
       <div className="flex items-center gap-3 p-3 border-b border-neutral-gray bg-neutral-light dark:bg-background">
         <Link
-          href={`/profile/${otherParticipant.id}`}
+          href={profilePath}
           className="shrink-0"
         >
           {otherParticipant.avatar_url ? (
@@ -142,7 +147,7 @@ export default function ChatWindow({
         </Link>
         <div className="flex-1 min-w-0">
           <Link
-            href={`/profile/${otherParticipant.id}`}
+            href={profilePath}
             className="font-heading text-sm text-neutral-black dark:text-neutral-white hover:underline"
           >
             {otherParticipant.full_name ?? "Usuario"}

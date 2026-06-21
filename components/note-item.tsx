@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Lock } from "lucide-react";
+import { useDemo } from "@/components/demo-provider";
 import type { PlanNote } from "@/lib/types";
 
 function formatDate(dateStr: string): string {
@@ -19,15 +20,19 @@ interface NoteItemProps {
 }
 
 export default function NoteItem({ note, currentUserId }: NoteItemProps) {
+  const { isDemo } = useDemo();
   const isOwn = note.author_id === currentUserId;
   const author = note.author;
   const authorInitial = (author?.full_name || author?.username || "U")[0];
+  const profilePath = isDemo
+    ? `/demo/profile/${author?.username || note.author_id}`
+    : `/profile/${author?.username || note.author_id}`;
 
   return (
     <div className="p-4 border-2 border-accent rounded-lg bg-accent/5 dark:bg-accent/10">
       <div className="flex items-start gap-3">
         {/* Avatar */}
-        <Link href={`/profile/${author?.username || note.author_id}`}>
+        <Link href={profilePath}>
           <div className="w-8 h-8 rounded-full bg-secondary/20 flex items-center justify-center text-sm font-bold text-secondary shrink-0">
             {authorInitial}
           </div>
@@ -38,7 +43,7 @@ export default function NoteItem({ note, currentUserId }: NoteItemProps) {
           {/* Header */}
           <div className="flex items-center gap-2">
             <Link
-              href={`/profile/${author?.username || note.author_id}`}
+              href={profilePath}
               className="font-semibold text-sm hover:underline"
             >
               {author?.full_name || author?.username || "Usuario"}

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Trash2, CornerDownRight, Loader2 } from "lucide-react";
 import { createPlanComment, deletePlanComment } from "@/lib/database-client";
+import { useDemo } from "@/components/demo-provider";
 import type { PlanComment } from "@/lib/types";
 
 function formatRelativeDate(dateStr: string): string {
@@ -46,6 +47,7 @@ export default function CommentItem({
   isReply = false,
   onCommentChanged,
 }: CommentItemProps) {
+  const { isDemo } = useDemo();
   const [showReplyForm, setShowReplyForm] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [posting, setPosting] = useState(false);
@@ -55,6 +57,9 @@ export default function CommentItem({
   const isOwn = comment.author_id === currentUserId;
   const author = comment.author;
   const authorInitial = (author?.full_name || author?.username || "U")[0];
+  const profilePath = isDemo
+    ? `/demo/profile/${author?.username || comment.author_id}`
+    : `/profile/${author?.username || comment.author_id}`;
 
   const handleDelete = async () => {
     const confirmed = window.confirm(
@@ -104,7 +109,7 @@ export default function CommentItem({
     <div className={isReply ? "ml-8 border-l-2 border-neutral-gray pl-4" : ""}>
       <div className="flex items-start gap-3 py-3">
         {/* Avatar */}
-        <Link href={`/profile/${author?.username || comment.author_id}`}>
+        <Link href={profilePath}>
           <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-sm font-bold text-primary shrink-0">
             {authorInitial}
           </div>
@@ -115,7 +120,7 @@ export default function CommentItem({
           {/* Header */}
           <div className="flex items-center gap-2">
             <Link
-              href={`/profile/${author?.username || comment.author_id}`}
+              href={profilePath}
               className="font-semibold text-sm hover:underline"
             >
               {author?.full_name || author?.username || "Usuario"}

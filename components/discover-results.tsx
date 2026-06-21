@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useDemo } from "@/components/demo-provider";
 import type { TravelPlan } from "@/lib/types";
 import { PLAN_TYPES } from "@/lib/types";
 import {
@@ -237,6 +238,7 @@ function AuthenticatedCard({
   plan: TravelPlan;
   typeInfo: { value: string; label: string; icon: string };
 }) {
+  const { isDemo } = useDemo();
   return (
     <div className="p-4 border-2 border-ink rounded-lg bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] dark:border-neutral-gray hover:shadow-lg transition-shadow flex flex-col cursor-pointer">
       {/* Header: type + title */}
@@ -255,7 +257,7 @@ function AuthenticatedCard({
           <p className="text-sm text-muted-foreground mt-0.5">
             por{" "}
             <Link
-              href={`/profile/${plan.creator?.username || plan.creator_id}`}
+              href={isDemo ? `/demo/profile/${plan.creator?.username || plan.creator_id}` : `/profile/${plan.creator?.username || plan.creator_id}`}
               className="hover:underline font-medium"
             >
               {plan.creator?.full_name || plan.creator?.username || "Usuario"}
