@@ -17,9 +17,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import UnreadBadge from "@/components/unread-badge";
 import NotificationDropdown from "@/components/notification-dropdown";
+import { useDemo } from "@/components/demo-provider";
+import { demoStore } from "@/lib/demo-store";
 import type { Notification } from "@/lib/types";
 
 export default function NotificationBell() {
+  const { isDemo } = useDemo();
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [open, setOpen] = useState(false);
@@ -28,6 +31,7 @@ export default function NotificationBell() {
   const clientRef = useRef<ReturnType<typeof createClient> | null>(null);
 
   const refreshUnread = useCallback(async () => {
+    if (isDemo) return;
     try {
       const supabase = createClient();
       const {
@@ -40,21 +44,26 @@ export default function NotificationBell() {
     } catch {
       // Best-effort; silence failures
     }
-  }, []);
+  }, [isDemo]);
 
-  // Mount: get unread count
+  // Mount: get unread count / demo count from demoStore
   useEffect(() => {
+    if (isDemo) {
+      setUnreadCount(demoStore.getUnreadCount());
+      return;
+    }
     refreshUnread();
-  }, [refreshUnread]);
+  }, [isDemo, refreshUnread]);
 
-  // Window focus: refresh count
+  // Window focus: refresh count (skip in demo)
   useEffect(() => {
+    if (isDemo) return;
     const handleFocus = () => {
       refreshUnread();
     };
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [refreshUnread]);
+  }, [refreshUnread, isDemo]);
 
   // Safety net: cleanup channel on unmount (even if dropdown is open)
   useEffect(() => {
@@ -68,7 +77,16 @@ export default function NotificationBell() {
   }, []);
 
   // Lazy realtime: subscribe when dropdown opens and userId is available
+  // In demo mode: load demo notifications from store, skip Supabase channel
   useEffect(() => {
+    // Demo mode: load from in-memory store, no Supabase subscription
+    if (isDemo) {
+      if (open) {
+        setNotifications(demoStore.notifications.slice(0, 5));
+      }
+      return;
+    }
+
     if (!open || !userId) return;
 
     // Fetch latest 5 notifications
@@ -117,22 +135,30 @@ export default function NotificationBell() {
         clientRef.current = null;
       }
     };
-  }, [open, userId]);
+  }, [open, userId, isDemo]);
 
   const handleOpenChange = useCallback((isOpen: boolean) => {
     setOpen(isOpen);
   }, []);
 
   const handleMarkAllRead = useCallback(async () => {
-    if (!userId) return;
-    const ok = await markAllAsRead(userId);
+    if (!userId && !isDemo) return;
+    if (isDemo) {
+      demoStore.markAllNotificationsRead();
+      setUnreadCount(0);
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, is_read: true }))
+      );
+      return;
+    }
+    const ok = await markAllAsRead(userId!);
     if (ok) {
       setUnreadCount(0);
       setNotifications((prev) =>
         prev.map((n) => ({ ...n, is_read: true }))
       );
     }
-  }, [userId]);
+  }, [userId, isDemo]);
 
   const handleRead = useCallback(() => {
     setUnreadCount((prev) => Math.max(0, prev - 1));

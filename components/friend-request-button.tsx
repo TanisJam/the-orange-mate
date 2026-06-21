@@ -8,6 +8,7 @@ import {
   acceptFriendRequest,
   rejectFriendRequest,
 } from "@/lib/database-client";
+import { useDemo } from "@/components/demo-provider";
 import type { FriendStatus } from "@/lib/types";
 
 interface FriendStatusResult {
@@ -29,6 +30,7 @@ export default function FriendRequestButton({
   isOwnProfile,
   initialStatus,
 }: FriendRequestButtonProps) {
+  const { isDemo, sendFriendRequest: demoSimSend, acceptFriendRequest: demoSimAccept } = useDemo();
   const [status, setStatus] = useState<FriendStatusResult | null>(
     initialStatus
   );
@@ -38,6 +40,25 @@ export default function FriendRequestButton({
 
   const handleSendRequest = async () => {
     setLoading(true);
+
+    // ── Demo mode: simulate via demoStore ─────────────────────────────
+    if (isDemo) {
+      const result = demoSimSend(profileUserId);
+      setLoading(false);
+      if (result) {
+        setStatus({
+          id: result.id,
+          status: "pending",
+          isSender: true,
+        });
+        toast.success("Demo mode: solicitud enviada", { duration: 3000 });
+      } else {
+        toast.error("No se pudo enviar la solicitud");
+      }
+      return;
+    }
+
+    // ── Real mode: call Supabase ──────────────────────────────────────
     const result = await sendFriendRequest(currentUserId, profileUserId);
     setLoading(false);
     if (result) {
@@ -54,6 +75,25 @@ export default function FriendRequestButton({
   const handleAccept = async () => {
     if (!status?.id) return;
     setLoading(true);
+
+    // ── Demo mode: simulate via demoStore ─────────────────────────────
+    if (isDemo) {
+      const result = demoSimAccept(status.id);
+      setLoading(false);
+      if (result) {
+        setStatus({
+          id: status.id,
+          status: "accepted",
+          isSender: false,
+        });
+        toast.success("Demo mode: solicitud aceptada", { duration: 3000 });
+      } else {
+        toast.error("No se pudo aceptar la solicitud");
+      }
+      return;
+    }
+
+    // ── Real mode ─────────────────────────────────────────────────────
     const result = await acceptFriendRequest(status.id, currentUserId);
     setLoading(false);
     if (result) {
@@ -71,6 +111,19 @@ export default function FriendRequestButton({
   const handleReject = async () => {
     if (!status?.id) return;
     setLoading(true);
+
+    if (isDemo) {
+      // Demo reject: just transition state locally
+      setStatus({
+        id: status.id,
+        status: "rejected",
+        isSender: false,
+      });
+      toast.success("Demo mode: solicitud rechazada", { duration: 3000 });
+      setLoading(false);
+      return;
+    }
+
     await rejectFriendRequest(status.id, currentUserId);
     setLoading(false);
     // Transition to rejected — re-apply is allowed

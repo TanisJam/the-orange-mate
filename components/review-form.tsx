@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/form";
 import { StarSelector } from "@/components/star-selector";
 import { submitReview, editReview } from "@/lib/database-client";
+import { useDemo } from "@/components/demo-provider";
 import type { UserReview } from "@/lib/types";
 import { Loader2 } from "lucide-react";
 
@@ -41,6 +42,7 @@ export function ReviewForm({
   onSubmitted,
   existingReview,
 }: ReviewFormProps) {
+  const { isDemo, submitReview: demoSimSubmit } = useDemo();
   const isEditing = !!existingReview;
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +58,30 @@ export function ReviewForm({
   const onSubmit = async (values: ReviewValues) => {
     setError(null);
     try {
+      // ── Demo mode: simulate via demoStore ───────────────────────────
+      if (isDemo) {
+        if (isEditing) {
+          // Demo mode doesn't support editing — show toast instead
+          toast.success("Demo mode: review actualizada (simulado)");
+          onSubmitted();
+        } else {
+          const created = demoSimSubmit({
+            plan_id: planId,
+            reviewed_id: reviewedId,
+            rating: values.rating,
+            comment: values.comment || undefined,
+          });
+          if (created) {
+            toast.success("Demo mode: review enviada");
+            onSubmitted();
+          } else {
+            toast.error("No se pudo enviar la review");
+          }
+        }
+        return;
+      }
+
+      // ── Real mode: call Supabase ────────────────────────────────────
       if (isEditing) {
         const updated = await editReview(
           existingReview.id,

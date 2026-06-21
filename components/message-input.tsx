@@ -7,6 +7,7 @@ import { Send, Loader2, X } from "lucide-react";
 import { sendMessage } from "@/lib/chat-client";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
+import { useDemo } from "@/components/demo-provider";
 import type { Message } from "@/lib/types";
 
 interface MessageInputProps {
@@ -18,6 +19,7 @@ export default function MessageInput({
   chatId,
   onMessageSent,
 }: MessageInputProps) {
+  const { isDemo, sendMessage: demoSimulateSend } = useDemo();
   const [content, setContent] = useState("");
   const [sending, setSending] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -28,6 +30,25 @@ export default function MessageInput({
 
     setSending(true);
     try {
+      // ── Demo mode: simulate message send ────────────────────────────
+      if (isDemo) {
+        const message = demoSimulateSend({
+          chat_id: chatId,
+          content: trimmed,
+        });
+        if (message) {
+          toast.success("Demo mode: mensaje enviado");
+          onMessageSent(message);
+          setContent("");
+          textareaRef.current?.focus();
+        } else {
+          toast.error("No se pudo enviar el mensaje. Intenta de nuevo.");
+        }
+        setSending(false);
+        return;
+      }
+
+      // ── Real mode: send via Supabase ────────────────────────────────
       const supabase = createClient();
       const {
         data: { user },
@@ -35,6 +56,7 @@ export default function MessageInput({
 
       if (!user) {
         toast.error("Debes iniciar sesión para enviar mensajes");
+        setSending(false);
         return;
       }
 
@@ -45,6 +67,7 @@ export default function MessageInput({
 
       if (!message) {
         toast.error("No se pudo enviar el mensaje. Intenta de nuevo.");
+        setSending(false);
         return;
       }
 

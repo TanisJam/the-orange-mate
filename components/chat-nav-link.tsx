@@ -6,11 +6,14 @@ import { MessagesSquare } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { getUnreadCount } from "@/lib/chat-client";
 import UnreadBadge from "@/components/unread-badge";
+import { useDemo } from "@/components/demo-provider";
 
 export default function ChatNavLink() {
+  const { isDemo } = useDemo();
   const [unreadCount, setUnreadCount] = useState(0);
 
   const refreshUnread = useCallback(async () => {
+    if (isDemo) return;
     try {
       const supabase = createClient();
       const {
@@ -23,10 +26,16 @@ export default function ChatNavLink() {
     } catch {
       // Best-effort; silence failures
     }
-  }, []);
+  }, [isDemo]);
 
   // Fetch initial unread count and subscribe to realtime
+  // In demo mode: show static unread badge (3) and skip Supabase
   useEffect(() => {
+    if (isDemo) {
+      setUnreadCount(3);
+      return;
+    }
+
     const supabase = createClient();
     let channel: ReturnType<typeof supabase.channel> | null = null;
 
@@ -81,21 +90,22 @@ export default function ChatNavLink() {
         supabase.removeChannel(channel);
       }
     };
-  }, []);
+  }, [isDemo]);
 
-  // Refresh on window focus
+  // Refresh on window focus (skip in demo)
   useEffect(() => {
+    if (isDemo) return;
     const handleFocus = () => {
       refreshUnread();
     };
 
     window.addEventListener("focus", handleFocus);
     return () => window.removeEventListener("focus", handleFocus);
-  }, [refreshUnread]);
+  }, [refreshUnread, isDemo]);
 
   return (
     <Link
-      href="/messages"
+      href={isDemo ? "/demo/messages" : "/messages"}
       className="relative flex items-center gap-1.5 text-sm font-body text-muted-foreground hover:text-neutral-black dark:hover:text-neutral-white transition-colors"
     >
       <MessagesSquare className="size-4" />
