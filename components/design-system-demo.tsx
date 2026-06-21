@@ -2,7 +2,7 @@ import { Button } from "./ui/button";
 
 export function DesignSystemDemo() {
   return (
-    <div className="p-8 space-y-8">
+    <div className="p-4 sm:p-8 space-y-8">
       <div className="space-y-4">
         <h1 className="text-4xl font-heading text-primary dark:text-primary-light">
           Design System Demo
@@ -17,7 +17,7 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Primary Colors
         </h2>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="w-20 h-20 bg-primary-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
@@ -35,7 +35,7 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Accent Colors
         </h2>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="w-20 h-20 bg-accent-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
@@ -53,7 +53,7 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Secondary Colors
         </h2>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="w-20 h-20 bg-secondary-light rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Light
           </div>
@@ -71,7 +71,7 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Neutral Colors
         </h2>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
           <div className="w-20 h-20 bg-neutral-white border-2 border-neutral-gray rounded-[--radius] flex items-center justify-center text-neutral-black font-bold">
             White
           </div>
@@ -92,11 +92,11 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           State Colors
         </h2>
-        <div className="flex gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="w-20 h-20 bg-error rounded-[--radius] flex items-center justify-center text-white font-bold">
             Error
           </div>
-          <div className="w-20 h-20 bg-success rounded-[--radius] flex items-center justify-center text-white font-bold">
+          <div className="w-20 h-20 bg-success rounded-[--radius] flex items-center justify-center text-white dark:text-neutral-black font-bold">
             Success
           </div>
         </div>
@@ -128,7 +128,7 @@ export function DesignSystemDemo() {
         <h2 className="text-2xl font-heading text-neutral-black dark:text-neutral-white">
           Buttons
         </h2>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <Button variant="primary" size="default">
             Primary Button
           </Button>

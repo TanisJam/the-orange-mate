@@ -14,13 +14,13 @@ const buttonVariants = cva(
         secondary:
           "bg-secondary text-neutral-black border-2 border-ink shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-secondary-light active:bg-secondary-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
         accent:
-          "bg-accent text-white border-2 border-ink shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-accent-light active:bg-accent-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
+          "bg-accent text-white dark:text-neutral-black border-2 border-ink shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-accent-light active:bg-accent-light active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
         outline:
           "bg-neutral-white text-neutral-black border-2 border-ink shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:text-secondary active:text-secondary active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
         destructive:
           "bg-error text-white border-2 border-ink shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] hover:bg-error active:bg-error active:shadow-none active:translate-x-[var(--stroke-width)] active:translate-y-[var(--stroke-width)]",
         ghost: 
-          "bg-transparent text-neutral-black border-none hover:bg-neutral-light active:bg-neutral-gray active:text-white",
+          "bg-transparent text-neutral-black dark:text-neutral-white border-none hover:bg-neutral-light hover:text-neutral-black dark:hover:bg-accent dark:hover:text-accent-foreground active:bg-neutral-gray active:text-white dark:active:bg-accent-light dark:active:text-neutral-black",
         link: 
           "bg-transparent text-primary border-none underline-offset-4 hover:underline active:text-primary-dark",
       },

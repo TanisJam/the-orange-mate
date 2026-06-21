@@ -120,7 +120,7 @@ export function ForgotPasswordForm({
                   )}
                   <Button
                     type="submit"
-                    className="w-full"
+                    className="w-full h-auto min-h-11 whitespace-normal px-4 py-3 text-center leading-snug"
                     disabled={form.formState.isSubmitting}
                     variant="primary"
                   >

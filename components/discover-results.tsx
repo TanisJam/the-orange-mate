@@ -238,7 +238,7 @@ function AuthenticatedCard({
   typeInfo: { value: string; label: string; icon: string };
 }) {
   return (
-    <div className="p-4 border-2 border-ink rounded-lg bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] dark:border-neutral-gray hover:shadow-lg transition-shadow flex flex-col">
+    <div className="p-4 border-2 border-ink rounded-lg bg-card shadow-[var(--stroke-width)_var(--stroke-width)_0px_0px_hsl(var(--ink))] dark:border-neutral-gray hover:shadow-lg transition-shadow flex flex-col cursor-pointer">
       {/* Header: type + title */}
       <div className="flex items-start gap-2 mb-3">
         <span className="text-xl">{typeInfo.icon}</span>

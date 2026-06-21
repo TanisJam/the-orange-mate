@@ -102,7 +102,7 @@ export function AvatarUpload({ userId, currentAvatarUrl, onUploadComplete }: Ava
       <div className="flex items-center gap-4">
         <div
           className="w-20 h-20 rounded-full border-2 border-ink dark:border-neutral-gray overflow-hidden bg-neutral-light flex items-center justify-center shrink-0
-            shadow-[2px_2px_0px_0px_hsl(var(--ink))] dark:shadow-[2px_2px_0px_0px_rgba(200,200,200,1)]"
+            shadow-[2px_2px_0px_0px_hsl(var(--ink))]"
         >
           {avatarSrc ? (
             <img

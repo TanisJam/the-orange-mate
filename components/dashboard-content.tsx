@@ -211,7 +211,11 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     const statusInfo = getPlanStatusInfo(plan.status);
                     
                     return (
-                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors">
+                      <Link
+                        key={plan.id}
+                        href={`/plans/${plan.id}`}
+                        className="block p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h4 className="font-semibold">{plan.title}</h4>
@@ -236,7 +240,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                             </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })
                 )}
@@ -260,7 +264,11 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                     const typeInfo = getPlanTypeInfo(plan.plan_type);
                     
                     return (
-                      <div key={plan.id} className="p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer">
+                      <Link
+                        key={plan.id}
+                        href={`/plans/${plan.id}`}
+                        className="block p-3 border rounded-lg hover:bg-neutral-light dark:hover:bg-muted transition-colors cursor-pointer"
+                      >
                         <div className="flex items-start justify-between">
                           <div className="flex-1">
                             <h4 className="font-semibold">{plan.title}</h4>
@@ -268,12 +276,7 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                               <span>{typeInfo.icon}</span>
                               <span>{typeInfo.label}</span>
                               <span>• por{' '}
-                                <Link
-                                  href={`/profile/${plan.creator?.username || plan.creator_id}`}
-                                  className="hover:underline"
-                                >
-                                  {plan.creator?.full_name || plan.creator?.username || 'Usuario'}
-                                </Link>
+                                <span className="font-medium">{plan.creator?.full_name || plan.creator?.username || 'Usuario'}</span>
                               </span>
                             </div>
                             <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
@@ -289,13 +292,8 @@ export function DashboardContent({ userId }: DashboardContentProps) {
                               )}
                             </div>
                           </div>
-                          <Button asChild size="sm" variant="outline">
-                            <Link href={`/plans/${plan.id}`}>
-                              Ver
-                            </Link>
-                          </Button>
                         </div>
-                      </div>
+                      </Link>
                     );
                   })
                 )}
