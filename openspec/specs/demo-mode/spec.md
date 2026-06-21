@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Unauthenticated users explore all app features under `/demo/*` with mock data, simulated mutations, and disabled realtime. No auth, no Supabase calls, no persistence.
+Unauthenticated users explore all app features under `/demo/*` with mock data, simulated mutations, and disabled realtime. No auth gating, no persistence, and no Supabase *data* reads/writes from demo pages/components (middleware may still call `supabase.auth.getUser()` to refresh session cookies).
 
 ## Requirements
 
